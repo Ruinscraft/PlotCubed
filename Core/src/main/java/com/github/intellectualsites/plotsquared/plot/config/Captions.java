@@ -4,6 +4,7 @@ import com.github.intellectualsites.plotsquared.commands.CommandCaller;
 import com.github.intellectualsites.plotsquared.configuration.ConfigurationSection;
 import com.github.intellectualsites.plotsquared.configuration.file.YamlConfiguration;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
+import com.github.intellectualsites.plotsquared.plot.object.PlotMessage;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 
 import java.io.File;
@@ -163,6 +164,7 @@ public enum Captions {
     // PlotCubed start
     PERMISSION_DELWARP_OTHER("plots.delwarp.other", "static.permissions"), PERMISSION_ADDWARP_OTHER(
             "plots.addwarp.other", "static.permissions"),
+    PERMISSION_USE_TIMER_OTHER("plots.timer.other", "static.permissions"),
     // PlotCubed end
 
     /*
@@ -688,26 +690,34 @@ public enum Captions {
 
     PLOT_INFO_HIDDEN("$2You cannot view the information about this plot", "Info"),
 
-    PLOT_INFO("$1ID: $2%id%$1&-" + "$1Alias: $2%alias%$1&-" + "$1Owner: $2%owner%$1&-"
-        + "$1Biome: $2%biome%$1&-" + "$1Can Build: $2%build%$1&-" + "$1Rating: $2%rating%&-"
-        + "$1Seen: $2%seen%&-" + "$1Trusted: $2%trusted%$1&-" + "$1Members: $2%members%$1&-"
-        + "$1Denied: $2%denied%$1&-" + "$1Flags: $2%flags%", "Info"), PLOT_INFO_FOOTER(
-        "$3&m---------&r $1INFO $3&m---------", false, "Info"),
+    // PlotCubed start
+    PLOT_INFO("$1ID: $2%id%$1&-"
+                + "$1Alias: $2%alias%$1&-"
+                + "$1Owner: $2%owner%$1&-"
+                + "$1Size: $2%size%$1&-"
+               // + "$1Biome: $2%biome%$1&-" + "$1Can Build: $2%build%$1&-" + "$1Rating: $2%rating%&-"
+               // + "$1Seen: $2%seen%&-" + "$1Trusted: $2%trusted%$1&-" + "$1Members: $2%members%$1&-"
+                + "$1Denied: $2%denied%$1&-"
+                + "$1Flags: $2%flags%&-"
+                + "$1Warps: $2%warps%", "Info"),
+    PLOT_INFO_FOOTER("$3&m---------&r $1INFO $3&m---------", false, "Info"),
+    // PlotCubed end
 
     PLOT_INFO_TRUSTED("$1Trusted:$2 %trusted%", "Info"), PLOT_INFO_MEMBERS("$1Members:$2 %members%",
         "Info"),
 
     PLOT_INFO_DENIED("$1Denied:$2 %denied%", "Info"), PLOT_INFO_FLAGS("$1Flags:$2 %flags%", "Info"),
 
-    // PlotCubed start
-    PLOT_INFO_WARPS("$1Warps:$2 ", "Info"),
-    // PlotCubed end
-
     PLOT_INFO_BIOME("$1Biome:$2 %biome%", "Info"), PLOT_INFO_RATING("$1Rating:$2 %rating%", "Info"),
 
     PLOT_INFO_LIKES("$1Like Ratio:$2 %likes%%", "Info"),
 
     PLOT_INFO_OWNER("$1Owner:$2 %owner%", "Info"), PLOT_INFO_ID("$1ID:$2 %id%", "Info"),
+
+    // PlotCubed start
+    PLOT_INFO_WARPS("$1Warps (%warpcount%):$2 %warps%", "Info"), // unclickable list of warps
+    PLOT_INFO_NEARBY("$1Nearby:$2 %nearby%", "Info"),
+    // PlotCubed end
 
     PLOT_INFO_ALIAS("$1Alias:$2 %alias%", "Info"), PLOT_INFO_SIZE("$1Size:$2 %size%", "Info"),
 
@@ -817,11 +827,20 @@ public enum Captions {
     WARP_REMOVED("$4Warp $2%s$4 removed", "Warp"),
     WARP_TELEPORTED("$4Teleported to warp: $1%s$4", "Warp"),
     WARP_NAME_REQUIRED("$1A warp name is required", "Warp"),
-    WARP_LIST("$1Plot warps (%s0):", "Warp"),
     WARP_ALREADY_EXISTS("$1Warp $2%s$1 already exists", "Warp"),
     WARP_NAME_INVALID("$1Warp name was invalid. Limit is 50 characters", "Warp"),
     WARP_TOO_MANY("$1This plot has exceeded the limit of %s warps", "Warp"),
     WARP_NOT_ALPHANUM("$1Warp names must be alphanumeric", "Warp"),
+
+    /*
+     * Timer
+     */
+    TIMER_ALREADY_EXISTS("$4There is already a timer running on this plot. Cancel with /p timer cancel", "Timer"),
+    TIMER_TOO_LONG("$4Too long of a timespan. Max is 8h", "Timer"),
+    TIMER_CANCELLED("$4Timer cancelled", "Timer"),
+    TIMER_NOT_FOUND("$4A timer is not running on this plot", "Timer"),
+    TIMER_CREATED("$4A timer has been created on this plot. To cancel: /p timer cancel", "Timer"),
+    TIMER_INCORRECT_FORMAT("$4Incorrect time format. Example: 1h 2m 10s", "Timer"),
     // PlotCubed end
 
     /*
@@ -885,7 +904,7 @@ public enum Captions {
     COMMAND_CATEGORY_CLAIMING("Claiming", "Category"), COMMAND_CATEGORY_TELEPPORT("Teleport",
         "Category"), COMMAND_CATEGORY_SETTINGS("Protection", "Category"), COMMAND_CATEGORY_CHAT(
         "Chat", "Category"), COMMAND_CATEGORY_SCHEMATIC("Web",
-        "Category"), COMMAND_CATEGORY_APPEARANCE("Cosmetic", "Category"), COMMAND_CATEGORY_INFO(
+        "Category"), COMMAND_CATEGORY_APPEARANCE("Cosmetic", "Category"), /* PlotCubed start */COMMAND_CATEGORY_ROLEPLAY("Roleplay", "Category"), /* PlotCubed end */COMMAND_CATEGORY_INFO(
         "Info", "Category"), COMMAND_CATEGORY_DEBUG("Debug",
         "Category"), COMMAND_CATEGORY_ADMINISTRATION("Admin", "Category"),
 

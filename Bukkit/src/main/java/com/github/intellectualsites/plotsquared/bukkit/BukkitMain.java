@@ -2,6 +2,7 @@ package com.github.intellectualsites.plotsquared.bukkit;
 
 import com.github.intellectualsites.plotsquared.bukkit.generator.BukkitPlotGenerator;
 import com.github.intellectualsites.plotsquared.bukkit.listeners.*;
+import com.github.intellectualsites.plotsquared.bukkit.object.BukkitPlotBossBar;
 import com.github.intellectualsites.plotsquared.bukkit.titles.DefaultTitle_111;
 import com.github.intellectualsites.plotsquared.bukkit.util.*;
 import com.github.intellectualsites.plotsquared.bukkit.util.block.BukkitLocalQueue;
@@ -838,4 +839,10 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     @Override public LegacyMappings getLegacyMappings() {
         return this.legacyMappings;
     }
+
+    // PlotCubed start
+    @Override public PlotBossBar createBossBar(String title, PlotBossBar.PlotBarColor color, PlotBossBar.PlotBarStyle style) {
+        return new BukkitPlotBossBar(title, BukkitPlotBossBar.getBarColor(color), BukkitPlotBossBar.getBarStyle(style));
+    }
+    // PlotCubed end
 }

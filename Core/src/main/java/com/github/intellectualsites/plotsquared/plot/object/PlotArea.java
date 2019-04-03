@@ -205,6 +205,13 @@ public abstract class PlotArea {
         return this.clusters == null ? new HashSet<>() : this.clusters.getAll();
     }
 
+    // PlotCubed start
+    public int getDefaultPlotSize() {
+        ConfigurationSection section = PlotSquared.get().worlds.getConfigurationSection("worlds");
+        return section.getInt(worldname + ".plot.size", 0);
+    }
+    // PlotCubed end
+
     /**
      * Check if a PlotArea is compatible (move/copy etc).
      *

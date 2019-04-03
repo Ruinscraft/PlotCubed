@@ -7,10 +7,7 @@ import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.*;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.WeatherType;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -282,6 +279,12 @@ public class BukkitPlayer extends PlotPlayer {
             this.player.setSpectatorTarget(null);
         }
     }
+
+    // PlotCubed start
+    @Override public boolean canSee(PlotPlayer player) {
+        return this.player.canSee(Bukkit.getPlayer(player.getUUID()));
+    }
+    // PlotCubed end
 
     @Override public boolean isBanned() {
         return this.player.isBanned();

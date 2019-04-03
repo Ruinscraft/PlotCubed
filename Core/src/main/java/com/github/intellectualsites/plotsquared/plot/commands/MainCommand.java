@@ -63,6 +63,7 @@ public class MainCommand extends Command {
             new Warp();
             new AddWarp();
             new DelWarp();
+            new Timer();
             // PlotCubed end
             new Debug();
             new SchematicCmd();

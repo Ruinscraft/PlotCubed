@@ -24,21 +24,22 @@ plugins {
 group = 'com.github.intellectualsites.plotsquared'
 
 def rootVersion = "4"
-def revision = ""
-def buildNumber = ""
+// PlotCubed start
+def revision = "1"
+def buildNumber = "1"
 def date = ""
 ext {
     git = Grgit.open(dir: '.git')
-    date = git.head().getDate().format("yy.MM.dd")
-    revision = "-${git.head().abbreviatedId}"
-    parents = git.head().parentIds;
-    index = -2042;  // Offset to match CI
-    for (; parents != null && !parents.isEmpty(); index++) {
-        parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
-    }
-    buildNumber = "${index}"
+//    date = git.head().getDate().format("yy.MM.dd")
+//    revision = "-${git.head().abbreviatedId}"
+//    parents = git.head().parentIds;
+//    index = -2042;  // Offset to match CI
+//    for (; parents != null && !parents.isEmpty(); index++) {
+//        parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
+//    }
+//    buildNumber = "${index}"
 }
-
+// PlotCubed end
 // version = String.format("%s.%s%s%s", rootVersion, date, revision, buildNumber)
 version = String.format("%s.%s", rootVersion, buildNumber)
 

@@ -255,30 +255,44 @@ public class MainUtil {
                 case "weeks":
                 case "wks":
                 case "w":
-
+                    // PlotCubed start
                     time += 604800 * nums;
+                    break;
+                    // PlotCubed end
                 case "days":
                 case "day":
                 case "d":
+                    // PlotCubed start
                     time += 86400 * nums;
+                    break;
+                    // PlotCubed end
                 case "hour":
                 case "hr":
                 case "hrs":
                 case "hours":
                 case "h":
+                    // PlotCubed start
                     time += 3600 * nums;
+                    break;
+                    // PlotCubed end
                 case "minutes":
                 case "minute":
                 case "mins":
                 case "min":
                 case "m":
+                    // PlotCubed start
                     time += 60 * nums;
+                    break;
+                    // PlotCubed end
                 case "seconds":
                 case "second":
                 case "secs":
                 case "sec":
                 case "s":
+                    // PlotCubed start
                     time += nums;
+                    break;
+                    // PlotCubed end
             }
         }
         return time;
@@ -759,17 +773,34 @@ public class MainUtil {
         }
         boolean build = plot.isAdded(player.getUUID());
         String owner = plot.getOwners().isEmpty() ? "unowned" : getPlayerList(plot.getOwners());
+        // PlotCubed start
+        /* Plot size */
+        int plotCount = plot.getConnectedPlots().size();
+        int plotSize = plot.getArea().getDefaultPlotSize();
+        String size = String.format("%d %dx%d plot%s",
+                plotCount, plotSize, plotSize,
+                plotCount > 1 ? "s" : "");
+
+        /* Plot warps */
+        String warps = getWarpsList(plot.getWarps());
+        // PlotCubed end
         info = info.replace("%id%", plot.getId().toString());
         info = info.replace("%alias%", alias);
         info = info.replace("%num%", String.valueOf(num));
         info = info.replace("%desc%", description);
         info = info.replace("%biome%", biome);
         info = info.replace("%owner%", owner);
+        // PlotCubed start
+        info = info.replace("%size%", size);
+        // PlotCubed end
         info = info.replace("%members%", members);
         info = info.replace("%player%", player.getName());
         info = info.replace("%trusted%", trusted);
         info = info.replace("%helpers%", members);
         info = info.replace("%denied%", denied);
+        // PlotCubed start
+        info = info.replace("%warps%", warps);
+        // PlotCubed end
         info = info.replace("%seen%", seen);
         info = info.replace("%flags%", flags);
         info = info.replace("%build%", String.valueOf(build));
@@ -851,32 +882,34 @@ public class MainUtil {
     }
 
     // PlotCubed start
-    public static PlotMessage getWarpsList(PlotMessage pre, HashSet<PlotWarp> warps) {
-        if (warps == null) {
-            return pre.text(Captions.NONE.s()).color("$2");
+    public static String getWarpsList(HashSet<PlotWarp> warps) {
+        if (warps == null || warps.isEmpty()) {
+            return Captions.NONE.s();
         }
 
         List<String> warpNames = new ArrayList<>();
-
-        for (PlotWarp warp : warps) {
-            warpNames.add(warp.name);
-        }
-
-        if (warpNames.isEmpty()) {
-            return pre.text(Captions.NONE.s()).color("$2");
-        }
-
+        warps.forEach(w -> warpNames.add(w.name));
         Collections.sort(warpNames);
 
-        String warpNamesJoined = String.join(", ", warpNames);
+        return String.join(", ", warpNames);
+    }
 
-        pre = pre.text(" ");
-        for (String warp : warpNamesJoined.split(" ")) {
-            String command = "/plot warp " + warp.replace(",", "");
-            pre = pre.text(warp + " ").color("$2").command(command).tooltip(command);
+    public static Collection<String> getVisiblePlayersInPlot(PlotPlayer player, Plot plot) {
+        List<PlotPlayer> playersInPlot = plot.getPlayersInPlot();
+        List<PlotPlayer> visiblePlayers = new ArrayList<>();
+
+        for (PlotPlayer otherPlayer : playersInPlot) {
+            if (player.canSee(otherPlayer) && !player.equals(otherPlayer)) {
+                visiblePlayers.add(otherPlayer);
+            }
         }
 
-        return pre;
+        List<String> formatted = new ArrayList<>();
+        for (PlotPlayer otherPlayer : visiblePlayers) {
+            formatted.add(otherPlayer.getName() + " (" + player.distance(otherPlayer) + "m)");
+        }
+
+        return formatted;
     }
     // PlotCubed end
 

@@ -35,6 +35,9 @@ import lombok.RequiredArgsConstructor;
      * Debug CommandConfig.
      * Such as: /plot debug
      */
+    // PlotCubed start
+    ROLEPLAY(Captions.COMMAND_CATEGORY_ROLEPLAY),
+    // PlotCubed end
     DEBUG(Captions.COMMAND_CATEGORY_DEBUG), /**
      * Administration commands.
      */

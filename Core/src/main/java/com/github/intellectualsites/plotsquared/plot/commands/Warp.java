@@ -25,11 +25,22 @@ public class Warp extends SubCommand {
             return sendMessage(player, Captions.NOT_IN_PLOT);
         }
 
+        // TODO: somehow clean this up, it's really hacky
         if (args.length < 1) {
-            PlotMessage plotMessage = new PlotMessage().text(Captions.WARP_LIST
-                    .f(Integer.toString(plot.getWarps().size()))).color("$1");
-            plotMessage = MainUtil.getWarpsList(plotMessage, plot.getWarps()).color("$2");
-            plotMessage.send(player);
+            PlotMessage clickableWarps = new PlotMessage(
+                    Captions.color(Captions.PLOT_INFO_WARPS.s() // .color doesn't work here?
+                            .replaceAll("%warpcount%", Integer.toString(plot.getWarps().size()))
+                            .replaceAll("%warps%", ""))).color("$1"); // basically ignore %warps%
+
+            String csvWarps = MainUtil.getWarpsList(plot.getWarps());
+
+            for (String warp : csvWarps.split(" ")) {
+                String command = "/plot warp " + warp.replace(",", "");
+                clickableWarps = clickableWarps.text(warp + " ").command(command).tooltip(command).color("$2");
+            }
+
+            clickableWarps.send(player);
+
             return true;
         }
 

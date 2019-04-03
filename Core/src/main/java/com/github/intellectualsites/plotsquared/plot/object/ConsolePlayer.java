@@ -125,6 +125,12 @@ public class ConsolePlayer extends PlotPlayer {
     @Override public void stopSpectating() {
     }
 
+    // PlotCubed start
+    @Override public boolean canSee(PlotPlayer player) {
+        return false;
+    }
+    // PlotCubed end
+
     @Override public boolean isBanned() {
         return false;
     }
