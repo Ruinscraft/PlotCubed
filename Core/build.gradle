@@ -1,0 +1,69 @@
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    compile 'org.yaml:snakeyaml:1.23'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile("org.projectlombok:lombok:1.18.4")
+    compileOnly("org.projectlombok:lombok:1.18.4")
+    testCompileOnly("org.projectlombok:lombok:1.18.4")
+    annotationProcessor("org.projectlombok:lombok:1.18.4")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.4")
+
+    compile 'com.github.Sauilitired:Jenkins4J:2.0-SNAPSHOT'
+    compile 'com.squareup.okhttp3:okhttp:3.14.0'
+    compile 'com.squareup.okio:okio:2.2.2'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.3.21'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+processResources {
+    from('src/main/resources') {
+        include 'plugin.properties'
+        expand(
+                version: "${project.parent.version}",
+                name: project.parent.name,
+                commit: "${git.head().abbreviatedId}",
+                date: "${git.head().getDate().format("yy.MM.dd")}",
+        )
+    }
+}
+
+jar.archiveName = "PlotSquared-API-${project.parent.version}.jar"
+jar.destinationDir = file '../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/' + project.parent.version
+task createPom {
+    doLast {
+        pom {
+            project {
+                groupId 'com.github.intellectualsites.plotsquared'
+                artifactId 'PlotSquared-API'
+                version project.parent.version
+            }
+        }.writeTo("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/${project.parent.version}/PlotSquared-API-${project.parent.version}.pom")
+        pom {
+            project {
+                groupId 'com.github.intellectualsites.plotsquared'
+                artifactId 'PlotSquared-API'
+                version 'latest'
+            }
+        }.writeTo("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/PlotSquared-API-latest.pom")
+    }
+}
+
+task copyFiles {
+    doLast {
+        copy {
+            from "../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/${project.parent.version}/"
+            into '../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/'
+            include('*.jar')
+            rename("PlotSquared-API-${project.parent.version}.jar", 'PlotSquared-API-latest.jar')
+        }
+    }
+}
+
+build.finalizedBy(copyFiles)
+copyFiles.dependsOn(createPom)
