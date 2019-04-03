@@ -1184,6 +1184,12 @@ import java.util.concurrent.atomic.AtomicInteger;
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix
                     + "plot_trusted` (`plot_plot_id` INT(11) NOT NULL,"
                     + "`user_uuid` VARCHAR(40) NOT NULL)");
+                // PlotCubed start
+                stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix
+                        + "plot_warps` (`plot_plot_id` INT(11) NOT NULL,"
+                        + "`warp_name` VARCHAR(50) NOT NULL,"
+                        + "`warp_loc` VARCHAR(255) NOT NULL)");
+                // PlotCubed end
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_comments` ("
                     + "`world` VARCHAR(40) NOT NULL, `hashcode` INT(11) NOT NULL,"
                     + "`comment` VARCHAR(40) NOT NULL,"

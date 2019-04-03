@@ -27,8 +27,8 @@ public class Warp extends SubCommand {
 
         if (args.length < 1) {
             PlotMessage plotMessage = new PlotMessage().text(Captions.WARP_LIST
-                    .f(Integer.toString(plot.getWarps().size()))).color("$1").text(" ").color("$2");
-            plotMessage = MainUtil.getWarpsList(plotMessage, plot.getWarps());
+                    .f(Integer.toString(plot.getWarps().size()))).color("$1");
+            plotMessage = MainUtil.getWarpsList(plotMessage, plot.getWarps()).color("$2");
             plotMessage.send(player);
             return true;
         }

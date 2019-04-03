@@ -17,9 +17,10 @@ public class AddWarp extends SubCommand {
 
     @Override
     public boolean onCommand(PlotPlayer player, String[] args) {
-        Plot plot = player.getCurrentPlot();
+        Location loc = player.getLocation();
+        final Plot plot = loc.getPlotAbs();
 
-        if (plot == null) {
+        if (plot == null || !plot.hasOwner()) {
             return sendMessage(player, Captions.NOT_IN_PLOT);
         }
 
