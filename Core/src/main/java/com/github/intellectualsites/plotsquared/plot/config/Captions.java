@@ -848,6 +848,12 @@ public enum Captions {
      */
     BROADCAST_PREFIX("$4Plot Broadcast > $1", "Broadcast"),
     BROADCAST_MSG_SHORTENED("$4Your message was too long and has been shortened to 128 chars", "Broadcast"),
+
+    /*
+     * Random
+     */
+    RANDOM_TELEPORTED("$4You have been teleported to a random plot", "Random"),
+    RANDOM_TELEPORTING("$4Finding a random plot...", "Random"),
     // PlotCubed end
 
     /*
