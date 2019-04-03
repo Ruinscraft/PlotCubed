@@ -165,6 +165,7 @@ public enum Captions {
     PERMISSION_DELWARP_OTHER("plots.delwarp.other", "static.permissions"), PERMISSION_ADDWARP_OTHER(
             "plots.addwarp.other", "static.permissions"),
     PERMISSION_USE_TIMER_OTHER("plots.timer.other", "static.permissions"),
+    PERMISSION_USE_BROADCAST_OTHER("plots.broadcast.other", "static.permissions"),
     // PlotCubed end
 
     /*
@@ -841,6 +842,12 @@ public enum Captions {
     TIMER_NOT_FOUND("$4A timer is not running on this plot", "Timer"),
     TIMER_CREATED("$4A timer has been created on this plot. To cancel: /p timer cancel", "Timer"),
     TIMER_INCORRECT_FORMAT("$4Incorrect time format. Example: 1h 2m 10s", "Timer"),
+
+    /*
+     * Broadcast
+     */
+    BROADCAST_PREFIX("$4Plot Broadcast > $1", "Broadcast"),
+    BROADCAST_MSG_SHORTENED("$4Your message was too long and has been shortened to 128 chars", "Broadcast"),
     // PlotCubed end
 
     /*
