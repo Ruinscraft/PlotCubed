@@ -78,6 +78,12 @@ public class Plot {
      * - Milliseconds since the epoch<br>
      */
     private long timestamp;
+    // PlotCubed start
+    /**
+     * List of plot warps.
+     */
+    private HashSet<PlotWarp> warps;
+    // PlotCubed end
     /**
      * List of trusted (with plot permissions).
      */
@@ -549,6 +555,58 @@ public class Plot {
         return this.timestamp;
     }
 
+    // PlotCubed start
+    public HashSet<PlotWarp> getWarps() {
+        if (warps == null) {
+            warps = new HashSet<>();
+        }
+        return warps;
+    }
+
+    public PlotWarp getWarpByName(String name) {
+        for (PlotWarp warp : getWarps()) {
+            if (warp.name.equalsIgnoreCase(name)) {
+                return warp;
+            }
+        }
+        return null;
+    }
+
+    public boolean hasWarp(String name) {
+        return getWarpByName(name) != null;
+    }
+
+    public void setWarp(PlotWarp warp) {
+        getWarps().add(warp);
+    }
+
+    public void removeWarp(PlotWarp warp) {
+        for (Plot current : getConnectedPlots()) {
+            if (current.getWarps().remove(warp)) {
+                DBFunc.removeWarp(current, warp);
+            }
+        }
+    }
+
+    public void clearWarps() {
+        for (Plot current : getConnectedPlots()) {
+            for (PlotWarp warp : getWarps()) {
+                DBFunc.removeWarp(current, warp);
+            }
+
+            current.warps.clear();
+        }
+    }
+
+    public void addWarp(PlotWarp warp) {
+        for (Plot current : getConnectedPlots()) {
+            if (current.getWarps().add(warp)) {
+                DBFunc.setWarp(current, warp);
+            }
+        }
+    }
+    // PlotCubed end
+
     /**
      * Gets if the plot is merged in a direction<br>
      * ------- Actual -------<br>
@@ -839,6 +897,9 @@ public class Plot {
             this.removeSign();
         }
         this.unlinkPlot(true, !isDelete);
+        // PlotCubed start
+        this.clearWarps();
+        // PlotCubed end
         final PlotManager manager = this.area.getPlotManager();
         Runnable run = new Runnable() {
             @Override public void run() {
@@ -2765,6 +2826,22 @@ public class Plot {
         }
         return false;
     }
+
+    // PlotCubed start
+    public boolean teleportToWarp(String name, PlotPlayer player) {
+        PlotWarp found = null;
+
+        found = getWarpByName(name);
+
+        if (found == null) {
+            return false;
+        }
+
+        player.teleport(found.getLocation(this));
+
+        return true;
+    }
+    // PlotCubed end
 
     public boolean isOnline() {
         if (this.owner == null) {

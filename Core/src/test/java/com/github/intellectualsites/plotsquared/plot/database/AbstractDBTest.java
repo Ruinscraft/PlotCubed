@@ -30,6 +30,11 @@ public class AbstractDBTest implements AbstractDB {
     @Override public void deleteHelpers(Plot plot) {
     }
 
+    // PlotCubed start
+    @Override public void deleteWarps(Plot plot) {
+    }
+    // PlotCubed end
+
     @Override public void deleteTrusted(Plot plot) {
     }
 
@@ -103,6 +108,11 @@ public class AbstractDBTest implements AbstractDB {
     @Override public void setPosition(PlotCluster cluster, String position) {
     }
 
+    // PlotCubed start
+    @Override public void removeWarp(Plot plot, PlotWarp warp) {
+    }
+    // PlotCubed end
+
     @Override public void removeTrusted(Plot plot, UUID uuid) {
     }
 
@@ -114,6 +124,11 @@ public class AbstractDBTest implements AbstractDB {
 
     @Override public void removeInvited(PlotCluster cluster, UUID uuid) {
     }
+
+    // PlotCubed start
+    @Override public void setWarp(Plot plot, PlotWarp warp) {
+    }
+    // PlotCubed end
 
     @Override public void setTrusted(Plot plot, UUID uuid) {
     }

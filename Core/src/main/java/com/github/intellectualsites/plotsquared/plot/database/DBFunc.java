@@ -397,6 +397,22 @@ public class DBFunc {
         DBFunc.dbManager.removeHelper(cluster, uuid);
     }
 
+    // PlotCubed start
+    public static void removeWarp(Plot plot, PlotWarp warp) {
+        if (dbManager == null) {
+            return;
+        }
+        DBFunc.dbManager.removeWarp(plot, warp);
+    }
+
+    public static void setWarp(Plot plot, PlotWarp warp) {
+        if (dbManager == null) {
+            return;
+        }
+        DBFunc.dbManager.setWarp(plot, warp);
+    }
+    // PlotCubed end
+
     /**
      * @param cluster
      */

@@ -59,6 +59,11 @@ public class MainCommand extends Command {
             new Info();
             new Near();
             new ListCmd();
+            // PlotCubed start
+            new Warp();
+            new AddWarp();
+            new DelWarp();
+            // PlotCubed end
             new Debug();
             new SchematicCmd();
             new PluginCmd();

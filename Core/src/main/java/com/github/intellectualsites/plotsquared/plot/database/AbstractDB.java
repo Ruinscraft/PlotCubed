@@ -55,6 +55,10 @@ public interface AbstractDB {
 
     void deleteHelpers(Plot plot);
 
+    // PlotCubed start
+    void deleteWarps(Plot plot);
+    // PlotCubed end
+
     void deleteTrusted(Plot plot);
 
     /**
@@ -189,6 +193,10 @@ public interface AbstractDB {
      */
     void setPosition(PlotCluster cluster, String position);
 
+    // PlotCubed start
+    void removeWarp(Plot plot, PlotWarp warp);
+    // PlotCubed end
+
     /**
      * Remove the specified player from the trust list of the specified plot.
      *
@@ -214,6 +222,10 @@ public interface AbstractDB {
      * @param uuid
      */
     void removeInvited(PlotCluster cluster, UUID uuid);
+
+    // PlotCubed start
+    void setWarp(Plot plot, PlotWarp warp);
+    // PlotCubed end
 
     /**
      * @param plot Plot Object

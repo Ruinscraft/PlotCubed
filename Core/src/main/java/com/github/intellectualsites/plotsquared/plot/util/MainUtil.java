@@ -850,6 +850,36 @@ public class MainUtil {
         return list.toString();
     }
 
+    // PlotCubed start
+    public static PlotMessage getWarpsList(PlotMessage pre, HashSet<PlotWarp> warps) {
+        if (warps == null) {
+            return pre.text(Captions.NONE.s()).color("$2");
+        }
+
+        List<String> warpNames = new ArrayList<>();
+
+        for (PlotWarp warp : warps) {
+            warpNames.add(warp.name);
+        }
+
+        if (warpNames.isEmpty()) {
+            return pre.text(Captions.NONE.s()).color("$2");
+        }
+
+        Collections.sort(warpNames);
+
+        String warpNamesJoined = String.join(", ", warpNames);
+
+        pre = pre.text(" ");
+        for (String warp : warpNamesJoined.split(" ")) {
+            String command = "/plot warp " + warp.replace(",", "");
+            pre = pre.text(warp + " ").color("$2").command(command).tooltip(command);
+        }
+
+        return pre;
+    }
+    // PlotCubed end
+
     public static void getPersistentMeta(UUID uuid, final String key,
         final RunnableVal<byte[]> result) {
         PlotPlayer player = UUIDHandler.getPlayer(uuid);

@@ -1077,7 +1077,7 @@ import java.util.concurrent.atomic.AtomicInteger;
      */
     @Override public void createTables() throws SQLException {
         String[] tables =
-            new String[] {"plot", "plot_denied", "plot_helpers", "plot_comments", "plot_trusted",
+            new String[] {"plot", "plot_denied", "plot_helpers", /* PlotCubed start */"plot_warps",/* PlotCubed end */ "plot_comments", "plot_trusted",
                 "plot_rating", "plot_settings", "cluster", "player_meta"};
         DatabaseMetaData meta = this.connection.getMetaData();
         int create = 0;
@@ -1117,6 +1117,13 @@ import java.util.concurrent.atomic.AtomicInteger;
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_trusted` ("
                     + "`plot_plot_id` INT(11) NOT NULL," + "`user_uuid` VARCHAR(40) NOT NULL"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8");
+                // PlotCubed start
+                stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_warps` ("
+                        + "`plot_plot_id` INT(11) NOT NULL,"
+                        + "`warp_name` VARCHAR(50) NOT NULL,"
+                        + "`warp_loc` VARCHAR(255) NOT NULL"
+                        + ") ENGINE=InnoDB DEFAULT CHARSET=utf8");
+                // PlotCubed end
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_settings` ("
                     + "  `plot_plot_id` INT(11) NOT NULL,"
                     + "  `biome` VARCHAR(45) DEFAULT 'FOREST'," + "  `rain` INT(1) DEFAULT 0,"
@@ -1254,6 +1261,28 @@ import java.util.concurrent.atomic.AtomicInteger;
         });
     }
 
+    // PlotCubed start
+    @Override
+    public void deleteWarps(Plot plot) {
+        if (plot.getWarps().isEmpty()) {
+            return;
+        }
+
+        addPlotTask(plot, new UniqueStatement("delete_plot_warps") {
+            @Override
+            public void set(PreparedStatement stmt) throws SQLException {
+                stmt.setInt(1, getId(plot));
+            }
+
+            @Override
+            public PreparedStatement get() throws SQLException {
+                return SQLManager.this.connection
+                        .prepareStatement("DELETE FROM `" + SQLManager.this.prefix + "plot_warps` WHERE `plot_plot_id` = ?");
+            }
+        });
+    }
+    // PlotCubed end
+
     @Override public void deleteTrusted(final Plot plot) {
         if (plot.getMembers().isEmpty()) {
             return;
@@ -1333,6 +1362,9 @@ import java.util.concurrent.atomic.AtomicInteger;
         deleteDenied(plot);
         deleteHelpers(plot);
         deleteTrusted(plot);
+        // PlotCubed start
+        deleteWarps(plot);
+        // PlotCubed end
         deleteComments(plot);
         deleteRatings(plot);
         addPlotTask(plot, new UniqueStatement("delete_plot") {
@@ -1797,6 +1829,33 @@ import java.util.concurrent.atomic.AtomicInteger;
                     deleteRows(toDelete, this.prefix + "plot_denied", "plot_plot_id");
                 }
 
+                // PlotCubed start
+                /*
+                 * Getting warps
+                 */
+                try (ResultSet r = statement.executeQuery("SELECT `plot_plot_id`, `warp_name`, `warp_loc` FROM `" + this.prefix + "plot_warps`")) {
+                    ArrayList<Integer> toDelete = new ArrayList<>();
+//                    HashSet<PlotWarp> warps = new HashSet<>();
+                    while (r.next()) {
+                        id = r.getInt("plot_plot_id");
+                        String warpName = r.getString("warp_name");
+                        String warpLocString = r.getString("warp_loc");
+
+                        Plot plot = plots.get(id);
+                        if (plot != null) {
+                            PlotWarp warp = new PlotWarp(warpName, BlockLoc.fromString(warpLocString));
+                            plot.setWarp(warp);
+                        } else if (Settings.Enabled_Components.DATABASE_PURGER) {
+                            toDelete.add(id);
+                        } else {
+                            PlotSquared.debug("&cENTRY " + id
+                                    + " in `plot_warps` does not exist. Create this plot or set `database-purger: true` in the settings.yml.");
+                        }
+                    }
+                    deleteRows(toDelete, this.prefix + "plot_warps", "plot_plot_id");
+                }
+                // PlotCubed end
+
                 try (ResultSet resultSet = statement
                     .executeQuery("SELECT * FROM `" + this.prefix + "plot_settings`")) {
                     ArrayList<Integer> toDelete = new ArrayList<>();
@@ -2243,6 +2302,25 @@ import java.util.concurrent.atomic.AtomicInteger;
         });
     }
 
+    // PlotCubed start
+    @Override
+    public void removeWarp(Plot plot, PlotWarp warp) {
+        addPlotTask(plot, new UniqueStatement("removeWarp") {
+            @Override
+            public void set(PreparedStatement statement) throws SQLException {
+                statement.setInt(1, getId(plot));
+                statement.setString(2, warp.name);
+            }
+
+            @Override
+            public PreparedStatement get() throws SQLException {
+                return SQLManager.this.connection
+                        .prepareStatement("DELETE FROM `" + SQLManager.this.prefix + "plot_warps` WHERE `plot_plot_id` = ? AND `warp_name` = ?");
+            }
+        });
+    }
+    // PlotCubed end
+
     @Override public void removeTrusted(final Plot plot, final UUID uuid) {
         addPlotTask(plot, new UniqueStatement("removeTrusted") {
             @Override public void set(PreparedStatement statement) throws SQLException {
@@ -2272,6 +2350,26 @@ import java.util.concurrent.atomic.AtomicInteger;
             }
         });
     }
+
+    // PlotCubed start
+    @Override
+    public void setWarp(Plot plot, PlotWarp warp) {
+        addPlotTask(plot, new UniqueStatement("setWarp") {
+            @Override
+            public void set(PreparedStatement statement) throws SQLException {
+                statement.setInt(1, getId(plot));
+                statement.setString(2, warp.name);
+                statement.setString(3, warp.blockLoc.toString());
+            }
+
+            @Override
+            public PreparedStatement get() throws SQLException {
+                return SQLManager.this.connection
+                        .prepareStatement("INSERT INTO `" + SQLManager.this.prefix + "plot_warps` (`plot_plot_id`, `warp_name`, `warp_loc`) VALUES(?,?,?)");
+            }
+        });
+    }
+    // PlotCubed end
 
     @Override public void setTrusted(final Plot plot, final UUID uuid) {
         addPlotTask(plot, new UniqueStatement("setTrusted") {

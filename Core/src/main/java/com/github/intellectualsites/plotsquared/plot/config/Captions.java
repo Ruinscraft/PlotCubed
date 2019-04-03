@@ -160,6 +160,11 @@ public enum Captions {
     PERMISSION_ALIAS_SET("plots.alias.set", "static.permissions"), PERMISSION_ALIAS_REMOVE(
         "plots.alias.remove", "static.permissions"),
 
+    // PlotCubed start
+    PERMISSION_DELWARP_OTHER("plots.delwarp.other", "static.permissions"), PERMISSION_ADDWARP_OTHER(
+            "plots.addwarp.other", "static.permissions"),
+    // PlotCubed end
+
     /*
      * Static console
      */
@@ -694,6 +699,10 @@ public enum Captions {
 
     PLOT_INFO_DENIED("$1Denied:$2 %denied%", "Info"), PLOT_INFO_FLAGS("$1Flags:$2 %flags%", "Info"),
 
+    // PlotCubed start
+    PLOT_INFO_WARPS("$1Warps:$2 ", "Info"),
+    // PlotCubed end
+
     PLOT_INFO_BIOME("$1Biome:$2 %biome%", "Info"), PLOT_INFO_RATING("$1Rating:$2 %rating%", "Info"),
 
     PLOT_INFO_LIKES("$1Like Ratio:$2 %likes%%", "Info"),
@@ -797,7 +806,25 @@ public enum Captions {
         "$4Successfully removed flag", "Flag"),
 
     FLAG_ADDED("$4Successfully added flag", "Flag"), FLAG_TUTORIAL_USAGE(
-        "$1Have an admin set the flag: $2%s", "CommandConfig"), /*
+        "$1Have an admin set the flag: $2%s", "CommandConfig"),
+
+    // PlotCubed start
+    /*
+     * Warps
+     */
+    WARP_NOT_FOUND("$4Warp not found", "Warp"),
+    WARP_ADDED("$4Warp $2%s$4 added", "Warp"),
+    WARP_REMOVED("$4Warp $2%s$4 removed", "Warp"),
+    WARP_TELEPORTED("$4Teleported to warp: $1%s$4", "Warp"),
+    WARP_NAME_REQUIRED("$1A warp name is required", "Warp"),
+    WARP_LIST("$1Plot warps (%s0):", "Warp"),
+    WARP_ALREADY_EXISTS("$1Warp $2%s$1 already exists", "Warp"),
+    WARP_NAME_INVALID("$1Warp name was invalid. Limit is 50 characters", "Warp"),
+    WARP_TOO_MANY("$1This plot has exceeded the limit of %s warps", "Warp"),
+    WARP_NOT_ALPHANUM("$1Warp names must be alphanumeric", "Warp"),
+    // PlotCubed end
+
+    /*
      * Trusted
      */
 
