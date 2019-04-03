@@ -1793,10 +1793,12 @@ import java.util.zip.ZipInputStream;
             this.style.set("version", this.version.toString());
         }
         Map<String, Object> o = new HashMap<>(4);
-        o.put("color.1", "6");
+        // PlotCubed start
+        o.put("color.1", "3");
         o.put("color.2", "7");
         o.put("color.3", "8");
-        o.put("color.4", "3");
+        o.put("color.4", "b");
+        // PlotCubed end
         if (!this.style.contains("color")) {
             for (Entry<String, Object> node : o.entrySet()) {
                 this.style.set(node.getKey(), node.getValue());
