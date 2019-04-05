@@ -1077,7 +1077,7 @@ import java.util.concurrent.atomic.AtomicInteger;
      */
     @Override public void createTables() throws SQLException {
         String[] tables =
-            new String[] {"plot", "plot_denied", "plot_helpers", /* PlotCubed start */"plot_warps",/* PlotCubed end */ "plot_comments", "plot_trusted",
+            new String[] {"plot", "plot_denied", "plot_helpers", /* PlotCubed start */"plot_warps", "plot_visits",/* PlotCubed end */ "plot_comments", "plot_trusted",
                 "plot_rating", "plot_settings", "cluster", "player_meta"};
         DatabaseMetaData meta = this.connection.getMetaData();
         int create = 0;
@@ -1122,6 +1122,11 @@ import java.util.concurrent.atomic.AtomicInteger;
                         + "`plot_plot_id` INT(11) NOT NULL,"
                         + "`warp_name` VARCHAR(50) NOT NULL,"
                         + "`warp_loc` VARCHAR(255) NOT NULL"
+                        + ") ENGINE=InnoDB DEFAULT CHARSET=utf8");
+                stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_visits` ("
+                        + "`plot_plot_id` INT(11) NOT NULL,"
+                        + "`visitor` VARCHAR(40) NOT NULL,"
+                        + "`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP"
                         + ") ENGINE=InnoDB DEFAULT CHARSET=utf8");
                 // PlotCubed end
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_settings` ("
@@ -1189,6 +1194,10 @@ import java.util.concurrent.atomic.AtomicInteger;
                         + "plot_warps` (`plot_plot_id` INT(11) NOT NULL,"
                         + "`warp_name` VARCHAR(50) NOT NULL,"
                         + "`warp_loc` VARCHAR(255) NOT NULL)");
+                stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_visits` ("
+                        + "`plot_plot_id` INT(11) NOT NULL,"
+                        + "`visitor` VARCHAR(40) NOT NULL,"
+                        + "`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP)");
                 // PlotCubed end
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_comments` ("
                     + "`world` VARCHAR(40) NOT NULL, `hashcode` INT(11) NOT NULL,"
@@ -1268,8 +1277,7 @@ import java.util.concurrent.atomic.AtomicInteger;
     }
 
     // PlotCubed start
-    @Override
-    public void deleteWarps(Plot plot) {
+    @Override public void deleteWarps(Plot plot) {
         if (plot.getWarps().isEmpty()) {
             return;
         }
@@ -1284,6 +1292,21 @@ import java.util.concurrent.atomic.AtomicInteger;
             public PreparedStatement get() throws SQLException {
                 return SQLManager.this.connection
                         .prepareStatement("DELETE FROM `" + SQLManager.this.prefix + "plot_warps` WHERE `plot_plot_id` = ?");
+            }
+        });
+    }
+
+    @Override public void deleteVisits(Plot plot) {
+        addPlotTask(plot, new UniqueStatement("delete_plot_visits") {
+            @Override
+            public void set(PreparedStatement stmt) throws SQLException {
+                stmt.setInt(1, getId(plot));
+            }
+
+            @Override
+            public PreparedStatement get() throws SQLException {
+                return SQLManager.this.connection
+                        .prepareStatement("DELETE FROM `" + SQLManager.this.prefix + "plot_visits` WHERE `plot_plot_id` = ?");
             }
         });
     }
@@ -2375,6 +2398,22 @@ import java.util.concurrent.atomic.AtomicInteger;
             }
         });
     }
+
+    @Override public void addVisit(Plot plot, UUID visitor) {
+        addPlotTask(plot, new UniqueStatement("addVisit") {
+            @Override
+            public void set(PreparedStatement statement) throws SQLException {
+                statement.setInt(1, getId(plot));
+                statement.setString(2, visitor.toString());
+            }
+
+            @Override
+            public PreparedStatement get() throws SQLException {
+                return SQLManager.this.connection
+                        .prepareStatement("INSERT INTO `" + SQLManager.this.prefix + "plot_visits` (`plot_plot_id`, `visitor`) VALUES(?,?)");
+            }
+        });
+    }
     // PlotCubed end
 
     @Override public void setTrusted(final Plot plot, final UUID uuid) {
@@ -2436,6 +2475,55 @@ import java.util.concurrent.atomic.AtomicInteger;
             }
         });
     }
+
+    // PlotCubed start
+    @Override public HashMap<UUID, Long> getVisits(Plot plot, int days) {
+        HashMap<UUID, Long> map = new HashMap<>();
+
+        // ignore the "days" and fetch all visits
+        if (-1 == days) {
+            try (PreparedStatement statement = this.connection.prepareStatement(
+                    "SELECT `visitor`, `timestamp` FROM `" + this.prefix
+                            + "plot_visits` WHERE `plot_plot_id` = ?")) {
+                statement.setInt(1, getId(plot));
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        UUID uuid = UUID.fromString(resultSet.getString("visitor"));
+                        Timestamp timestamp = resultSet.getTimestamp("timestamp");
+                        map.put(uuid, timestamp.getTime());
+                    }
+                }
+            } catch (SQLException e) {
+                PlotSquared
+                        .debug("&7[WARN] Failed to fetch visits for plot " + plot.getId().toString());
+                e.printStackTrace();
+            }
+        }
+
+        // fetch the most visited plots for a certain number of days
+        else {
+            try (PreparedStatement statement = this.connection.prepareStatement(
+                    "SELECT `visitor`, `timestamp` FROM `" + this.prefix
+                            + "plot_visits` WHERE `plot_plot_id` = ? AND `timestamp` >= NOW() + INTERVAL ? DAY")) {
+                statement.setInt(1, getId(plot));
+                statement.setInt(2, days);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        UUID uuid = UUID.fromString(resultSet.getString("visitor"));
+                        Timestamp timestamp = resultSet.getTimestamp("timestamp");
+                        map.put(uuid, timestamp.getTime());
+                    }
+                }
+            } catch (SQLException e) {
+                PlotSquared
+                        .debug("&7[WARN] Failed to fetch visits for plot " + plot.getId().toString());
+                e.printStackTrace();
+            }
+        }
+
+        return map;
+    }
+    // PlotCubed end
 
     @Override public HashMap<UUID, Integer> getRatings(Plot plot) {
         HashMap<UUID, Integer> map = new HashMap<>();
@@ -2927,6 +3015,10 @@ import java.util.concurrent.atomic.AtomicInteger;
             stmt.addBatch("DROP TABLE `" + this.prefix + "plot_trusted`");
             stmt.addBatch("DROP TABLE `" + this.prefix + "plot_helpers`");
             stmt.addBatch("DROP TABLE `" + this.prefix + "plot_denied`");
+            // PlotCubed start
+            stmt.addBatch("DROP TABLE `" + this.prefix + "plot_warps`");
+            stmt.addBatch("DROP TABLE `" + this.prefix + "plot_visits`");
+            // PlotCubed end
             stmt.executeBatch();
             stmt.clearBatch();
             statement.executeUpdate();

@@ -411,6 +411,20 @@ public class DBFunc {
         }
         DBFunc.dbManager.setWarp(plot, warp);
     }
+
+    public static void addVisit(Plot plot, UUID visitor) {
+        if (dbManager == null) {
+            return;
+        }
+        DBFunc.dbManager.addVisit(plot, visitor);
+    }
+
+    public static void deleteVisits(Plot plot) {
+        if (dbManager == null) {
+            return;
+        }
+        DBFunc.dbManager.deleteVisits(plot);
+    }
     // PlotCubed end
 
     /**

@@ -854,6 +854,11 @@ public enum Captions {
      */
     RANDOM_TELEPORTED("$4You have been teleported to a random plot", "Random"),
     RANDOM_TELEPORTING("$4Finding a random plot...", "Random"),
+
+    /*
+     * Top
+     */
+    TOP_INVENTORY_NAME("Most popular plots", "Top"),
     // PlotCubed end
 
     /*

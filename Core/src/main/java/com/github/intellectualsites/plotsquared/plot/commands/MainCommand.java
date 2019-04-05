@@ -66,6 +66,7 @@ public class MainCommand extends Command {
             new Timer();
             new Broadcast();
             new Random();
+            new Top();
             // PlotCubed end
             new Debug();
             new SchematicCmd();

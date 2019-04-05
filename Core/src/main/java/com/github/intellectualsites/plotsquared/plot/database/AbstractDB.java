@@ -57,6 +57,8 @@ public interface AbstractDB {
 
     // PlotCubed start
     void deleteWarps(Plot plot);
+
+    void deleteVisits(Plot plot);
     // PlotCubed end
 
     void deleteTrusted(Plot plot);
@@ -225,6 +227,8 @@ public interface AbstractDB {
 
     // PlotCubed start
     void setWarp(Plot plot, PlotWarp warp);
+
+    void addVisit(Plot plot, UUID visitor);
     // PlotCubed end
 
     /**
@@ -266,6 +270,10 @@ public interface AbstractDB {
      * @param uuid the uuid of the player to deny
      */
     void setDenied(Plot plot, UUID uuid);
+
+    // PlotCubed start
+    HashMap<UUID, Long> getVisits(Plot plot, int days);
+    // PlotCubed end
 
     /**
      * Gets the ratings from the specified plot.

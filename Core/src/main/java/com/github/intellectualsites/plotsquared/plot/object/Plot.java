@@ -83,6 +83,11 @@ public class Plot {
      * List of plot warps.
      */
     private HashSet<PlotWarp> warps;
+
+    /**
+     * Transient set of users who have visited this plot.
+     */
+    private transient Set<UUID> visitors;
     // PlotCubed end
     /**
      * List of trusted (with plot permissions).
@@ -594,7 +599,7 @@ public class Plot {
                 DBFunc.removeWarp(current, warp);
             }
 
-            current.warps.clear();
+            current.getWarps().clear();
         }
     }
 
@@ -603,6 +608,41 @@ public class Plot {
             if (current.getWarps().add(warp)) {
                 DBFunc.setWarp(current, warp);
             }
+        }
+    }
+
+    public Set<UUID> getVisitors() {
+        if (this.visitors == null) {
+            this.visitors = new HashSet<>();
+        }
+        Set<UUID> visitors = new HashSet<>();
+        for (Plot current : getConnectedPlots()) {
+            visitors.addAll(current.getVisitors());
+        }
+        return visitors;
+    }
+
+    public boolean addVisitor(UUID uuid) {
+        boolean added = false;
+        for (Plot current : getConnectedPlots()) {
+            if (current.getVisitors().add(uuid)) {
+                added = true;
+                DBFunc.addVisit(current, uuid);
+            }
+        }
+        return added;
+    }
+
+    public void deleteVisits() {
+        for (Plot current : getConnectedPlots()) {
+            current.clearVisitors();
+            DBFunc.deleteVisits(current);
+        }
+    }
+
+    public void clearVisitors() {
+        for (Plot current : getConnectedPlots()) {
+            current.getVisitors().clear();
         }
     }
     // PlotCubed end
