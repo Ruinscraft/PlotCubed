@@ -425,6 +425,13 @@ public class DBFunc {
         }
         DBFunc.dbManager.deleteVisits(plot);
     }
+
+    public static Map<PlotId, Integer> getTopVisits(int days) {
+        if (dbManager == null) {
+            return new HashMap<>();
+        }
+        return DBFunc.dbManager.getTopVisits(days);
+    }
     // PlotCubed end
 
     /**

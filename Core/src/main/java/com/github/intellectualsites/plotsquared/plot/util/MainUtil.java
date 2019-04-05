@@ -532,6 +532,20 @@ public class MainUtil {
         return area.getPlotAbs(id);
     }
 
+    // PlotCubed start
+    public static Map<Plot, Integer> getCurrentVisitors() {
+        Map<Plot, Integer> map = new HashMap<>();
+        for (PlotPlayer plotPlayer : UUIDHandler.getPlayers().values()) {
+            Plot current = plotPlayer.getCurrentPlot();
+            if (current == null || !current.hasOwner()) {
+                continue;
+            }
+            map.merge(current, 1, Integer::sum);
+        }
+        return map; // unsorted
+    }
+    // PlotCubed end
+
     public static File getFile(File base, String path) {
         if (Paths.get(path).isAbsolute()) {
             return new File(path);

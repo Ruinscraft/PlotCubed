@@ -2504,9 +2504,8 @@ import java.util.concurrent.atomic.AtomicInteger;
         else {
             try (PreparedStatement statement = this.connection.prepareStatement(
                     "SELECT `visitor`, `timestamp` FROM `" + this.prefix
-                            + "plot_visits` WHERE `plot_plot_id` = ? AND `timestamp` >= NOW() + INTERVAL ? DAY")) {
+                            + "plot_visits` WHERE `plot_plot_id` = ? AND `timestamp` >= NOW() + INTERVAL " + days + " DAY")) {
                 statement.setInt(1, getId(plot));
-                statement.setInt(2, days);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         UUID uuid = UUID.fromString(resultSet.getString("visitor"));
@@ -2517,6 +2516,53 @@ import java.util.concurrent.atomic.AtomicInteger;
             } catch (SQLException e) {
                 PlotSquared
                         .debug("&7[WARN] Failed to fetch visits for plot " + plot.getId().toString());
+                e.printStackTrace();
+            }
+        }
+
+        return map;
+    }
+
+    @Override public HashMap<PlotId, Integer> getTopVisits(int days) {
+        HashMap<PlotId, Integer> map = new HashMap<>();
+
+        // ignore a request for current visitors
+        if (days <= 0 && days != -1) return map;
+
+        // get visits for all time
+        else if (days == -1) {
+            try (PreparedStatement statement = this.connection.prepareStatement(
+                    "SELECT `plot_plot_id`, COUNT(*) AS `visits` FROM `" + this.prefix
+                            + "plot_visits` GROUP BY `plot_plot_id`")) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int plotIdHash = resultSet.getInt("plot_plot_id");
+                        int visits = resultSet.getInt("visits");
+                        map.put(PlotId.unpair(plotIdHash), visits);
+                    }
+                }
+            } catch (SQLException e) {
+                PlotSquared
+                        .debug("&7[WARN] Failed to fetch top plot visits for all time");
+                e.printStackTrace();
+            }
+        }
+
+        // get visits based on day time period
+        else {
+            try (PreparedStatement statement = this.connection.prepareStatement(
+                    "SELECT `plot_plot_id`, COUNT(*) AS `visits` FROM `" + this.prefix
+                            + "plot_visits` GROUP BY `plot_plot_id` WHERE `timestamp` >= NOW() + INTERVAL " + days + " DAY")) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int plotIdHash = resultSet.getInt("plot_plot_id");
+                        int visits = resultSet.getInt("visits");
+                        map.put(PlotId.unpair(plotIdHash), visits);
+                    }
+                }
+            } catch (SQLException e) {
+                PlotSquared
+                        .debug("&7[WARN] Failed to fetch top plot visits for day time period: " + days);
                 e.printStackTrace();
             }
         }

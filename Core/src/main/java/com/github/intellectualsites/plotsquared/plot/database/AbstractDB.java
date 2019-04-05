@@ -273,6 +273,8 @@ public interface AbstractDB {
 
     // PlotCubed start
     HashMap<UUID, Long> getVisits(Plot plot, int days);
+
+    HashMap<PlotId, Integer> getTopVisits(int days);
     // PlotCubed end
 
     /**
