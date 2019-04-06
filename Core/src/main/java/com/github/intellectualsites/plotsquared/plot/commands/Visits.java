@@ -115,7 +115,8 @@ public class Visits extends SubCommand {
                         INVENTORY_ITEM_STACK_AMT,
                         itemName,
                         "Plot ID: " + entry.plot.getId(),
-                        "Visitors: " + entry.visits);
+                        "Visitors: " + entry.visits,
+                        "Click to visit");
                 inventory.setItem(i, itemStack);
             }
 
