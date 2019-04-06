@@ -2,30 +2,28 @@
 package com.github.intellectualsites.plotsquared.plot.commands;
 
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
 import com.github.intellectualsites.plotsquared.plot.object.*;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
-import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@CommandDeclaration(command = "top",
+@CommandDeclaration(command = "visits",
         description = "Show and visit the most visited plots",
-        usage = "/plot top <current|day|week|month|year|all>",
-        aliases = {"popular"},
-        permission = "plots.top",
+        usage = "/plot visits <current|day|week|month|year|all>",
+        aliases = {"popular", "top"},
+        permission = "plots.visits",
         category = CommandCategory.TELEPORT,
         requiredType = RequiredType.NONE)
-public class Top extends SubCommand {
+public class Visits extends SubCommand {
 
-    private static final String INVENTORY_ITEM_ID = "minecraft:grass";
+    private static final String INVENTORY_ITEM_ID = "minecraft:stone_slab";
     private static final int INVENTORY_ITEM_STACK_AMT = 1;
-    private static final int INVENTORY_SIZE = 9 * 4;
+    private static final int INVENTORY_SIZE = 6; // this automatically gets multiplied by 9 in PlotInventory
 
     @Override
     public boolean onCommand(final PlotPlayer player, String[] args) {
@@ -34,76 +32,91 @@ public class Top extends SubCommand {
         }
 
         TaskManager.runTaskAsync(() -> {
-            int days;
+            final String optionName;
+            final int days;
 
             switch (args[0].toLowerCase()) {
                 case "current":
                 case "now":
                     days = 0;
+                    optionName = "right now";
                     break;
                 case "day":
                 case "d":
                     days = 1;
+                    optionName = "daily";
                     break;
                 case "week":
                 case "w":
                     days = 7;
+                    optionName = "weekly";
                     break;
                 case "month":
                 case "m":
                     days = 30;
+                    optionName = "monthly";
                     break;
                 case "year":
                 case "y":
                     days = 365;
+                    optionName = "yearly";
                     break;
                 case "all":
                 default:
                     days = -1;
+                    optionName = "all time";
                     break;
             }
 
-            final PlotInventory inventory = new PlotInventory(player, INVENTORY_SIZE, Captions.TOP_INVENTORY_NAME.s());
+            final PlotArea applicableArea = player.getApplicablePlotArea();
             final List<TopInventoryEntry> inventoryEntries = new ArrayList<>();
+            final String inventoryName = Captions.TOP_INVENTORY_NAME.f(optionName);
+            final PlotInventory inventory = new PlotInventory(player, INVENTORY_SIZE, inventoryName) {
+                @Override public boolean onClick(final int index) {
+                    if (inventoryEntries.size() - 1 < index) return false;
+                    TopInventoryEntry entry = inventoryEntries.get(index);
+                    Plot plot = entry.plot;
+                    plot.teleportPlayer(player);
+                    return false;
+                }
+            };
+
+            Map<Plot, Integer> unsorted;
 
             // handle current visitors
             if (days == 0) {
-                Map<Plot, Integer> unsorted = MainUtil.getCurrentVisitors();
-
-                unsorted.entrySet()
-                        .stream()
-                        .sorted(Map.Entry.<Plot, Integer>comparingByValue().reversed())
-                        .limit(INVENTORY_SIZE).forEach(entry -> {
-                            inventoryEntries.add(new TopInventoryEntry(entry.getKey(), entry.getValue()));
-                });
+                unsorted = MainUtil.getCurrentVisitors();
             }
 
-            // handle time period
+            // handle database visits
             else {
-                PlotArea applicableArea = player.getApplicablePlotArea();
-                Map<PlotId, Integer> unsorted = DBFunc.getTopVisits(days);
-
-                unsorted.entrySet()
-                        .stream()
-                        .sorted(Map.Entry.<PlotId, Integer>comparingByValue().reversed())
-                        .limit(INVENTORY_SIZE).forEach(entry -> {
-                            Plot plot = PlotSquared.get().getPlot(applicableArea, entry.getKey());
-                            inventoryEntries.add(new TopInventoryEntry(plot, entry.getValue()));
-                });
+                unsorted = DBFunc.getTopVisits(applicableArea, days, INVENTORY_SIZE * 9);
             }
+
+            // sort the entries into inventoryEntries
+            unsorted.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.<Plot, Integer>comparingByValue().reversed())
+                    .limit(INVENTORY_SIZE).forEach(entry -> {
+                inventoryEntries.add(new TopInventoryEntry(entry.getKey(), entry.getValue()));
+            });
 
             // fill the inventory contents
             for (int i = 0; i < INVENTORY_SIZE; i++) {
                 if (inventoryEntries.size() < i + 1) break;
                 TopInventoryEntry entry = inventoryEntries.get(i);
-                String plotOwnerName = UUIDHandler.getName(entry.plot.guessOwner());
+                String plotOwnerName = MainUtil.getName(entry.plot.guessOwner());
                 String itemName = Captions.color(Captions.TOP_ITEM_NAME.f(plotOwnerName));
-                PlotItemStack itemStack = new PlotItemStack(INVENTORY_ITEM_ID, INVENTORY_ITEM_STACK_AMT, itemName);
+                PlotItemStack itemStack = new PlotItemStack(
+                        INVENTORY_ITEM_ID,
+                        INVENTORY_ITEM_STACK_AMT,
+                        itemName,
+                        "Plot ID: " + entry.plot.getId(),
+                        "Visitors: " + entry.visits);
                 inventory.setItem(i, itemStack);
             }
 
-            // display the inventory
-            PlotInventory.setPlotInventoryOpen(player, inventory); // TODO: why is this not implemented with PlotPlayer#openInventory()
+            inventory.openInventory();
         });
 
         return true;

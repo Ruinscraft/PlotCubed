@@ -33,6 +33,9 @@ public class AbstractDBTest implements AbstractDB {
     // PlotCubed start
     @Override public void deleteWarps(Plot plot) {
     }
+
+    @Override public void deleteVisits(Plot plot) {
+    }
     // PlotCubed end
 
     @Override public void deleteTrusted(Plot plot) {
@@ -65,6 +68,12 @@ public class AbstractDBTest implements AbstractDB {
     @Override public int getId(Plot plot) {
         return 0;
     }
+
+    // PlotCubed start
+    @Override public PlotId getPlotId(int id) {
+        return null;
+    }
+    // PlotCubed end
 
     @Override public int getClusterId(PlotCluster cluster) {
         return 0;
@@ -128,6 +137,9 @@ public class AbstractDBTest implements AbstractDB {
     // PlotCubed start
     @Override public void setWarp(Plot plot, PlotWarp warp) {
     }
+
+    @Override public void addVisit(Plot plot, UUID visitor) {
+    }
     // PlotCubed end
 
     @Override public void setTrusted(Plot plot, UUID uuid) {
@@ -147,6 +159,12 @@ public class AbstractDBTest implements AbstractDB {
 
     @Override public void setDenied(Plot plot, UUID uuid) {
     }
+
+    // PlotCubed start
+    @Override public HashMap<Plot, Integer> getTopVisits(PlotArea plotArea, int days, int sizeLimit) {
+        return null;
+    }
+    // PlotCubed end
 
     @Override public HashMap<UUID, Integer> getRatings(Plot plot) {
         return null;

@@ -426,11 +426,11 @@ public class DBFunc {
         DBFunc.dbManager.deleteVisits(plot);
     }
 
-    public static Map<PlotId, Integer> getTopVisits(int days) {
+    public static Map<Plot, Integer> getTopVisits(PlotArea plotArea, int days, int sizeLimit) {
         if (dbManager == null) {
             return new HashMap<>();
         }
-        return DBFunc.dbManager.getTopVisits(days);
+        return DBFunc.dbManager.getTopVisits(plotArea, days, sizeLimit);
     }
     // PlotCubed end
 

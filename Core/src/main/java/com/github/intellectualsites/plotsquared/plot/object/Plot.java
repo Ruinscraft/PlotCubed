@@ -615,10 +615,6 @@ public class Plot {
         if (this.visitors == null) {
             this.visitors = new HashSet<>();
         }
-        Set<UUID> visitors = new HashSet<>();
-        for (Plot current : getConnectedPlots()) {
-            visitors.addAll(current.getVisitors());
-        }
         return visitors;
     }
 

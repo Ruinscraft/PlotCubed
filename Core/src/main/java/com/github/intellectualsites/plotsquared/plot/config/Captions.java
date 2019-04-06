@@ -858,7 +858,7 @@ public enum Captions {
     /*
      * Top
      */
-    TOP_INVENTORY_NAME("Most popular plots", "Top"),
+    TOP_INVENTORY_NAME("Most popular plots (%s0)", "Top"),
     TOP_ITEM_NAME("$1%s0's plot", "Top"),
     // PlotCubed end
 

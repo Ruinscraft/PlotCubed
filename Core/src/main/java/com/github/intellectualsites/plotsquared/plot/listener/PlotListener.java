@@ -31,6 +31,9 @@ public class PlotListener {
         player.setMeta(PlotPlayer.META_LAST_PLOT, plot);
         EventUtil.manager.callEntry(player, plot);
         if (plot.hasOwner()) {
+            // PlotCubed start
+            plot.addVisitor(player.getUUID());
+            // PlotCubed end
             Map<Flag<?>, Object> flags = FlagManager.getPlotFlags(plot);
 
             boolean titles;

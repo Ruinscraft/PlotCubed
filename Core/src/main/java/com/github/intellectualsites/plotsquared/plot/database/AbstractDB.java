@@ -103,6 +103,10 @@ public interface AbstractDB {
      */
     int getId(Plot plot);
 
+    // PlotCubed start
+    PlotId getPlotId(int id);
+    // PlotCubed end
+
     /**
      * Gets the id of a given plot cluster.
      *
@@ -272,9 +276,7 @@ public interface AbstractDB {
     void setDenied(Plot plot, UUID uuid);
 
     // PlotCubed start
-    HashMap<UUID, Long> getVisits(Plot plot, int days);
-
-    HashMap<PlotId, Integer> getTopVisits(int days);
+    HashMap<Plot, Integer> getTopVisits(PlotArea plotArea, int days, int sizeLimit);
     // PlotCubed end
 
     /**

@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -1126,7 +1127,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_visits` ("
                         + "`plot_plot_id` INT(11) NOT NULL,"
                         + "`visitor` VARCHAR(40) NOT NULL,"
-                        + "`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP"
+                        + "`timestamp` INT(11) NOT NULL"
                         + ") ENGINE=InnoDB DEFAULT CHARSET=utf8");
                 // PlotCubed end
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_settings` ("
@@ -1197,7 +1198,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_visits` ("
                         + "`plot_plot_id` INT(11) NOT NULL,"
                         + "`visitor` VARCHAR(40) NOT NULL,"
-                        + "`timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+                        + "`timestamp` INT(11) NOT NULL)");
                 // PlotCubed end
                 stmt.addBatch("CREATE TABLE IF NOT EXISTS `" + this.prefix + "plot_comments` ("
                     + "`world` VARCHAR(40) NOT NULL, `hashcode` INT(11) NOT NULL,"
@@ -1506,6 +1507,28 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
         return Integer.MAX_VALUE;
     }
+
+    // PlotCubed start
+    @Override public PlotId getPlotId(int id) {
+        try (PreparedStatement statement = this.connection.prepareStatement(
+                "SELECT `plot_id_x`, `plot_id_z` FROM `" + this.prefix + "plot` WHERE `id` = ?")) {
+            statement.setInt(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int x = resultSet.getInt("plot_id_x");
+                    int z = resultSet.getInt("plot_id_z");
+
+                    return new PlotId(x, z);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return new PlotId(0, 0);
+    }
+    // PlotCubed end
 
     @Override public void updateTables(int[] oldVersion) {
         try {
@@ -1864,7 +1887,6 @@ import java.util.concurrent.atomic.AtomicInteger;
                  */
                 try (ResultSet r = statement.executeQuery("SELECT `plot_plot_id`, `warp_name`, `warp_loc` FROM `" + this.prefix + "plot_warps`")) {
                     ArrayList<Integer> toDelete = new ArrayList<>();
-//                    HashSet<PlotWarp> warps = new HashSet<>();
                     while (r.next()) {
                         id = r.getInt("plot_plot_id");
                         String warpName = r.getString("warp_name");
@@ -2405,12 +2427,13 @@ import java.util.concurrent.atomic.AtomicInteger;
             public void set(PreparedStatement statement) throws SQLException {
                 statement.setInt(1, getId(plot));
                 statement.setString(2, visitor.toString());
+                statement.setLong(3, System.currentTimeMillis() / 1000);
             }
 
             @Override
             public PreparedStatement get() throws SQLException {
                 return SQLManager.this.connection
-                        .prepareStatement("INSERT INTO `" + SQLManager.this.prefix + "plot_visits` (`plot_plot_id`, `visitor`) VALUES(?,?)");
+                        .prepareStatement("INSERT INTO `" + SQLManager.this.prefix + "plot_visits` (`plot_plot_id`, `visitor`, `timestamp`) VALUES(?,?,?)");
             }
         });
     }
@@ -2477,94 +2500,32 @@ import java.util.concurrent.atomic.AtomicInteger;
     }
 
     // PlotCubed start
-    @Override public HashMap<UUID, Long> getVisits(Plot plot, int days) {
-        HashMap<UUID, Long> map = new HashMap<>();
+    @Override public HashMap<Plot, Integer> getTopVisits(PlotArea plotArea, int days, int sizeLimit) {
+        HashMap<Plot, Integer> map = new HashMap<>();
 
-        // ignore the "days" and fetch all visits
-        if (-1 == days) {
-            try (PreparedStatement statement = this.connection.prepareStatement(
-                    "SELECT `visitor`, `timestamp` FROM `" + this.prefix
-                            + "plot_visits` WHERE `plot_plot_id` = ?")) {
-                statement.setInt(1, getId(plot));
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        UUID uuid = UUID.fromString(resultSet.getString("visitor"));
-                        Timestamp timestamp = resultSet.getTimestamp("timestamp");
-                        map.put(uuid, timestamp.getTime());
-                    }
+        if (days == 0) return map; // ignore a request for current visitors
+
+        long currentTimeSeconds = System.currentTimeMillis() / 1000;
+        long timePeriodSeconds = days == -1 ? currentTimeSeconds : (int) TimeUnit.DAYS.toSeconds(days);
+
+        try (PreparedStatement statement = this.connection.prepareStatement(
+                "SELECT `plot_plot_id`, COUNT(*) AS `visits` FROM `" + this.prefix
+                        + "plot_visits` WHERE " + currentTimeSeconds + " - `timestamp` <= " + timePeriodSeconds
+                        + " GROUP BY `plot_plot_id` LIMIT " + sizeLimit)) {
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int internalPlotId = resultSet.getInt("plot_plot_id");
+                    int visits = resultSet.getInt("visits");
+                    PlotId plotId = getPlotId(internalPlotId);
+                    Plot plot = PlotSquared.get().getPlot(plotArea, plotId);
+
+                    map.put(plot, visits);
                 }
-            } catch (SQLException e) {
-                PlotSquared
-                        .debug("&7[WARN] Failed to fetch visits for plot " + plot.getId().toString());
-                e.printStackTrace();
             }
-        }
-
-        // fetch the most visited plots for a certain number of days
-        else {
-            try (PreparedStatement statement = this.connection.prepareStatement(
-                    "SELECT `visitor`, `timestamp` FROM `" + this.prefix
-                            + "plot_visits` WHERE `plot_plot_id` = ? AND `timestamp` >= NOW() + INTERVAL " + days + " DAY")) {
-                statement.setInt(1, getId(plot));
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        UUID uuid = UUID.fromString(resultSet.getString("visitor"));
-                        Timestamp timestamp = resultSet.getTimestamp("timestamp");
-                        map.put(uuid, timestamp.getTime());
-                    }
-                }
-            } catch (SQLException e) {
-                PlotSquared
-                        .debug("&7[WARN] Failed to fetch visits for plot " + plot.getId().toString());
-                e.printStackTrace();
-            }
-        }
-
-        return map;
-    }
-
-    @Override public HashMap<PlotId, Integer> getTopVisits(int days) {
-        HashMap<PlotId, Integer> map = new HashMap<>();
-
-        // ignore a request for current visitors
-        if (days <= 0 && days != -1) return map;
-
-        // get visits for all time
-        else if (days == -1) {
-            try (PreparedStatement statement = this.connection.prepareStatement(
-                    "SELECT `plot_plot_id`, COUNT(*) AS `visits` FROM `" + this.prefix
-                            + "plot_visits` GROUP BY `plot_plot_id`")) {
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int plotIdHash = resultSet.getInt("plot_plot_id");
-                        int visits = resultSet.getInt("visits");
-                        map.put(PlotId.unpair(plotIdHash), visits);
-                    }
-                }
-            } catch (SQLException e) {
-                PlotSquared
-                        .debug("&7[WARN] Failed to fetch top plot visits for all time");
-                e.printStackTrace();
-            }
-        }
-
-        // get visits based on day time period
-        else {
-            try (PreparedStatement statement = this.connection.prepareStatement(
-                    "SELECT `plot_plot_id`, COUNT(*) AS `visits` FROM `" + this.prefix
-                            + "plot_visits` GROUP BY `plot_plot_id` WHERE `timestamp` >= NOW() + INTERVAL " + days + " DAY")) {
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int plotIdHash = resultSet.getInt("plot_plot_id");
-                        int visits = resultSet.getInt("visits");
-                        map.put(PlotId.unpair(plotIdHash), visits);
-                    }
-                }
-            } catch (SQLException e) {
-                PlotSquared
-                        .debug("&7[WARN] Failed to fetch top plot visits for day time period: " + days);
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            PlotSquared
+                    .debug("&7[WARN] Failed to fetch top plot visits for day time period: " + days);
+            e.printStackTrace();
         }
 
         return map;
