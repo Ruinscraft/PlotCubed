@@ -8,6 +8,7 @@ The goal of PlotCubed is to modify PlotSquared to suit the needs of Ruinscraft. 
 - Plot warps
 - Plot timers
 - Plot broadcasts
+- Plot visit count tracking
 - Teleport to a random plot
 - BossBar API
 - (WIP) Scoreboard API
