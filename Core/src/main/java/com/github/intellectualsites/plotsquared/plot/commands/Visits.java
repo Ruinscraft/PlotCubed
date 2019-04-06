@@ -2,6 +2,7 @@
 package com.github.intellectualsites.plotsquared.plot.commands;
 
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
+import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
 import com.github.intellectualsites.plotsquared.plot.object.*;
@@ -21,7 +22,6 @@ import java.util.Map;
         requiredType = RequiredType.NONE)
 public class Visits extends SubCommand {
 
-    private static final String INVENTORY_ITEM_ID = "minecraft:stone_slab";
     private static final int INVENTORY_ITEM_STACK_AMT = 1;
     private static final int INVENTORY_SIZE = 6; // this automatically gets multiplied by 9 in PlotInventory
 
@@ -30,6 +30,10 @@ public class Visits extends SubCommand {
         if (args.length < 1) {
             return sendMessage(player, Captions.COMMAND_SYNTAX, getUsage());
         }
+
+        final PlotArea applicableArea = player.getApplicablePlotArea();
+        String blockIdKey = "worlds." + applicableArea.worldname + ".wall.block_claimed";
+        final String itemStackBlockId = PlotSquared.get().worlds.getString(blockIdKey);
 
         TaskManager.runTaskAsync(() -> {
             final String optionName;
@@ -68,12 +72,11 @@ public class Visits extends SubCommand {
                     break;
             }
 
-            final PlotArea applicableArea = player.getApplicablePlotArea();
             final List<TopInventoryEntry> inventoryEntries = new ArrayList<>();
             final String inventoryName = Captions.TOP_INVENTORY_NAME.f(optionName);
             final PlotInventory inventory = new PlotInventory(player, INVENTORY_SIZE, inventoryName) {
                 @Override public boolean onClick(final int index) {
-                    if (inventoryEntries.size() - 1 < index) return false;
+                    if (inventoryEntries.size() < index) return false;
                     TopInventoryEntry entry = inventoryEntries.get(index);
                     Plot plot = entry.plot;
                     plot.teleportPlayer(player);
@@ -108,7 +111,7 @@ public class Visits extends SubCommand {
                 String plotOwnerName = MainUtil.getName(entry.plot.guessOwner());
                 String itemName = Captions.color(Captions.TOP_ITEM_NAME.f(plotOwnerName));
                 PlotItemStack itemStack = new PlotItemStack(
-                        INVENTORY_ITEM_ID,
+                        itemStackBlockId,
                         INVENTORY_ITEM_STACK_AMT,
                         itemName,
                         "Plot ID: " + entry.plot.getId(),
