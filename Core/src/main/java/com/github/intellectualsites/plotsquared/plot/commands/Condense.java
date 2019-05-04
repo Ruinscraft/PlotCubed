@@ -11,8 +11,8 @@ import com.github.intellectualsites.plotsquared.plot.util.MathMan;
 import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 
-import java.util.*;
 import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @CommandDeclaration(command = "condense", permission = "plots.admin",
@@ -126,13 +126,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
                             }
                             i++;
                             final AtomicBoolean result = new AtomicBoolean(false);
-                            result.set(origin.move(possible, new Runnable() {
-                                @Override public void run() {
-                                    if (result.get()) {
-                                        MainUtil.sendMessage(player,
-                                            "Moving: " + origin + " -> " + possible);
-                                        TaskManager.runTaskLater(task, 1);
-                                    }
+                            result.set(origin.move(possible, () -> {
+                                if (result.get()) {
+                                    MainUtil.sendMessage(player,
+                                        "Moving: " + origin + " -> " + possible);
+                                    TaskManager.runTaskLater(task, 1);
                                 }
                             }, false));
                             if (result.get()) {

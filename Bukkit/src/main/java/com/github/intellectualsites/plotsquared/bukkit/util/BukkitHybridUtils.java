@@ -112,7 +112,7 @@ public class BukkitHybridUtils extends HybridUtils {
                 }
                 int minY;
                 if (Settings.Schematics.PASTE_ON_TOP) {
-                    minY = Math.min(hpw.PLOT_HEIGHT, hpw.ROAD_HEIGHT);
+                    minY = hpw.SCHEM_Y;
                 } else {
                     minY = 1;
                 }
@@ -304,7 +304,7 @@ public class BukkitHybridUtils extends HybridUtils {
                             }
                         }
                     }
-                    worldObj.unloadChunkRequest(X, Z, true);
+                    worldObj.unloadChunkRequest(X, Z);
                 }
             }, () -> TaskManager.runTaskAsync(run), 5);
         });

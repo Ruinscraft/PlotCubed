@@ -265,4 +265,5 @@ public interface IPlotMain extends ILogger {
     // PlotCubed start
     PlotBossBar createBossBar(String title, PlotBossBar.PlotBarColor color, PlotBossBar.PlotBarStyle style);
     // PlotCubed end
+
 }

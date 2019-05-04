@@ -69,12 +69,8 @@ public class SinglePlotAreaManager extends DefaultPlotAreaManager {
     }
 
     @Override public PlotArea getApplicablePlotArea(Location location) {
-        PlotArea found = super.getApplicablePlotArea(location);
-        if (found != null) {
-            return found;
-        }
         String world = location.getWorld();
-        return isWorld(world) || world.equals("*") ?
+        return isWorld(world) || world.equals("*") || super.getAllPlotAreas().length == 0 ?
             area :
             super.getApplicablePlotArea(location);
     }
@@ -100,7 +96,9 @@ public class SinglePlotAreaManager extends DefaultPlotAreaManager {
         if (found != null && found.length != 0) {
             return found;
         }
-        return isWorld(world) || world.equals("*") ? array : all.length == 0 ? noPlotAreas : super.getPlotAreas(world, region);
+        return isWorld(world) || world.equals("*") ?
+            array :
+            all.length == 0 ? noPlotAreas : super.getPlotAreas(world, region);
     }
 
     @Override public PlotArea[] getAllPlotAreas() {

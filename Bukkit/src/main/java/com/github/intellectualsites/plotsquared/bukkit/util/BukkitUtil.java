@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.*;
-import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -331,7 +331,7 @@ import java.util.*;
         final Block block = world.getBlockAt(x, y, z);
         //        block.setType(Material.AIR);
         final Material type = block.getType();
-        if (type != Material.SIGN && type != Material.WALL_SIGN) {
+        if (type != Material.LEGACY_SIGN && type != Material.LEGACY_WALL_SIGN) {
             BlockFace facing = BlockFace.EAST;
             if (world.getBlockAt(x, y, z + 1).getType().isSolid()) {
                 facing = BlockFace.NORTH;
@@ -340,8 +340,12 @@ import java.util.*;
             } else if (world.getBlockAt(x, y, z - 1).getType().isSolid()) {
                 facing = BlockFace.SOUTH;
             }
-            block.setType(Material.WALL_SIGN, false);
-            final WallSign sign = (WallSign) block.getBlockData();
+            if (PlotSquared.get().IMP.getServerVersion()[1] == 13) {
+                block.setType(Material.valueOf("WALL_SIGN"), false);
+            } else {
+                block.setType(Material.valueOf("OAK_WALL_SIGN"), false);
+            }
+            final Directional sign = (Directional) block.getBlockData();
             sign.setFacing(facing);
             block.setBlockData(sign, false);
         }

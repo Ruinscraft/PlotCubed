@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class BukkitPlayer extends PlotPlayer {
 
+    private static boolean CHECK_EFFECTIVE = true;
     public final Player player;
     private boolean offline;
     private UUID uuid;
@@ -114,29 +115,43 @@ public class BukkitPlayer extends PlotPlayer {
             return Integer.MAX_VALUE;
         }
         int max = 0;
-        String stubPlus = stub + ".";
-        Set<PermissionAttachmentInfo> effective = player.getEffectivePermissions();
-        if (!effective.isEmpty()) {
-            for (PermissionAttachmentInfo attach : effective) {
-                String perm = attach.getPermission();
-                if (perm.startsWith(stubPlus)) {
-                    String end = perm.substring(stubPlus.length());
-                    if (MathMan.isInteger(end)) {
-                        int val = Integer.parseInt(end);
-                        if (val > range) {
-                            return val;
-                        }
-                        if (val > max) {
-                            max = val;
+        if (CHECK_EFFECTIVE) {
+            boolean hasAny = false;
+            String stubPlus = stub + ".";
+            Set<PermissionAttachmentInfo> effective = player.getEffectivePermissions();
+            if (!effective.isEmpty()) {
+                for (PermissionAttachmentInfo attach : effective) {
+                    String permStr = attach.getPermission();
+                    if (permStr.startsWith(stubPlus)) {
+                        hasAny = true;
+                        String end = permStr.substring(stubPlus.length());
+                        if (MathMan.isInteger(end)) {
+                            int val = Integer.parseInt(end);
+                            if (val > range) {
+                                return val;
+                            }
+                            if (val > max) {
+                                max = val;
+                            }
                         }
                     }
                 }
-            }
-        } else {
-            for (int i = range; i > 0; i--) {
-                if (hasPermission(stub + "." + i)) {
-                    return i;
+                if (hasAny) {
+                    return max;
                 }
+                // Workaround
+                for (PermissionAttachmentInfo attach : effective) {
+                    String permStr = attach.getPermission();
+                    if (permStr.startsWith("plots.") && !permStr.equals("plots.use")) {
+                        return max;
+                    }
+                }
+                CHECK_EFFECTIVE = false;
+            }
+        }
+        for (int i = range; i > 0; i--) {
+            if (hasPermission(stub + "." + i)) {
+                return i;
             }
         }
         return max;

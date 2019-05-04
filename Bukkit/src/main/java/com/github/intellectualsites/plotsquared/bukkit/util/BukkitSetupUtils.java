@@ -9,6 +9,8 @@ import com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.SetupObject;
 import com.github.intellectualsites.plotsquared.plot.util.SetupUtils;
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MultiverseCoreConfig;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
@@ -61,11 +63,11 @@ public class BukkitSetupUtils extends SetupUtils {
         }
         if (save) {
             for (Chunk chunk : world.getLoadedChunks()) {
-                chunk.unload(true, false);
+                chunk.unload(true);
             }
         } else {
             for (Chunk chunk : world.getLoadedChunks()) {
-                chunk.unload(false, false);
+                chunk.unload(false);
             }
         }
         Bukkit.unloadWorld(world, false);
@@ -123,23 +125,28 @@ public class BukkitSetupUtils extends SetupUtils {
                 break;
             }
             case 1: {
-                if (!PlotSquared.get().worlds.contains(worldPath)) {
-                    PlotSquared.get().worlds.createSection(worldPath);
-                }
-                ConfigurationSection worldSection =
-                    PlotSquared.get().worlds.getConfigurationSection(worldPath);
-                for (ConfigurationNode step : steps) {
-                    worldSection.set(step.getConstant(), step.getValue());
-                }
-                PlotSquared.get().worlds.set("worlds." + world + ".generator.type", object.type);
-                PlotSquared.get().worlds
-                    .set("worlds." + world + ".generator.terrain", object.terrain);
-                PlotSquared.get().worlds
-                    .set("worlds." + world + ".generator.plugin", object.plotManager);
-                if (object.setupGenerator != null && !object.setupGenerator
-                    .equals(object.plotManager)) {
+                if (!object.plotManager.endsWith(":single")) {
+                    if (!PlotSquared.get().worlds.contains(worldPath)) {
+                        PlotSquared.get().worlds.createSection(worldPath);
+                    }
+                    if (steps.length != 0) {
+                        ConfigurationSection worldSection =
+                            PlotSquared.get().worlds.getConfigurationSection(worldPath);
+                        for (ConfigurationNode step : steps) {
+                            worldSection.set(step.getConstant(), step.getValue());
+                        }
+                    }
                     PlotSquared.get().worlds
-                        .set("worlds." + world + ".generator.init", object.setupGenerator);
+                        .set("worlds." + world + ".generator.type", object.type);
+                    PlotSquared.get().worlds
+                        .set("worlds." + world + ".generator.terrain", object.terrain);
+                    PlotSquared.get().worlds
+                        .set("worlds." + world + ".generator.plugin", object.plotManager);
+                    if (object.setupGenerator != null && !object.setupGenerator
+                        .equals(object.plotManager)) {
+                        PlotSquared.get().worlds
+                            .set("worlds." + world + ".generator.init", object.setupGenerator);
+                    }
                 }
                 GeneratorWrapper<?> gen = SetupUtils.generators.get(object.setupGenerator);
                 if (gen != null && gen.isFull()) {
@@ -166,20 +173,11 @@ public class BukkitSetupUtils extends SetupUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("Multiverse-Core");
         if (object.setupGenerator != null) {
-            if (Bukkit.getPluginManager().getPlugin("Multiverse-Core") != null && Bukkit
-                .getPluginManager().getPlugin("Multiverse-Core").isEnabled()) {
+            if (plugin != null && plugin.isEnabled()) {
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
                     "mv create " + world + " normal -g " + object.setupGenerator);
-                setGenerator(world, object.setupGenerator);
-                if (Bukkit.getWorld(world) != null) {
-                    return world;
-                }
-            }
-            if (Bukkit.getPluginManager().getPlugin("MultiWorld") != null && Bukkit
-                .getPluginManager().getPlugin("MultiWorld").isEnabled()) {
-                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
-                    "mw create " + world + " plugin:" + object.setupGenerator);
                 setGenerator(world, object.setupGenerator);
                 if (Bukkit.getWorld(world) != null) {
                     return world;
@@ -192,18 +190,9 @@ public class BukkitSetupUtils extends SetupUtils {
             Bukkit.createWorld(wc);
             setGenerator(world, object.setupGenerator);
         } else {
-            if (Bukkit.getPluginManager().getPlugin("Multiverse-Core") != null && Bukkit
-                .getPluginManager().getPlugin("Multiverse-Core").isEnabled()) {
+            if (plugin != null && plugin.isEnabled()) {
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
                     "mv create " + world + " normal");
-                if (Bukkit.getWorld(world) != null) {
-                    return world;
-                }
-            }
-            if (Bukkit.getPluginManager().getPlugin("MultiWorld") != null && Bukkit
-                .getPluginManager().getPlugin("MultiWorld").isEnabled()) {
-                Bukkit.getServer()
-                    .dispatchCommand(Bukkit.getServer().getConsoleSender(), "mw create " + world);
                 if (Bukkit.getWorld(world) != null) {
                     return world;
                 }

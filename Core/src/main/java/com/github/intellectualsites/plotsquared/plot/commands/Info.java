@@ -12,8 +12,8 @@ import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
 import java.util.UUID;
 
 @CommandDeclaration(command = "info", aliases = "i", description = "Display plot info",
-    usage = "/plot info <id> [-f, to force info]", category = CommandCategory.INFO) public class Info
-    extends SubCommand {
+    usage = "/plot info <id> [-f, to force info]", category = CommandCategory.INFO)
+public class Info extends SubCommand {
 
     @Override public boolean onCommand(final PlotPlayer player, String[] args) {
         Plot plot;
@@ -130,9 +130,15 @@ import java.util.UUID;
         if (arg != null) {
             info = getCaption(arg);
             if (info == null) {
-                MainUtil.sendMessage(player,
-                    "&6Categories&7: &amembers&7, &aalias&7, &abiome&7, &aseen&7, &adenied&7, &aflags&7, &aid&7, &asize&7, &atrusted&7, "
-                        + "&aowner&7, " + (Settings.Ratings.USE_LIKES ? " &alikes" : " &arating"));
+                if (Settings.Ratings.USE_LIKES) {
+                    MainUtil.sendMessage(player,
+                        "&6Categories&7: &amembers&7, &aalias&7, &abiome&7, &aseen&7, &adenied&7, &aflags&7, &aid&7, &asize&7, &atrusted&7, "
+                            + "&aowner&7, " + " &alikes");
+                } else {
+                    MainUtil.sendMessage(player,
+                        "&6Categories&7: &amembers&7, &aalias&7, &abiome&7, &aseen&7, &adenied&7, &aflags&7, &aid&7, &asize&7, &atrusted&7, "
+                            + "&aowner&7, " + " &arating");
+                }
                 return false;
             }
             full = true;

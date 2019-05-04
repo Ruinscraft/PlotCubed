@@ -3,7 +3,7 @@ package com.github.intellectualsites.plotsquared.bukkit;
 import com.github.intellectualsites.plotsquared.bukkit.generator.BukkitPlotGenerator;
 import com.github.intellectualsites.plotsquared.bukkit.listeners.*;
 import com.github.intellectualsites.plotsquared.bukkit.object.BukkitPlotBossBar;
-import com.github.intellectualsites.plotsquared.bukkit.titles.DefaultTitle_111;
+import com.github.intellectualsites.plotsquared.bukkit.titles.DefaultTitle;
 import com.github.intellectualsites.plotsquared.bukkit.util.*;
 import com.github.intellectualsites.plotsquared.bukkit.util.block.BukkitLocalQueue;
 import com.github.intellectualsites.plotsquared.bukkit.uuid.*;
@@ -32,8 +32,8 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import lombok.Getter;
 import lombok.NonNull;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.*;
 import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -49,7 +49,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.*;
 
 import static com.github.intellectualsites.plotsquared.plot.util.ReflectionUtils.getRefClass;
@@ -61,7 +60,8 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     static {
         try {
             Settings.load(new File("plugins/PlotSquared/config/settings.yml"));
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     private final LegacyMappings legacyMappings = new BukkitLegacyMappings();
@@ -111,17 +111,13 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS);
         } catch (final Throwable throwable) {
             throw new IllegalStateException(
-                    "Failed to force load WorldEdit. Road schematics will fail to generate",
-                    throwable);
+                "Failed to force load WorldEdit. Road schematics will fail to generate", throwable);
         }
     }
 
     @Override public void onEnable() {
 
-
         this.pluginName = getDescription().getName();
-        getServer().getName();
-
         PlotPlayer.registerConverter(Player.class, BukkitUtil::getPlayer);
 
         if (Bukkit.getVersion().contains("git-Spigot")) {
@@ -146,25 +142,31 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
         // Check for updates
         if (PlotSquared.get().getUpdateUtility() != null) {
             final UpdateUtility updateUtility = PlotSquared.get().getUpdateUtility();
-            updateUtility.checkForUpdate(this.getPluginVersionString(), ((updateDescription, throwable) -> {
-                Bukkit.getScheduler().runTask(BukkitMain.this, () -> {
-                    getLogger().info("-------- PlotSquared Update Check --------");
-                    if (throwable != null) {
-                        getLogger().severe(String.format("Could not check for update. Reason: %s",
-                            throwable.getMessage()));
-                    } else {
-                        if (updateDescription == null) {
-                            getLogger().info("You appear to be running the latest version of PlotSquared. Congratulations!");
+            updateUtility
+                .checkForUpdate(this.getPluginVersionString(), ((updateDescription, throwable) -> {
+                    Bukkit.getScheduler().runTask(BukkitMain.this, () -> {
+                        getLogger().info("-------- PlotSquared Update Check --------");
+                        if (throwable != null) {
+                            getLogger().severe(String
+                                .format("Could not check for update. Reason: %s",
+                                    throwable.getMessage()));
                         } else {
-                            getLogger().info("There appears to be a PlotSquared update available!");
-                            getLogger().info(String.format("You are running version %s,"
-                                + " the newest available version is %s", getPluginVersionString(), updateDescription.getVersion()));
-                            getLogger().info(String.format("Update URL: %s", updateDescription.getUrl()));
+                            if (updateDescription == null) {
+                                getLogger().info(
+                                    "You appear to be running the latest version of PlotSquared. Congratulations!");
+                            } else {
+                                getLogger()
+                                    .info("There appears to be a PlotSquared update available!");
+                                getLogger().info(String.format("You are running version %s,"
+                                        + " the newest available version is %s",
+                                    getPluginVersionString(), updateDescription.getVersion()));
+                                getLogger().info(
+                                    String.format("Update URL: %s", updateDescription.getUrl()));
+                            }
                         }
-                    }
-                    getLogger().info("-------- PlotSquared Update Check --------");
-                });
-            }));
+                        getLogger().info("-------- PlotSquared Update Check --------");
+                    });
+                }));
         } else {
             getLogger().warning("Update checking disabled. Skipping.");
         }
@@ -247,15 +249,15 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                                         continue outer;
                                     }
                                 } else {
-                                    result = world
-                                        .unloadChunk(chunkI.getX(), chunkI.getZ(), true, false);
+                                    result = world.unloadChunk(chunkI.getX(), chunkI.getZ(), true);
                                 }
                                 if (!result) {
                                     continue outer;
                                 }
-                            } while (index < chunks.length
-                                && System.currentTimeMillis() - start < 5);
-                            return;
+                                if (System.currentTimeMillis() - start > 5) {
+                                    return;
+                                }
+                            } while (index < chunks.length);
                         }
                     }
                 }
@@ -332,15 +334,12 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                     Entity entity = iterator.next();
                     switch (entity.getType()) {
                         case EGG:
-                        case COMPLEX_PART:
                         case FISHING_HOOK:
                         case ENDER_SIGNAL:
-                        case LINGERING_POTION:
                         case AREA_EFFECT_CLOUD:
                         case EXPERIENCE_ORB:
                         case LEASH_HITCH:
                         case FIREWORK:
-                        case WEATHER:
                         case LIGHTNING:
                         case WITHER_SKULL:
                         case UNKNOWN:
@@ -352,7 +351,6 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                         case SNOWBALL:
                         case SHULKER_BULLET:
                         case SPECTRAL_ARROW:
-                        case TIPPED_ARROW:
                         case ENDER_PEARL:
                         case ARROW:
                         case LLAMA_SPIT:
@@ -420,13 +418,13 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                         case SHULKER:
                             if (Settings.Enabled_Components.KILL_ROAD_MOBS) {
                                 LivingEntity livingEntity = (LivingEntity) entity;
-                                List<MetadataValue> meta = entity.getMetadata("plot");
-                                if (meta != null && !meta.isEmpty()) {
+                                List<MetadataValue> meta = entity.getMetadata("shulkerPlot");
+                                if (!meta.isEmpty()) {
                                     if (livingEntity.isLeashed()) {
                                         continue;
                                     }
                                     List<MetadataValue> keep = entity.getMetadata("keep");
-                                    if (keep != null && !keep.isEmpty()) {
+                                    if (!keep.isEmpty()) {
                                         continue;
                                     }
 
@@ -457,7 +455,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                                     if (area != null) {
                                         PlotId currentPlotId = PlotId.of(area.getPlotAbs(pLoc));
                                         if (currentPlotId != null) {
-                                            entity.setMetadata("plot", new FixedMetadataValue(
+                                            entity.setMetadata("shulkerPlot", new FixedMetadataValue(
                                                 (Plugin) PlotSquared.get().IMP, currentPlotId));
                                         }
                                     }
@@ -657,11 +655,15 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
         if (this.metricsStarted) {
             return;
         }
-        System.setProperty("bstats.relocatecheck",
-            "false"); // We do not want to relocate the package...
-        Metrics metrics = new Metrics(this);// bstats
-        PlotSquared.log(Captions.PREFIX + "&6Metrics enabled.");
         this.metricsStarted = true;
+        try {
+            System.setProperty("bstats.relocatecheck",
+                "false"); // We do not want to relocate the package...
+            Metrics metrics = new Metrics(this);// bstats
+            PlotSquared.log(Captions.PREFIX + "&6Metrics enabled.");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     @Override public ChunkManager initChunkManager() {
@@ -723,7 +725,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                 + " &c[WARN] Titles are disabled - please update your version of Bukkit to support this feature.");
             Settings.TITLES = false;
         } else {
-            AbstractTitle.TITLE_CLASS = new DefaultTitle_111();
+            AbstractTitle.TITLE_CLASS = new DefaultTitle();
             if (wrapper instanceof DefaultUUIDWrapper
                 || wrapper.getClass() == OfflineUUIDWrapper.class && !Bukkit.getOnlineMode()) {
                 Settings.UUID.NATIVE_UUID_PROVIDER = true;
@@ -770,6 +772,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                 return;
             }
         }
+        assert world != null;
         ChunkGenerator gen = world.getGenerator();
         if (gen instanceof BukkitPlotGenerator) {
             PlotSquared.get().loadWorld(worldName, (BukkitPlotGenerator) gen);
@@ -845,4 +848,5 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
         return new BukkitPlotBossBar(title, BukkitPlotBossBar.getBarColor(color), BukkitPlotBossBar.getBarStyle(style));
     }
     // PlotCubed end
+
 }

@@ -58,6 +58,7 @@ public class Plot {
      * plot owner
      * (Merged plots can have multiple owners)
      * Direct access is Deprecated: use getOwners()
+     *
      * @deprecated
      */
     @Deprecated public UUID owner;
@@ -355,6 +356,7 @@ public class Plot {
      * plot owner
      * (Merged plots can have multiple owners)
      * Direct access is Deprecated: use getOwners()
+     *
      * @deprecated
      */
     @Deprecated public UUID getOwner() {
@@ -362,6 +364,32 @@ public class Plot {
             return DBFunc.SERVER;
         }
         return this.owner;
+    }
+
+    /**
+     * Sets the plot owner (and update the database)
+     *
+     * @param owner uuid to set as owner
+     */
+    public void setOwner(UUID owner) {
+        if (!hasOwner()) {
+            this.owner = owner;
+            create();
+            return;
+        }
+        if (!isMerged()) {
+            if (!this.owner.equals(owner)) {
+                this.owner = owner;
+                DBFunc.setOwner(this, owner);
+            }
+            return;
+        }
+        for (Plot current : getConnectedPlots()) {
+            if (!owner.equals(current.owner)) {
+                current.owner = owner;
+                DBFunc.setOwner(current, owner);
+            }
+        }
     }
 
     /**
@@ -838,32 +866,6 @@ public class Plot {
         for (Plot current : getConnectedPlots()) {
             if (current.getMembers().add(uuid)) {
                 DBFunc.setMember(current, uuid);
-            }
-        }
-    }
-
-    /**
-     * Sets the plot owner (and update the database)
-     *
-     * @param owner uuid to set as owner
-     */
-    public void setOwner(UUID owner) {
-        if (!hasOwner()) {
-            this.owner = owner;
-            create();
-            return;
-        }
-        if (!isMerged()) {
-            if (!this.owner.equals(owner)) {
-                this.owner = owner;
-                DBFunc.setOwner(this, owner);
-            }
-            return;
-        }
-        for (Plot current : getConnectedPlots()) {
-            if (!owner.equals(current.owner)) {
-                current.owner = owner;
-                DBFunc.setOwner(current, owner);
             }
         }
     }
@@ -1379,7 +1381,7 @@ public class Plot {
         if (loc != null) {
             int x;
             int z;
-            if (loc.x == Integer.MAX_VALUE && loc.z == Integer.MAX_VALUE) {
+            if (loc.getX() == Integer.MAX_VALUE && loc.getZ() == Integer.MAX_VALUE) {
                 // center
                 RegionWrapper largest = plot.getLargestRegion();
                 x = (largest.maxX >> 1) - (largest.minX >> 1) + largest.minX;
@@ -1387,12 +1389,12 @@ public class Plot {
             } else {
                 // specific
                 Location bot = plot.getBottomAbs();
-                x = bot.getX() + loc.x;
-                z = bot.getZ() + loc.z;
+                x = bot.getX() + loc.getX();
+                z = bot.getZ() + loc.getZ();
             }
-            int y = loc.y < 1 ?
+            int y = loc.getY() < 1 ?
                 (isLoaded() ? WorldUtil.IMP.getHighestBlock(plot.getWorldName(), x, z) + 1 : 63) :
-                loc.y;
+                loc.getY();
             return new Location(plot.getWorldName(), x, y, z);
         }
         // Side

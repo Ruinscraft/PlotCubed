@@ -126,7 +126,8 @@ public class ConsolePlayer extends PlotPlayer {
     }
 
     // PlotCubed start
-    @Override public boolean canSee(PlotPlayer player) {
+    @Override
+    public boolean canSee(PlotPlayer player) {
         return false;
     }
     // PlotCubed end

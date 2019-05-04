@@ -1156,9 +1156,9 @@ import java.util.zip.ZipInputStream;
                                 + areaGen);
                         PlotSquared.log(Captions.PREFIX + "&c | &9plotworld: &7" + pa);
                         PlotSquared.log(Captions.PREFIX + "&c | &9manager: &7" + pa);
-                        PlotSquared
-                            .log(Captions.PREFIX + "&cNote: &7Area created for cluster:" + name
-                            + " (invalid or old configuration?)");
+                        PlotSquared.log(
+                            Captions.PREFIX + "&cNote: &7Area created for cluster:" + name
+                                + " (invalid or old configuration?)");
                         areaGen.getPlotGenerator().initialize(pa);
                         areaGen.augment(pa);
                         toLoad.add(pa);
@@ -1390,7 +1390,7 @@ import java.util.zip.ZipInputStream;
                 ConfigurationSection section =
                     this.worlds.getConfigurationSection("worlds." + world);
                 plotworld.saveConfiguration(section);
-                plotworld.loadConfiguration(section);
+                plotworld.loadDefaultConfiguration(section);
                 this.worlds.save(this.worldsFile);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1611,14 +1611,39 @@ import java.util.zip.ZipInputStream;
             }
         }
         Settings.load(configFile);
+        setupUpdateUtility();
+        //Sets the version information for the settings.yml file
+        try (InputStream stream = getClass().getResourceAsStream("/plugin.properties")) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
+                String versionString = br.readLine();
+                String commitString = br.readLine();
+                String dateString = br.readLine();
+                this.version = PlotVersion.tryParse(versionString, commitString, dateString);
+                Settings.DATE =
+                    new Date(100 + version.year, version.month, version.day).toGMTString();
+                Settings.BUILD = "https://ci.athion.net/job/PlotSquared/" + version.build;
+                Settings.COMMIT =
+                    "https://github.com/IntellectualSites/PlotSquared/commit/" + Integer
+                        .toHexString(version.hash);
+                System.out.println("Version is " + this.version);
+            }
+        } catch (IOException throwable) {
+            throwable.printStackTrace();
+        }
+        Settings.save(configFile);
+        config = YamlConfiguration.loadConfiguration(configFile);
+    }
+
+    private void setupUpdateUtility() {
         try {
             copyFile("updater.properties", "config");
-            try (BufferedReader bufferedReader =
-                new BufferedReader(new InputStreamReader(new FileInputStream(new File(new File(this.IMP.getDirectory(),
-                    "config"), "updater.properties"))))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(new File(new File(this.IMP.getDirectory(), "config"),
+                    "updater.properties"))))) {
                 final Properties properties = new Properties();
                 properties.load(bufferedReader);
-                final boolean enabled = Boolean.valueOf(properties.getOrDefault("enabled", true).toString());
+                final boolean enabled =
+                    Boolean.valueOf(properties.getOrDefault("enabled", true).toString());
                 if (enabled) {
                     this.updateUtility = new UpdateUtility(properties.getProperty("path"),
                         properties.getProperty("job"), properties.getProperty("artifact"));
@@ -1629,24 +1654,6 @@ import java.util.zip.ZipInputStream;
         } catch (final Throwable throwable) {
             throwable.printStackTrace();
         }
-        try (InputStream stream = getClass().getResourceAsStream("/plugin.properties");
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-            //java.util.Scanner scanner = new java.util.Scanner(stream).useDelimiter("\\A");
-            String versionString = br.readLine();
-            String commitString = br.readLine();
-            String dateString = br.readLine();
-            //scanner.close();
-            this.version = PlotVersion.tryParse(versionString, commitString, dateString);
-            Settings.DATE = new Date(100 + version.year, version.month, version.day).toGMTString();
-            Settings.BUILD = "https://ci.athion.net/job/PlotSquared/" + version.build;
-            Settings.COMMIT = "https://github.com/IntellectualSites/PlotSquared/commit/" + Integer
-                .toHexString(version.hash);
-            System.out.println("Version is " + this.version);
-        } catch (IOException throwable) {
-            throwable.printStackTrace();
-        }
-        Settings.save(configFile);
-        config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     /**

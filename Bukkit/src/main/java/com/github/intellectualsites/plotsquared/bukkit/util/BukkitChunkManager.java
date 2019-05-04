@@ -223,7 +223,7 @@ public class BukkitChunkManager extends ChunkManager {
                 for (int y = 0; y < blocks.length; y++) {
                     if (blocks[y] != null) {
                         BaseBlock block = blocks[y];
-                        queue.setBlock(loc.x, y, loc.z, block);
+                        queue.setBlock(loc.getX(), y, loc.getZ(), block);
                     }
                 }
             }
@@ -275,8 +275,6 @@ public class BukkitChunkManager extends ChunkManager {
                         continue;
                     }
                     final LocalBlockQueue queue = GlobalBlockQueue.IMP.getNewQueue(world, false);
-                    RegionWrapper currentPlotClear =
-                        new RegionWrapper(pos1.getX(), pos2.getX(), pos1.getZ(), pos2.getZ());
                     if (xxb >= p1x && xxt <= p2x && zzb >= p1z && zzt <= p2z) {
                         AugmentedUtils
                             .bypass(ignoreAugment, () -> queue.regenChunkSafe(chunk.x, chunk.z));
@@ -341,6 +339,8 @@ public class BukkitChunkManager extends ChunkManager {
                     if (checkX2 && checkZ2) {
                         map.saveRegion(bukkitWorldObj, xxt2, xxt, zzt2, zzt); //
                     }
+                    RegionWrapper currentPlotClear =
+                        new RegionWrapper(pos1.getX(), pos2.getX(), pos1.getZ(), pos2.getZ());
                     map.saveEntitiesOut(chunkObj, currentPlotClear);
                     AugmentedUtils.bypass(ignoreAugment,
                         () -> setChunkInPlotArea(null, new RunnableVal<ScopedLocalBlockQueue>() {
@@ -394,10 +394,9 @@ public class BukkitChunkManager extends ChunkManager {
     public void unloadChunk(final String world, final ChunkLoc loc, final boolean save,
         final boolean safe) {
         if (!PlotSquared.get().isMainThread(Thread.currentThread())) {
-            TaskManager
-                .runTask(() -> BukkitUtil.getWorld(world).unloadChunk(loc.x, loc.z, save, safe));
+            TaskManager.runTask(() -> BukkitUtil.getWorld(world).unloadChunk(loc.x, loc.z, save));
         } else {
-            BukkitUtil.getWorld(world).unloadChunk(loc.x, loc.z, save, safe);
+            BukkitUtil.getWorld(world).unloadChunk(loc.x, loc.z, save);
         }
     }
 
@@ -466,7 +465,6 @@ public class BukkitChunkManager extends ChunkManager {
             case ENDER_PEARL:
             case ARROW:
             case TRIDENT:
-            case TIPPED_ARROW:
             case SHULKER_BULLET:
             case SPECTRAL_ARROW:
             case DRAGON_FIREBALL:
@@ -476,18 +474,15 @@ public class BukkitChunkManager extends ChunkManager {
             case FALLING_BLOCK:
                 // Block entities
             case ENDER_CRYSTAL:
-            case COMPLEX_PART:
             case FISHING_HOOK:
             case ENDER_SIGNAL:
             case EXPERIENCE_ORB:
             case LEASH_HITCH:
             case FIREWORK:
-            case WEATHER:
             case LIGHTNING:
             case WITHER_SKULL:
             case UNKNOWN:
             case AREA_EFFECT_CLOUD:
-            case LINGERING_POTION:
             case EVOKER_FANGS:
                 // non moving / unremovable
                 break;
@@ -534,6 +529,9 @@ public class BukkitChunkManager extends ChunkManager {
             case SALMON:
             case PUFFERFISH:
             case TROPICAL_FISH:
+            case CAT:
+            case FOX:
+            case PANDA:
                 // animal
                 count[3]++;
                 count[1]++;
@@ -613,11 +611,7 @@ public class BukkitChunkManager extends ChunkManager {
             }
         }
 
-        public void saveEntitiesIn(Chunk chunk, RegionWrapper region) {
-            saveEntitiesIn(chunk, region, 0, 0, false);
-        }
-
-        public void saveEntitiesOut(Chunk chunk, RegionWrapper region) {
+        void saveEntitiesOut(Chunk chunk, RegionWrapper region) {
             for (Entity entity : chunk.getEntities()) {
                 Location loc = BukkitUtil.getLocation(entity);
                 int x = loc.getX();
@@ -634,7 +628,11 @@ public class BukkitChunkManager extends ChunkManager {
             }
         }
 
-        public void saveEntitiesIn(Chunk chunk, RegionWrapper region, int offsetX, int offsetZ,
+        void saveEntitiesIn(Chunk chunk, RegionWrapper region) {
+            saveEntitiesIn(chunk, region, 0, 0, false);
+        }
+
+        void saveEntitiesIn(Chunk chunk, RegionWrapper region, int offsetX, int offsetZ,
             boolean delete) {
             for (Entity entity : chunk.getEntities()) {
                 Location loc = BukkitUtil.getLocation(entity);
@@ -659,7 +657,7 @@ public class BukkitChunkManager extends ChunkManager {
             }
         }
 
-        public void restoreEntities(World world, int xOffset, int zOffset) {
+        void restoreEntities(World world, int xOffset, int zOffset) {
             for (EntityWrapper entity : this.entities) {
                 try {
                     entity.spawn(world, xOffset, zOffset);
@@ -672,8 +670,7 @@ public class BukkitChunkManager extends ChunkManager {
         }
 
         //todo optimize maxY
-        public void saveBlocks(BukkitWorld world, int maxY, int x, int z, int offsetX,
-            int offsetZ) {
+        void saveBlocks(BukkitWorld world, int maxY, int x, int z, int offsetX, int offsetZ) {
             maxY = Math.min(255, maxY);
             BaseBlock[] ids;
             ids = new BaseBlock[maxY + 1];

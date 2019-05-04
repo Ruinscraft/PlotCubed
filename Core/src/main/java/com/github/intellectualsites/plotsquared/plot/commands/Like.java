@@ -17,14 +17,11 @@ import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
 import java.util.*;
 
 @CommandDeclaration(command = "like", permission = "plots.like", description = "Like the plot",
-    usage = "/plot like [next|purge]", category = CommandCategory.INFO, requiredType = RequiredType.PLAYER)
-public class Like extends SubCommand {
+    usage = "/plot like [next|purge]", category = CommandCategory.INFO,
+    requiredType = RequiredType.PLAYER) public class Like extends SubCommand {
 
-    @Override public boolean onCommand(PlotPlayer player, String[] args) {
-        return handleLike(player, args, true);
-    }
-
-    protected static boolean handleLike(final PlotPlayer player, String[] args, final boolean like) {
+    protected static boolean handleLike(final PlotPlayer player, String[] args,
+        final boolean like) {
         final UUID uuid = player.getUUID();
         if (args.length == 1) {
             switch (args[0].toLowerCase()) {
@@ -96,8 +93,11 @@ public class Like extends SubCommand {
             final Rating result = EventUtil.manager.callRating(player, plot, new Rating(rating));
             if (result != null) {
                 plot.addRating(uuid, result);
-                sendMessage(player, like ? Captions.RATING_LIKED : Captions.RATING_DISLIKED,
-                    plot.getId().toString());
+                if (like) {
+                    sendMessage(player, Captions.RATING_LIKED, plot.getId().toString());
+                } else {
+                    sendMessage(player, Captions.RATING_DISLIKED, plot.getId().toString());
+                }
             }
         };
         if (plot.getSettings().ratings == null) {
@@ -138,6 +138,10 @@ public class Like extends SubCommand {
             return 1.0D;
         }
         return numLikes / (numLikes + numDislikes);
+    }
+
+    @Override public boolean onCommand(PlotPlayer player, String[] args) {
+        return handleLike(player, args, true);
     }
 
 }
