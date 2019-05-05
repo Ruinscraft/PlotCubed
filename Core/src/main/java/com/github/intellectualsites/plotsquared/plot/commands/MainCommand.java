@@ -98,6 +98,15 @@ public class MainCommand extends Command {
             new SetHome();
             new Cluster();
             new DebugImportWorlds();
+            // PlotCubed start
+            new AddWarp();
+            new Broadcast();
+            new DelWarp();
+            new Random();
+            new Timer();
+            new Visits();
+            new Warp();
+            // PlotCubed end
 
             if (Settings.Ratings.USE_LIKES) {
                 new Like();

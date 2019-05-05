@@ -41,6 +41,8 @@ ext {
         }
         buildNumber = "${index}"
     }
+
+    buildNumber = 1;
 }
 
 // version = String.format("%s.%s%s%s", rootVersion, date, revision, buildNumber)
