@@ -9,6 +9,8 @@ import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 
+import java.util.HashSet;
+
 @CommandDeclaration(command = "near", aliases = "n", description = "Display nearby players",
     usage = "/plot near", category = CommandCategory.INFO, requiredType = RequiredType.PLAYER)
 public class Near extends Command {
@@ -20,6 +22,14 @@ public class Near extends Command {
         RunnableVal3<Command, Runnable, Runnable> confirm,
         RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
-        Captions.PLOT_NEAR.send(player, StringMan.join(plot.getPlayersInPlot(), ", "));
+        // PlotCubed start
+        java.util.Set<PlotPlayer> toList = new HashSet<>();
+        for (PlotPlayer inPlot : plot.getPlayersInPlot()) {
+            if (player.canSee(inPlot)) {
+                toList.add(inPlot);
+            }
+        }
+        Captions.PLOT_NEAR.send(player, StringMan.join(toList, ", "));
+        // PlotCubed end
     }
 }
