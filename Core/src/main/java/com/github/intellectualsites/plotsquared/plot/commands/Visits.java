@@ -76,7 +76,7 @@ public class Visits extends SubCommand {
             final String inventoryName = Captions.TOP_INVENTORY_NAME.f(optionName);
             final PlotInventory inventory = new PlotInventory(player, INVENTORY_ROWS, inventoryName) {
                 @Override public boolean onClick(final int index) {
-                    if (inventoryEntries.size() < index) return false;
+                    if (inventoryEntries.size() - 1 < index) return false;
                     TopInventoryEntry entry = inventoryEntries.get(index);
                     Plot plot = entry.plot;
                     plot.teleportPlayer(player);
