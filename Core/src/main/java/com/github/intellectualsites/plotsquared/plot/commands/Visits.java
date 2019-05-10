@@ -23,7 +23,7 @@ import java.util.Map;
 public class Visits extends SubCommand {
 
     private static final int INVENTORY_ITEM_STACK_AMT = 1;
-    private static final int INVENTORY_SIZE = 6; // this automatically gets multiplied by 9 in PlotInventory
+    private static final int INVENTORY_ROWS = 6; // this automatically gets multiplied by 9 in PlotInventory
 
     @Override
     public boolean onCommand(final PlotPlayer player, String[] args) {
@@ -74,7 +74,7 @@ public class Visits extends SubCommand {
 
             final List<TopInventoryEntry> inventoryEntries = new ArrayList<>();
             final String inventoryName = Captions.TOP_INVENTORY_NAME.f(optionName);
-            final PlotInventory inventory = new PlotInventory(player, INVENTORY_SIZE, inventoryName) {
+            final PlotInventory inventory = new PlotInventory(player, INVENTORY_ROWS, inventoryName) {
                 @Override public boolean onClick(final int index) {
                     if (inventoryEntries.size() < index) return false;
                     TopInventoryEntry entry = inventoryEntries.get(index);
@@ -93,19 +93,19 @@ public class Visits extends SubCommand {
 
             // handle database visits
             else {
-                unsorted = DBFunc.getTopVisits(applicableArea, days, INVENTORY_SIZE * 9);
+                unsorted = DBFunc.getTopVisits(applicableArea, days, INVENTORY_ROWS * 9);
             }
 
             // sort the entries into inventoryEntries
             unsorted.entrySet()
                     .stream()
                     .sorted(Map.Entry.<Plot, Integer>comparingByValue().reversed())
-                    .limit(INVENTORY_SIZE).forEach(entry -> {
+                    .limit(INVENTORY_ROWS * 9).forEach(entry -> {
                 inventoryEntries.add(new TopInventoryEntry(entry.getKey(), entry.getValue()));
             });
 
             // fill the inventory contents
-            for (int i = 0; i < INVENTORY_SIZE; i++) {
+            for (int i = 0; i < INVENTORY_ROWS * 9; i++) {
                 if (inventoryEntries.size() < i + 1) break;
                 TopInventoryEntry entry = inventoryEntries.get(i);
                 String plotOwnerName = MainUtil.getName(entry.plot.guessOwner());
