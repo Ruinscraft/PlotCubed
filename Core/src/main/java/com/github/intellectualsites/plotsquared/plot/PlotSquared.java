@@ -1635,25 +1635,27 @@ import java.util.zip.ZipInputStream;
     }
 
     private void setupUpdateUtility() {
-        try {
-            copyFile("updater.properties", "config");
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
-                new FileInputStream(new File(new File(this.IMP.getDirectory(), "config"),
-                    "updater.properties"))))) {
-                final Properties properties = new Properties();
-                properties.load(bufferedReader);
-                final boolean enabled =
-                    Boolean.valueOf(properties.getOrDefault("enabled", true).toString());
-                if (enabled) {
-                    this.updateUtility = new UpdateUtility(properties.getProperty("path"),
-                        properties.getProperty("job"), properties.getProperty("artifact"));
-                }
-            } catch (final IOException throwable) {
-                throwable.printStackTrace();
-            }
-        } catch (final Throwable throwable) {
-            throwable.printStackTrace();
-        }
+        // PlotCubed start
+//        try {
+//            copyFile("updater.properties", "config");
+//            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+//                new FileInputStream(new File(new File(this.IMP.getDirectory(), "config"),
+//                    "updater.properties"))))) {
+//                final Properties properties = new Properties();
+//                properties.load(bufferedReader);
+//                final boolean enabled =
+//                    Boolean.valueOf(properties.getOrDefault("enabled", true).toString());
+//                if (enabled) {
+//                    this.updateUtility = new UpdateUtility(properties.getProperty("path"),
+//                        properties.getProperty("job"), properties.getProperty("artifact"));
+//                }
+//            } catch (final IOException throwable) {
+//                throwable.printStackTrace();
+//            }
+//        } catch (final Throwable throwable) {
+//            throwable.printStackTrace();
+//        }
+        // PlotCubed end
     }
 
     /**
