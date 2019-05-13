@@ -32,10 +32,14 @@ public class Random extends SubCommand {
                 plot = (Plot) PlotSquared.get().getPlots(worldName).toArray()[random.nextInt(PlotSquared.get().getPlots(worldName).size())];
             }
 
-            if (player != null && player.isOnline()) {
-                player.teleport(plot.getHome());
-                sendMessage(player, Captions.RANDOM_TELEPORTED);
-            }
+            final Plot finalPlot = plot;
+
+            TaskManager.runTask(() -> {
+                if (player != null && player.isOnline()) {
+                    player.teleport(finalPlot.getHome());
+                    sendMessage(player, Captions.RANDOM_TELEPORTED);
+                }
+            });
         });
 
         return true;
