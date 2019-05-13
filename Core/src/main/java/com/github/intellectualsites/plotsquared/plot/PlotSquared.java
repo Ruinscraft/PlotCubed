@@ -157,11 +157,13 @@ import java.util.zip.ZipInputStream;
             }
             // Required
             this.IMP.registerWorldEvents();
-            if (Settings.Enabled_Components.METRICS) {
-                this.IMP.startMetrics();
-            } else {
-                PlotSquared.log(Captions.CONSOLE_PLEASE_ENABLE_METRICS.f(IMP.getPluginName()));
-            }
+            // PlotCubed start
+//            if (Settings.Enabled_Components.METRICS) {
+//                this.IMP.startMetrics();
+//            } else {
+//                PlotSquared.log(Captions.CONSOLE_PLEASE_ENABLE_METRICS.f(IMP.getPluginName()));
+//            }
+            // PlotCubed end
             if (Settings.Enabled_Components.CHUNK_PROCESSOR) {
                 this.IMP.registerChunkProcessor();
             }
