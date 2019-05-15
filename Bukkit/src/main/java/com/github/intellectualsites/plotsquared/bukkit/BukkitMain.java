@@ -1,12 +1,21 @@
 package com.github.intellectualsites.plotsquared.bukkit;
 
 import com.github.intellectualsites.plotsquared.bukkit.generator.BukkitPlotGenerator;
-import com.github.intellectualsites.plotsquared.bukkit.listeners.*;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.ChunkListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.EntitySpawnListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.PlayerEvents;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.PlotPlusListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.SingleWorldListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.WorldEvents;
 import com.github.intellectualsites.plotsquared.bukkit.object.BukkitPlotBossBar;
 import com.github.intellectualsites.plotsquared.bukkit.titles.DefaultTitle;
 import com.github.intellectualsites.plotsquared.bukkit.util.*;
 import com.github.intellectualsites.plotsquared.bukkit.util.block.BukkitLocalQueue;
-import com.github.intellectualsites.plotsquared.bukkit.uuid.*;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.DefaultUUIDWrapper;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.FileUUIDHandler;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.LowerOfflineUUIDWrapper;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.OfflineUUIDWrapper;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.SQLUUIDHandler;
 import com.github.intellectualsites.plotsquared.configuration.ConfigurationSection;
 import com.github.intellectualsites.plotsquared.plot.IPlotMain;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -31,9 +40,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Capability;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bstats.bukkit.Metrics;
-import org.bukkit.Location;
 import org.bukkit.*;
+import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -49,7 +57,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 import static com.github.intellectualsites.plotsquared.plot.util.ReflectionUtils.getRefClass;
 
@@ -116,7 +128,6 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     }
 
     @Override public void onEnable() {
-
         this.pluginName = getDescription().getName();
         PlotPlayer.registerConverter(Player.class, BukkitUtil::getPlayer);
 
@@ -138,6 +149,15 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
         }
 
         new PlotSquared(this, "Bukkit");
+
+        if (PlotSquared.get().IMP.getServerVersion()[1] < 13) {
+            System.out.println(
+                "You can't use this version of PlotSquared on a server less than Minecraft 1.13.2.");
+            System.out
+                .println("Please check the download page for the link to the legacy versions.");
+            Bukkit.shutdown();
+            return;
+        }
 
         // Check for updates
         if (PlotSquared.get().getUpdateUtility() != null) {
@@ -171,11 +191,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
             getLogger().warning("Update checking disabled. Skipping.");
         }
 
-        if (Settings.Enabled_Components.METRICS) {
-            this.startMetrics();
-        } else {
-            PlotSquared.log(Captions.CONSOLE_PLEASE_ENABLE_METRICS.f(getPluginName()));
-        }
+        this.startMetrics();
         if (Settings.Enabled_Components.WORLDS) {
             TaskManager.IMP.taskRepeat(this::unload, 20);
             try {
@@ -656,14 +672,8 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
             return;
         }
         this.metricsStarted = true;
-        try {
-            System.setProperty("bstats.relocatecheck",
-                "false"); // We do not want to relocate the package...
-            Metrics metrics = new Metrics(this);// bstats
-            PlotSquared.log(Captions.PREFIX + "&6Metrics enabled.");
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+        Metrics metrics = new Metrics(this);// bstats
+        PlotSquared.log(Captions.PREFIX + "&6Metrics enabled.");
     }
 
     @Override public ChunkManager initChunkManager() {
@@ -695,12 +705,6 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     }
 
     @Override public UUIDHandlerImplementation initUUIDHandler() {
-        boolean checkVersion = false;
-        try {
-            OfflinePlayer.class.getDeclaredMethod("getUniqueId");
-            checkVersion = true;
-        } catch (Throwable ignore) {
-        }
         final UUIDWrapper wrapper;
         if (Settings.UUID.OFFLINE) {
             if (Settings.UUID.FORCE_LOWERCASE) {
@@ -709,23 +713,11 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                 wrapper = new OfflineUUIDWrapper();
             }
             Settings.UUID.OFFLINE = true;
-        } else if (checkVersion) {
+        } else {
             wrapper = new DefaultUUIDWrapper();
             Settings.UUID.OFFLINE = false;
-        } else {
-            if (Settings.UUID.FORCE_LOWERCASE) {
-                wrapper = new LowerOfflineUUIDWrapper();
-            } else {
-                wrapper = new OfflineUUIDWrapper();
-            }
-            Settings.UUID.OFFLINE = true;
         }
-        if (!checkVersion) {
-            PlotSquared.log(Captions.PREFIX
-                + " &c[WARN] Titles are disabled - please update your version of Bukkit to support this feature.");
-            Settings.TITLES = false;
-        } else {
-            AbstractTitle.TITLE_CLASS = new DefaultTitle();
+        if (!Bukkit.getVersion().contains("git-Spigot")) {
             if (wrapper instanceof DefaultUUIDWrapper
                 || wrapper.getClass() == OfflineUUIDWrapper.class && !Bukkit.getOnlineMode()) {
                 Settings.UUID.NATIVE_UUID_PROVIDER = true;
@@ -788,8 +780,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     }
 
     @Override public AbstractTitle initTitleManager() {
-        // Already initialized in UUID handler
-        return AbstractTitle.TITLE_CLASS;
+        return new DefaultTitle();
     }
 
     @Override @Nullable public PlotPlayer wrapPlayer(final Object player) {

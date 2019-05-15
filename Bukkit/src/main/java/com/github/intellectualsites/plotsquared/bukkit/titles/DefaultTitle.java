@@ -9,11 +9,7 @@ public class DefaultTitle extends AbstractTitle {
 
   @Override
   public void sendTitle(PlotPlayer player, String head, String sub, int in, int delay, int out) {
-    try {
-      final Player playerObj = ((BukkitPlayer) player).player;
-      TitleManager_1_11 title = new TitleManager_1_11(head, sub, in, delay, out);
-      title.send(playerObj);
-    } catch (Throwable ignored) {
-    }
+    final Player playerObj = ((BukkitPlayer) player).player;
+    playerObj.sendTitle(head, sub, in, delay, out);
   }
 }
