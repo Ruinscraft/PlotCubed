@@ -692,13 +692,11 @@ public enum Captions {
 
     // PlotCubed start
     PLOT_INFO("$1ID: $2%id%$1&-"
-                + "$1Alias: $2%alias%$1&-"
                 + "$1Owner: $2%owner%$1&-"
                 + "$1Size: $2%size%$1&-"
-               // + "$1Biome: $2%biome%$1&-" + "$1Can Build: $2%build%$1&-" + "$1Rating: $2%rating%&-"
-               // + "$1Seen: $2%seen%&-" + "$1Trusted: $2%trusted%$1&-" + "$1Members: $2%members%$1&-"
+                + "$1Trusted: $2%trusted%$1&-"
+                + "$1Members: $2%members%$1&-"
                 + "$1Denied: $2%denied%$1&-"
-                + "$1Flags: $2%flags%&-"
                 + "$1Warps: $2%warps%", "Info"),
     PLOT_INFO_FOOTER("$3&m---------&r $1INFO $3&m---------", false, "Info"),
     // PlotCubed end

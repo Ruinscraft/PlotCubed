@@ -181,6 +181,10 @@ public class Info extends SubCommand {
                 return Captions.PLOT_INFO_LIKES.s();
             case "seen":
                 return Captions.PLOT_INFO_SEEN.s();
+            // PlotCubed start
+            case "warps":
+                return Captions.PLOT_INFO_WARPS.s();
+            // PlotCubed end
             default:
                 return null;
         }
