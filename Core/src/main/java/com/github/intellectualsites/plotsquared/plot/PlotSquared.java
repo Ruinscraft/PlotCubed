@@ -195,8 +195,6 @@ import java.util.zip.ZipInputStream;
             ChunkManager.manager = this.IMP.initChunkManager();
             // Schematic handler
             SchematicHandler.manager = this.IMP.initSchematicHandler();
-            // Titles
-            AbstractTitle.TITLE_CLASS = this.IMP.initTitleManager();
             // Chat
             ChatManager.manager = this.IMP.initChatManager();
             // Commands
@@ -262,7 +260,7 @@ import java.util.zip.ZipInputStream;
                                 "&c`" + world + "` was not properly loaded - " + IMP.getPluginName()
                                     + " will now try to load it properly: ");
                             debug(
-                                "&8 - &7Are you trying to delete this world? Remember to remove it from the settings.yml, bukkit.yml and multiverse worlds.yml");
+                                "&8 - &7Are you trying to delete this world? Remember to remove it from the worlds.yml, bukkit.yml and multiverse worlds.yml");
                             debug(
                                 "&8 - &7Your world management plugin may be faulty (or non existent)");
                             PlotSquared.this.IMP.setGenerator(world);
@@ -1095,7 +1093,7 @@ import java.util.zip.ZipInputStream;
             }
             // Conventional plot generator
             PlotArea plotArea = plotGenerator.getNewPlotArea(world, null, null, null);
-            PlotManager plotManager = plotGenerator.getNewPlotManager();
+            PlotManager plotManager = plotArea.getPlotManager();
             PlotSquared.log(Captions.PREFIX + "&aDetected world load for '" + world + "'");
             PlotSquared
                 .log(Captions.PREFIX + "&3 - generator: &7" + baseGenerator + ">" + plotGenerator);
@@ -1340,8 +1338,8 @@ import java.util.zip.ZipInputStream;
                 }
                 String key = pair[0].toLowerCase();
                 String value = pair[1];
-                String base = "worlds." + world + ".";
                 try {
+                    String base = "worlds." + world + ".";
                     switch (key) {
                         case "s":
                         case "size":

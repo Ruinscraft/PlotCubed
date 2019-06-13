@@ -951,9 +951,9 @@ public class Plot {
                     };
                     for (Plot current : plots) {
                         if (isDelete || current.owner == null) {
-                            manager.unClaimPlot(Plot.this.area, current, null);
+                            manager.unClaimPlot(current, null);
                         } else {
-                            manager.claimPlot(Plot.this.area, current);
+                            manager.claimPlot(current);
                         }
                     }
                     GlobalBlockQueue.IMP.addTask(run);
@@ -965,7 +965,7 @@ public class Plot {
                         .regenerateRegion(current.getBottomAbs(), current.getTopAbs(), false, this);
                     return;
                 }
-                manager.clearPlot(Plot.this.area, current, this);
+                manager.clearPlot(current, this);
             }
         };
         run.run();
@@ -1040,20 +1040,20 @@ public class Plot {
         }
         PlotManager manager = this.area.getPlotManager();
         if (createRoad) {
-            manager.startPlotUnlink(this.area, ids);
+            manager.startPlotUnlink(ids);
         }
         if (this.area.TERRAIN != 3 && createRoad) {
             for (Plot current : plots) {
                 if (current.getMerged(Direction.EAST)) {
-                    manager.createRoadEast(current.area, current);
-                    if (getMerged(Direction.SOUTH)) {
-                        manager.createRoadSouth(current.area, current);
-                        if (getMerged(Direction.SOUTHEAST)) {
-                            manager.createRoadSouthEast(current.area, current);
+                    manager.createRoadEast(current);
+                    if (current.getMerged(Direction.SOUTH)) {
+                        manager.createRoadSouth(current);
+                        if (current.getMerged(Direction.SOUTHEAST)) {
+                            manager.createRoadSouthEast(current);
                         }
                     }
-                } else if (getMerged(Direction.SOUTH)) {
-                    manager.createRoadSouth(current.area, current);
+                } else if (current.getMerged(Direction.SOUTH)) {
+                    manager.createRoadSouth(current);
                 }
             }
         }
@@ -1069,7 +1069,7 @@ public class Plot {
             });
         }
         if (createRoad) {
-            manager.finishPlotUnlink(this.area, ids);
+            manager.finishPlotUnlink(ids);
         }
         return true;
     }
@@ -1089,7 +1089,7 @@ public class Plot {
         }
         PlotManager manager = this.area.getPlotManager();
         if (this.area.ALLOW_SIGNS) {
-            Location loc = manager.getSignLoc(this.area, this);
+            Location loc = manager.getSignLoc(this);
             String id = this.id.x + ";" + this.id.y;
             String[] lines =
                 new String[] {Captions.OWNER_SIGN_LINE_1.formatted().replaceAll("%id%", id),
@@ -1304,7 +1304,7 @@ public class Plot {
         int y =
             isLoaded() ? WorldUtil.IMP.getHighestBlock(getWorldName(), loc.getX(), loc.getZ()) : 62;
         if (area.ALLOW_SIGNS) {
-            y = Math.max(y, getManager().getSignLoc(area, this).getY());
+            y = Math.max(y, getManager().getSignLoc(this).getY());
         }
         loc.setY(1 + y);
         return loc;
@@ -1317,7 +1317,7 @@ public class Plot {
         PlotManager manager = getManager();
         int y = isLoaded() ? WorldUtil.IMP.getHighestBlock(getWorldName(), x, z) : 62;
         if (area.ALLOW_SIGNS && (y <= 0 || y >= 255)) {
-            y = Math.max(y, manager.getSignLoc(area, this).getY() - 1);
+            y = Math.max(y, manager.getSignLoc(this).getY() - 1);
         }
         return new Location(getWorldName(), x, y + 1, z);
     }
@@ -1457,9 +1457,7 @@ public class Plot {
     public Map<UUID, Boolean> getLikes() {
         final Map<UUID, Boolean> map = new HashMap<>();
         final Map<UUID, Rating> ratings = this.getRatings();
-        ratings.forEach((uuid, rating) -> {
-            map.put(uuid, rating.getLike());
-        });
+        ratings.forEach((uuid, rating) -> map.put(uuid, rating.getLike()));
         return map;
     }
 
@@ -1512,7 +1510,7 @@ public class Plot {
         if (!this.area.ALLOW_SIGNS) {
             return;
         }
-        Location loc = manager.getSignLoc(this.area, this);
+        Location loc = manager.getSignLoc(this);
         LocalBlockQueue queue = GlobalBlockQueue.IMP.getNewQueue(getWorldName(), false);
         queue.setBlock(loc.getX(), loc.getY(), loc.getZ(), PlotBlock.get("air"));
         queue.flush();
@@ -1595,7 +1593,7 @@ public class Plot {
                     }
                 });
         }
-        plotworld.getPlotManager().claimPlot(plotworld, this);
+        plotworld.getPlotManager().claimPlot(this);
         return true;
     }
 
@@ -1664,7 +1662,7 @@ public class Plot {
      * Returns the top location for the plot.
      */
     public Location getTopAbs() {
-        Location top = this.area.getPlotManager().getPlotTopLocAbs(this.area, this.id);
+        Location top = getManager().getPlotTopLocAbs(this.id);
         top.setWorld(getWorldName());
         return top;
     }
@@ -1675,7 +1673,7 @@ public class Plot {
      * Returns the bottom location for the plot.
      */
     public Location getBottomAbs() {
-        Location loc = this.area.getPlotManager().getPlotBottomLocAbs(this.area, this.id);
+        Location loc = getManager().getPlotBottomLocAbs(this.id);
         loc.setWorld(getWorldName());
         return loc;
     }
@@ -1766,7 +1764,7 @@ public class Plot {
             top.setZ(this.getRelative(Direction.SOUTH).getBottomAbs().getZ() - 1);
         }
         if (this.getMerged(Direction.EAST)) {
-            top.setX(this.getRelative(Direction.SOUTH).getBottomAbs().getX() - 1);
+            top.setX(this.getRelative(Direction.EAST).getBottomAbs().getX() - 1);
         }
         return top;
     }
@@ -1823,7 +1821,7 @@ public class Plot {
             Location pos2 = new Location(this.getWorldName(), bot.getX(), MAX_HEIGHT, top.getZ());
             ChunkManager.manager.regenerateRegion(pos1, pos2, true, null);
         } else {
-            this.area.getPlotManager().removeRoadEast(this.area, this);
+            this.area.getPlotManager().removeRoadEast(this);
         }
     }
 
@@ -2223,7 +2221,7 @@ public class Plot {
             return null;
         }
         try {
-            final Location loc = this.getManager().getSignLoc(this.area, this);
+            final Location loc = this.getManager().getSignLoc(this);
             String[] lines = TaskManager.IMP.sync(new RunnableVal<String[]>() {
                 @Override public void run(String[] value) {
                     ChunkManager.manager.loadChunk(loc.getWorld(), loc.getChunkLoc(), false);
@@ -2292,7 +2290,7 @@ public class Plot {
             Location pos2 = new Location(this.getWorldName(), top.getX(), MAX_HEIGHT, bot.getZ());
             ChunkManager.manager.regenerateRegion(pos1, pos2, true, null);
         } else {
-            this.getManager().removeRoadSouth(this.area, this);
+            this.getManager().removeRoadSouth(this);
         }
     }
 
@@ -2317,13 +2315,13 @@ public class Plot {
         if (!EventUtil.manager.callMerge(this, dir, max)) {
             return false;
         }
-        HashSet<Plot> visited = new HashSet<>();
-        HashSet<PlotId> merged;
         Set<Plot> connected = this.getConnectedPlots();
-        merged = connected.stream().map(Plot::getId).collect(Collectors.toCollection(HashSet::new));
+        HashSet<PlotId> merged =
+            connected.stream().map(Plot::getId).collect(Collectors.toCollection(HashSet::new));
         ArrayDeque<Plot> frontier = new ArrayDeque<>(connected);
         Plot current;
         boolean toReturn = false;
+        HashSet<Plot> visited = new HashSet<>();
         while ((current = frontier.poll()) != null && max >= 0) {
             if (visited.contains(current)) {
                 continue;
@@ -2340,6 +2338,13 @@ public class Plot {
                     merged.add(current.getId());
                     merged.add(other.getId());
                     toReturn = true;
+
+                    if (removeRoads) {
+                        ArrayList<PlotId> ids = new ArrayList<>();
+                        ids.add(current.getId());
+                        ids.add(other.getId());
+                        this.getManager().finishPlotMerge(ids);
+                    }
                 }
             }
             if (max >= 0 && (dir == -1 || dir == 1) && !current.getMerged(Direction.EAST)) {
@@ -2352,6 +2357,13 @@ public class Plot {
                     merged.add(current.getId());
                     merged.add(other.getId());
                     toReturn = true;
+
+                    if (removeRoads) {
+                        ArrayList<PlotId> ids = new ArrayList<>();
+                        ids.add(current.getId());
+                        ids.add(other.getId());
+                        this.getManager().finishPlotMerge(ids);
+                    }
                 }
             }
             if (max >= 0 && (dir == -1 || dir == 2) && !getMerged(Direction.SOUTH)) {
@@ -2364,6 +2376,13 @@ public class Plot {
                     merged.add(current.getId());
                     merged.add(other.getId());
                     toReturn = true;
+
+                    if (removeRoads) {
+                        ArrayList<PlotId> ids = new ArrayList<>();
+                        ids.add(current.getId());
+                        ids.add(other.getId());
+                        this.getManager().finishPlotMerge(ids);
+                    }
                 }
             }
             if (max >= 0 && (dir == -1 || dir == 3) && !getMerged(Direction.WEST)) {
@@ -2376,12 +2395,15 @@ public class Plot {
                     merged.add(current.getId());
                     merged.add(other.getId());
                     toReturn = true;
+
+                    if (removeRoads) {
+                        ArrayList<PlotId> ids = new ArrayList<>();
+                        ids.add(current.getId());
+                        ids.add(other.getId());
+                        this.getManager().finishPlotMerge(ids);
+                    }
                 }
             }
-        }
-        if (removeRoads && toReturn) {
-            ArrayList<PlotId> ids = new ArrayList<>(merged);
-            this.getManager().finishPlotMerge(this.area, ids);
         }
         return toReturn;
     }
@@ -2447,7 +2469,7 @@ public class Plot {
             pos2.setY(MAX_HEIGHT);
             ChunkManager.manager.regenerateRegion(pos1, pos2, true, null);
         } else {
-            this.area.getPlotManager().removeRoadSouthEast(this.area, this);
+            this.area.getPlotManager().removeRoadSouthEast(this);
         }
     }
 
@@ -2507,9 +2529,7 @@ public class Plot {
         if (this.settings == null) {
             return Collections.singleton(this);
         }
-        boolean[] merged = this.getMerged();
-        int hash = MainUtil.hash(merged);
-        if (hash == 0) {
+        if (!this.isMerged()) {
             return Collections.singleton(this);
         }
         if (connected_cache != null && connected_cache.contains(this)) {
@@ -2518,11 +2538,11 @@ public class Plot {
         regions_cache = null;
 
         HashSet<Plot> tmpSet = new HashSet<>();
-        ArrayDeque<Plot> frontier = new ArrayDeque<>();
-        HashSet<Object> queuecache = new HashSet<>();
         tmpSet.add(this);
         Plot tmp;
-        if (merged[0]) {
+        HashSet<Object> queuecache = new HashSet<>();
+        ArrayDeque<Plot> frontier = new ArrayDeque<>();
+        if (this.getMerged(Direction.NORTH)) {
             tmp = this.area.getPlotAbs(this.id.getRelative(Direction.NORTH));
             if (!tmp.getMerged(Direction.SOUTH)) {
                 // invalid merge
@@ -2538,7 +2558,7 @@ public class Plot {
             queuecache.add(tmp);
             frontier.add(tmp);
         }
-        if (merged[1]) {
+        if (this.getMerged(Direction.EAST)) {
             tmp = this.area.getPlotAbs(this.id.getRelative(Direction.EAST));
             if (!tmp.getMerged(Direction.WEST)) {
                 // invalid merge
@@ -2554,7 +2574,7 @@ public class Plot {
             queuecache.add(tmp);
             frontier.add(tmp);
         }
-        if (merged[2]) {
+        if (this.getMerged(Direction.SOUTH)) {
             tmp = this.area.getPlotAbs(this.id.getRelative(Direction.SOUTH));
             if (!tmp.getMerged(Direction.NORTH)) {
                 // invalid merge
@@ -2570,7 +2590,7 @@ public class Plot {
             queuecache.add(tmp);
             frontier.add(tmp);
         }
-        if (merged[3]) {
+        if (this.getMerged(Direction.WEST)) {
             tmp = this.area.getPlotAbs(this.id.getRelative(Direction.WEST));
             if (!tmp.getMerged(Direction.EAST)) {
                 // invalid merge
@@ -2597,29 +2617,28 @@ public class Plot {
             }
             tmpSet.add(current);
             queuecache.remove(current);
-            merged = current.getMerged();
-            if (merged[0]) {
+            if (current.getMerged(Direction.NORTH)) {
                 tmp = current.area.getPlotAbs(current.id.getRelative(Direction.NORTH));
                 if (tmp != null && !queuecache.contains(tmp) && !tmpSet.contains(tmp)) {
                     queuecache.add(tmp);
                     frontier.add(tmp);
                 }
             }
-            if (merged[1]) {
+            if (current.getMerged(Direction.EAST)) {
                 tmp = current.area.getPlotAbs(current.id.getRelative(Direction.EAST));
                 if (tmp != null && !queuecache.contains(tmp) && !tmpSet.contains(tmp)) {
                     queuecache.add(tmp);
                     frontier.add(tmp);
                 }
             }
-            if (merged[2]) {
+            if (current.getMerged(Direction.SOUTH)) {
                 tmp = current.area.getPlotAbs(current.id.getRelative(Direction.SOUTH));
                 if (tmp != null && !queuecache.contains(tmp) && !tmpSet.contains(tmp)) {
                     queuecache.add(tmp);
                     frontier.add(tmp);
                 }
             }
-            if (merged[3]) {
+            if (current.getMerged(Direction.WEST)) {
                 tmp = current.area.getPlotAbs(current.id.getRelative(Direction.WEST));
                 if (tmp != null && !queuecache.contains(tmp) && !tmpSet.contains(tmp)) {
                     queuecache.add(tmp);
@@ -2907,15 +2926,15 @@ public class Plot {
      */
     public boolean setComponent(String component, BlockBucket blocks) {
         if (StringMan
-            .isEqualToAny(component, getManager().getPlotComponents(this.area, this.getId()))) {
+            .isEqualToAny(component, getManager().getPlotComponents(this.getId()))) {
             EventUtil.manager.callComponentSet(this, component);
         }
-        return this.getManager().setComponent(this.area, this.getId(), component, blocks);
+        return this.getManager().setComponent(this.getId(), component, blocks);
     }
 
     public int getDistanceFromOrigin() {
-        Location bot = getManager().getPlotBottomLocAbs(this.area, id);
-        Location top = getManager().getPlotTopLocAbs(this.area, id);
+        Location bot = getManager().getPlotBottomLocAbs(id);
+        Location top = getManager().getPlotTopLocAbs(id);
         return Math.max(Math.max(Math.abs(bot.getX()), Math.abs(bot.getZ())),
             Math.max(Math.abs(top.getX()), Math.abs(top.getZ())));
     }
@@ -3036,51 +3055,51 @@ public class Plot {
             plot.swapData(other, null);
         }
         // copy terrain
-        Runnable move = new Runnable() {
-            @Override public void run() {
-                if (regions.isEmpty()) {
-                    Plot plot = destination.getRelative(0, 0);
-                    for (Plot current : plot.getConnectedPlots()) {
-                        getManager().claimPlot(current.getArea(), current);
-                        Plot originPlot = originArea.getPlotAbs(
-                            new PlotId(current.id.x - offset.x, current.id.y - offset.y));
-                        originPlot.getManager().unClaimPlot(originArea, originPlot, null);
-                    }
-                    plot.setSign();
-                    TaskManager.runTask(whenDone);
-                    return;
-                }
-                final Runnable task = this;
-                RegionWrapper region = regions.poll();
-                Location[] corners = region.getCorners(getWorldName());
-                final Location pos1 = corners[0];
-                final Location pos2 = corners[1];
-                Location newPos = pos1.clone().add(offsetX, 0, offsetZ);
-                newPos.setWorld(destination.getWorldName());
-                ChunkManager.manager.copyRegion(pos1, pos2, newPos,
-                    () -> ChunkManager.manager.regenerateRegion(pos1, pos2, false, task));
-            }
-        };
-        Runnable swap = new Runnable() {
-            @Override public void run() {
-                if (regions.isEmpty()) {
-                    TaskManager.runTask(whenDone);
-                    return;
-                }
-                RegionWrapper region = regions.poll();
-                Location[] corners = region.getCorners(getWorldName());
-                Location pos1 = corners[0];
-                Location pos2 = corners[1];
-                Location pos3 = pos1.clone().add(offsetX, 0, offsetZ);
-                Location pos4 = pos2.clone().add(offsetX, 0, offsetZ);
-                pos3.setWorld(destination.getWorldName());
-                pos4.setWorld(destination.getWorldName());
-                ChunkManager.manager.swap(pos1, pos2, pos3, pos4, this);
-            }
-        };
         if (occupied) {
+            Runnable swap = new Runnable() {
+                @Override public void run() {
+                    if (regions.isEmpty()) {
+                        TaskManager.runTask(whenDone);
+                        return;
+                    }
+                    RegionWrapper region = regions.poll();
+                    Location[] corners = region.getCorners(getWorldName());
+                    Location pos1 = corners[0];
+                    Location pos2 = corners[1];
+                    Location pos3 = pos1.clone().add(offsetX, 0, offsetZ);
+                    Location pos4 = pos2.clone().add(offsetX, 0, offsetZ);
+                    pos3.setWorld(destination.getWorldName());
+                    pos4.setWorld(destination.getWorldName());
+                    ChunkManager.manager.swap(pos1, pos2, pos3, pos4, this);
+                }
+            };
             swap.run();
         } else {
+            Runnable move = new Runnable() {
+                @Override public void run() {
+                    if (regions.isEmpty()) {
+                        Plot plot = destination.getRelative(0, 0);
+                        for (Plot current : plot.getConnectedPlots()) {
+                            getManager().claimPlot(current);
+                            Plot originPlot = originArea.getPlotAbs(
+                                new PlotId(current.id.x - offset.x, current.id.y - offset.y));
+                            originPlot.getManager().unClaimPlot(originPlot, null);
+                        }
+                        plot.setSign();
+                        TaskManager.runTask(whenDone);
+                        return;
+                    }
+                    final Runnable task = this;
+                    RegionWrapper region = regions.poll();
+                    Location[] corners = region.getCorners(getWorldName());
+                    final Location pos1 = corners[0];
+                    final Location pos2 = corners[1];
+                    Location newPos = pos1.clone().add(offsetX, 0, offsetZ);
+                    newPos.setWorld(destination.getWorldName());
+                    ChunkManager.manager.copyRegion(pos1, pos2, newPos,
+                        () -> ChunkManager.manager.regenerateRegion(pos1, pos2, false, task));
+                }
+            };
             move.run();
         }
         return true;
@@ -3150,7 +3169,7 @@ public class Plot {
             @Override public void run() {
                 if (regions.isEmpty()) {
                     for (Plot current : getConnectedPlots()) {
-                        destination.getManager().claimPlot(destination.getArea(), destination);
+                        destination.getManager().claimPlot(destination);
                     }
                     destination.setSign();
                     TaskManager.runTask(whenDone);

@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.RegisteredListener;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
@@ -52,7 +52,7 @@ public class BukkitPlayer extends PlotPlayer {
         return location == null ? BukkitUtil.getLocation(this.player) : location;
     }
 
-    @Nonnull @Override public UUID getUUID() {
+    @NotNull @Override public UUID getUUID() {
         if (this.uuid == null) {
             this.uuid = UUIDHandler.getUUID(this);
         }
@@ -74,6 +74,11 @@ public class BukkitPlayer extends PlotPlayer {
         event = new PlayerTeleportEvent(player, to, from);
         callEvent(event);
         return true;
+    }
+
+    @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
     }
 
     private void callEvent(final Event event) {
@@ -211,8 +216,6 @@ public class BukkitPlayer extends PlotPlayer {
                 this.player.setPlayerWeather(WeatherType.DOWNFALL);
                 break;
             case RESET:
-                this.player.resetPlayerWeather();
-                break;
             default:
                 this.player.resetPlayerWeather();
                 break;
@@ -246,8 +249,6 @@ public class BukkitPlayer extends PlotPlayer {
                 this.player.setGameMode(GameMode.SPECTATOR);
                 break;
             case SURVIVAL:
-                this.player.setGameMode(GameMode.SURVIVAL);
-                break;
             default:
                 this.player.setGameMode(GameMode.SURVIVAL);
                 break;

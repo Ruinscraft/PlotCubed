@@ -9,6 +9,7 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotBossBar;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.*;
 import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
@@ -247,14 +248,7 @@ public interface IPlotMain extends ILogger {
      *
      * @return Default implementation generator
      */
-    IndependentPlotGenerator getDefaultGenerator();
-
-    /**
-     * Gets the class that will manage player titles.
-     *
-     * @return
-     */
-    AbstractTitle initTitleManager();
+    @NotNull IndependentPlotGenerator getDefaultGenerator();
 
     List<String> getPluginIds();
 

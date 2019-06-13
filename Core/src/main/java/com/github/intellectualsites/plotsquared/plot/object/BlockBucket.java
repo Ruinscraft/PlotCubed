@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -135,7 +136,7 @@ import java.util.Map.Entry;
         }
     }
 
-    @Override public Iterator<PlotBlock> iterator() {
+    @NotNull @Override public Iterator<PlotBlock> iterator() {
         return this.bucketIterator;
     }
 
@@ -166,16 +167,16 @@ import java.util.Map.Entry;
             compile();
         }
         final StringBuilder builder = new StringBuilder();
-        Iterator<Entry<PlotBlock, Double>> iter = blocks.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<PlotBlock, Double> entry = iter.next();
+        Iterator<Entry<PlotBlock, Double>> iterator = blocks.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Entry<PlotBlock, Double> entry = iterator.next();
             PlotBlock block = entry.getKey();
             builder.append(block.getRawId());
             Double weight = entry.getValue();
             if (weight != 1) {
                 builder.append(":").append(weight.intValue());
             }
-            if (iter.hasNext()) {
+            if (iterator.hasNext()) {
                 builder.append(",");
             }
         }

@@ -10,12 +10,18 @@ import com.github.intellectualsites.plotsquared.plot.flag.FlagManager;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.generator.GridPlotWorld;
 import com.github.intellectualsites.plotsquared.plot.generator.IndependentPlotGenerator;
-import com.github.intellectualsites.plotsquared.plot.util.*;
+import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
+import com.github.intellectualsites.plotsquared.plot.util.EventUtil;
+import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
+import com.github.intellectualsites.plotsquared.plot.util.MathMan;
+import com.github.intellectualsites.plotsquared.plot.util.PlotGameMode;
+import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.github.intellectualsites.plotsquared.plot.util.area.QuadMap;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,11 +77,11 @@ public abstract class PlotArea {
     private QuadMap<PlotCluster> clusters;
 
     public PlotArea(@Nonnull final String worldName, @Nullable final String id,
-        @Nullable IndependentPlotGenerator generator, @Nullable final PlotId min,
+        @NotNull IndependentPlotGenerator generator, @Nullable final PlotId min,
         @Nullable final PlotId max) {
         this.worldname = worldName;
         this.id = id;
-        this.manager = generator != null ? generator.getNewPlotManager() : null;
+        this.manager = createManager();
         this.generator = generator;
         if (min == null || max == null) {
             if (min != max) {
@@ -89,27 +95,14 @@ public abstract class PlotArea {
             this.max = max;
         }
         this.worldhash = worldName.hashCode();
-        if (Settings.Enabled_Components.PLOT_EXPIRY && generator != null) {
+        if (Settings.Enabled_Components.PLOT_EXPIRY) {
             blockBucketChunk = generator.generateBlockBucketChunk(this);
         } else {
             blockBucketChunk = null;
         }
     }
 
-    /**
-     * Create a new PlotArea object with no functionality/information.
-     * - Mainly used during startup before worlds are created as a temporary object
-     */
-    public static PlotArea createGeneric(@Nonnull final String world) {
-        return new PlotArea(world, null, null, null, null) {
-            @Override public void loadConfiguration(ConfigurationSection config) {
-            }
-
-            @Override public ConfigurationNode[] getSettingNodes() {
-                return null;
-            }
-        };
-    }
+    protected abstract PlotManager createManager();
 
     public LocalBlockQueue getQueue(final boolean autoQueue) {
         return GlobalBlockQueue.IMP.getNewQueue(worldname, autoQueue);
@@ -153,8 +146,8 @@ public abstract class PlotArea {
     private RegionWrapper getRegionAbs() {
         if (this.region == null) {
             if (this.min != null) {
-                Location bot = getPlotManager().getPlotBottomLocAbs(this, this.min);
-                Location top = getPlotManager().getPlotTopLocAbs(this, this.max);
+                Location bot = getPlotManager().getPlotBottomLocAbs(this.min);
+                Location top = getPlotManager().getPlotTopLocAbs(this.max);
                 this.region = new RegionWrapper(bot.getX() - 1, top.getX() + 1, bot.getZ() - 1,
                     top.getZ() + 1);
             }
@@ -438,7 +431,7 @@ public abstract class PlotArea {
      */
     @Nullable public Plot getPlotAbs(@Nonnull final Location location) {
         final PlotId pid =
-            this.manager.getPlotId(this, location.getX(), location.getY(), location.getZ());
+            this.manager.getPlotId(location.getX(), location.getY(), location.getZ());
         if (pid == null) {
             return null;
         }
@@ -453,7 +446,7 @@ public abstract class PlotArea {
      */
     @Nullable public Plot getPlot(@Nonnull final Location location) {
         final PlotId pid =
-            this.manager.getPlotId(this, location.getX(), location.getY(), location.getZ());
+            this.manager.getPlotId(location.getX(), location.getY(), location.getZ());
         if (pid == null) {
             return null;
         }
@@ -468,7 +461,7 @@ public abstract class PlotArea {
      */
     @Nullable public Plot getOwnedPlot(@Nonnull final Location location) {
         final PlotId pid =
-            this.manager.getPlotId(this, location.getX(), location.getY(), location.getZ());
+            this.manager.getPlotId(location.getX(), location.getY(), location.getZ());
         if (pid == null) {
             return null;
         }
@@ -484,7 +477,7 @@ public abstract class PlotArea {
      */
     @Nullable public Plot getOwnedPlotAbs(@Nonnull final Location location) {
         final PlotId pid =
-            this.manager.getPlotId(this, location.getX(), location.getY(), location.getZ());
+            this.manager.getPlotId(location.getX(), location.getY(), location.getZ());
         if (pid == null) {
             return null;
         }
@@ -851,11 +844,10 @@ public abstract class PlotArea {
             return false;
         }
 
+        manager.startPlotMerge(plotIds);
         final Set<UUID> trusted = new HashSet<>();
         final Set<UUID> members = new HashSet<>();
         final Set<UUID> denied = new HashSet<>();
-
-        manager.startPlotMerge(this, plotIds);
         for (int x = pos1.x; x <= pos2.x; x++) {
             for (int y = pos1.y; y <= pos2.y; y++) {
                 PlotId id = new PlotId(x, y);
@@ -904,7 +896,7 @@ public abstract class PlotArea {
                 }
             }
         }
-        manager.finishPlotMerge(this, plotIds);
+        manager.finishPlotMerge(plotIds);
         return true;
     }
 

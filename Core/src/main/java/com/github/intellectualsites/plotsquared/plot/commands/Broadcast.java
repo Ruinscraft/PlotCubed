@@ -5,7 +5,6 @@ import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.util.AbstractTitle;
 
 @CommandDeclaration(command = "broadcast",
         description = "Broadcast a message to a plot",
@@ -39,7 +38,7 @@ public class Broadcast extends SubCommand {
         }
 
         for (PlotPlayer playerInPlot : plot.getPlayersInPlot()) {
-            AbstractTitle.sendTitle(playerInPlot, msg, "");
+            playerInPlot.sendTitle(msg, "");
             playerInPlot.sendMessage(Captions.color(Captions.BROADCAST_PREFIX.s() + msg));
         }
 

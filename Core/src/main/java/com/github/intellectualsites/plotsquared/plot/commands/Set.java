@@ -8,8 +8,17 @@ import com.github.intellectualsites.plotsquared.plot.config.Configuration.Unknow
 import com.github.intellectualsites.plotsquared.plot.flag.Flag;
 import com.github.intellectualsites.plotsquared.plot.flag.FlagManager;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
-import com.github.intellectualsites.plotsquared.plot.object.*;
-import com.github.intellectualsites.plotsquared.plot.util.*;
+import com.github.intellectualsites.plotsquared.plot.object.BlockBucket;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
+import com.github.intellectualsites.plotsquared.plot.object.PlotManager;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
+import com.github.intellectualsites.plotsquared.plot.util.Permissions;
+import com.github.intellectualsites.plotsquared.plot.util.StringComparison;
+import com.github.intellectualsites.plotsquared.plot.util.StringMan;
+import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 
 import java.util.ArrayList;
@@ -38,7 +47,7 @@ import java.util.stream.IntStream;
             @Override public boolean set(PlotPlayer player, final Plot plot, String value) {
                 PlotArea plotArea = player.getLocation().getPlotArea();
                 PlotManager manager = player.getLocation().getPlotManager();
-                String[] components = manager.getPlotComponents(plotArea, plot.getId());
+                String[] components = manager.getPlotComponents(plot.getId());
                 boolean allowUnsafe = DebugAllowUnsafe.unsafeAllowed.contains(player.getUUID());
 
                 String[] args = value.split(" ");
@@ -60,8 +69,6 @@ import java.util.stream.IntStream;
                                 MainUtil.sendMessage(player, Captions.NEED_BLOCK);
                                 return true;
                             }
-                            String[] split = material.split(",");
-                            // blocks = Configuration.BLOCKLIST.parseString(material);
 
                             try {
                                 bucket = Configuration.BLOCK_BUCKET.parseString(material);
@@ -117,7 +124,7 @@ import java.util.stream.IntStream;
         Plot plot = player.getCurrentPlot();
         if (plot != null) {
             newValues.addAll(
-                Arrays.asList(plot.getManager().getPlotComponents(plot.getArea(), plot.getId())));
+                Arrays.asList(plot.getManager().getPlotComponents(plot.getId())));
         }
         MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.s() + StringMan
             .join(newValues, Captions.BLOCK_LIST_SEPARATER.formatted()));
@@ -144,7 +151,7 @@ import java.util.stream.IntStream;
         }
         // components
         HashSet<String> components = new HashSet<>(
-            Arrays.asList(plot.getManager().getPlotComponents(plot.getArea(), plot.getId())));
+            Arrays.asList(plot.getManager().getPlotComponents(plot.getId())));
         if (components.contains(args[0].toLowerCase())) {
             return this.component.onCommand(player, Arrays.copyOfRange(args, 0, args.length));
         }

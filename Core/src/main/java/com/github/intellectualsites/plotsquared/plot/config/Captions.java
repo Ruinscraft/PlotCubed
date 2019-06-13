@@ -60,8 +60,8 @@ public enum Captions {
     PERMISSION_ADMIN_ENTRY_DENIED("plots.admin.entry.denied", "static.permissions"),
     PERMISSION_ADMIN_ENTRY_FORCEFIELD("plots.admin.entry.forcefield", "static.permissions"),
     PERMISSION_COMMANDS_CHAT("plots.admin.command.chat", "static.permissions"),
-    PERMISSION_MERGE_OTHER("plots.merge.other", "static.permissions"),
-    PERMISSION_MERGE_KEEPROAD("plots.merge.keeproad", "static.permissions"),
+    PERMISSION_MERGE_OTHER("plots.merge.other", "static.permissions"), PERMISSION_MERGE_KEEP_ROAD(
+        "plots.merge.keeproad", "static.permissions"),
     PERMISSION_ADMIN_DESTROY_UNOWNED("plots.admin.destroy.unowned", "static.permissions"),
     PERMISSION_ADMIN_DESTROY_GROUNDLEVEL("plots.admin.destroy.groundlevel", "static.permissions"),
     PERMISSION_ADMIN_DESTROY_OTHER("plots.admin.destroy.other", "static.permissions"),
@@ -71,8 +71,8 @@ public enum Captions {
     PERMISSION_ADMIN_BUILD_OTHER("plots.admin.build.other", "static.permissions"),
     PERMISSION_ADMIN_INTERACT_ROAD("plots.admin.interact.road", "static.permissions"),
     PERMISSION_ADMIN_INTERACT_UNOWNED("plots.admin.interact.unowned", "static.permissions"),
-    PERMISSION_ADMIN_INTERACT_OTHER("plots.admin.interact.other", "static.permissions"),
-    PERMISSION_ADMIN_BUILD_HEIGHTLIMIT("plots.admin.build.heightlimit", "static.permissions"),
+    PERMISSION_ADMIN_INTERACT_OTHER("plots.admin.interact.other", "static.permissions"), PERMISSION_ADMIN_BUILD_HEIGHT_LIMIT(
+        "plots.admin.build.heightlimit", "static.permissions"),
     PERMISSION_ADMIN_UPDATE("plots.admin.command.update", "static.permissions"),
     PERMISSION_ADMIN_COMMAND_RATE("plots.admin.command.rate", "static.permissions"),
     PERMISSION_ADMIN_COMMAND_TRUST("plots.admin.command.trust", "static.permissions"),
@@ -125,8 +125,8 @@ public enum Captions {
     PERMISSION_FLAG_ADD("plots.flag.add", "static.permissions"),
     PERMISSION_FLAG_LIST("plots.flag.list", "static.permissions"),
     PERMISSION_ADMIN_COMMAND_KICK("plots.admin.command.kick", "static.permissions"),
-    PERMISSION_GRANT("plots.grant.%s0", "static.permissions"),
-    PERMISSION_LIST_FORSALE("plots.list.forsale", "static.permissions"),
+    PERMISSION_GRANT("plots.grant.%s0", "static.permissions"), PERMISSION_LIST_FOR_SALE(
+        "plots.list.forsale", "static.permissions"),
     PERMISSION_LIST_MINE("plots.list.mine", "static.permissions"),
     PERMISSION_LIST_SHARED("plots.list.shared", "static.permissions"),
     PERMISSION_LIST_WORLD("plots.list.world", "static.permissions"),
@@ -141,8 +141,8 @@ public enum Captions {
     PERMISSION_LIST_FUZZY("plots.list.fuzzy", "static.permissions"),
     PERMISSION_LIST_AREA("plots.list.area", "static.permissions"),
     PERMISSION_ADMIN_COMMAND_LOAD("plots.admin.command.load", "static.permissions"),
-    PERMISSION_ADMIN_COMMAND_MERGE("plots.admin.command.merge", "static.permissions"),
-    PERMISSION_ADMIN_COMMAND_SETOWNER("plots.admin.command.setowner", "static.permissions"),
+    PERMISSION_ADMIN_COMMAND_MERGE("plots.admin.command.merge", "static.permissions"), PERMISSION_ADMIN_COMMAND_SET_OWNER(
+        "plots.admin.command.setowner", "static.permissions"),
     PERMISSION_COMMENT("plots.comment", "static.permissions"),
     PERMISSION_ADMIN_COMMAND_REMOVE("plots.admin.command.remove", "static.permissions"),
     PERMISSION_ADMIN_COMMAND_SAVE("plots.admin.command.save", "static.permissions"),
@@ -219,37 +219,25 @@ public enum Captions {
     CLUSTER_AVAILABLE_ARGS(
         "$1The following sub commands are available: $4list$2, $4create$2, $4delete$2, $4resize$2, $4invite$2, $4kick$2, $4leave$2, "
             + "$4members$2, $4info$2, $4tp$2, $4sethome", "Cluster"), CLUSTER_LIST_HEADING(
-        "$2There are $1%s$2 clusters in this world", "Cluster"),
-
-    CLUSTER_LIST_ELEMENT("$2 - $1%s&-", "Cluster"), CLUSTER_INTERSECTION(
-        "$2The proposed area overlaps with: %s0", "Cluster"),
-
-    CLUSTER_OUTSIDE("$2The proposed area is outside the plot area: %s0", "Cluster"), CLUSTER_ADDED(
-        "$4Successfully created the cluster.", "Cluster"),
-
-    CLUSTER_DELETED("$4Successfully deleted the cluster.", "Cluster"), CLUSTER_RESIZED(
-        "$4Successfully resized the cluster.", "Cluster"),
-
-    CLUSTER_ADDED_USER("$4Successfully added user to the cluster.", "Cluster"), CANNOT_KICK_PLAYER(
-        "$2You cannot kick that player", "Cluster"),
-
-    CLUSTER_INVITED("$1You have been invited to the following cluster: $2%s",
-        "Cluster"), CLUSTER_REMOVED("$1You have been removed from cluster: $2%s", "Cluster"),
-
-    CLUSTER_KICKED_USER("$4Successfully kicked the user", "Cluster"), INVALID_CLUSTER(
-        "$1Invalid cluster name: $2%s", "Cluster"),
-
-    CLUSTER_NOT_ADDED("$2That player was not added to the plot cluster",
-        "Cluster"), CLUSTER_CANNOT_LEAVE("$1You must delete or transfer ownership before leaving",
-        "Cluster"),
-
-    CLUSTER_ADDED_HELPER("$4Successfully added a helper to the cluster",
+        "$2There are $1%s$2 clusters in this world", "Cluster"), CLUSTER_LIST_ELEMENT("$2 - $1%s&-",
+        "Cluster"), CLUSTER_INTERSECTION(
+        "$2The proposed area overlaps with: %s0", "Cluster"), CLUSTER_OUTSIDE(
+        "$2The proposed area is outside the plot area: %s0", "Cluster"), CLUSTER_ADDED(
+        "$4Successfully created the cluster.", "Cluster"), CLUSTER_DELETED(
+        "$4Successfully deleted the cluster.", "Cluster"), CLUSTER_RESIZED(
+        "$4Successfully resized the cluster.", "Cluster"), CLUSTER_ADDED_USER(
+        "$4Successfully added user to the cluster.", "Cluster"), CANNOT_KICK_PLAYER(
+        "$2You cannot kick that player", "Cluster"), CLUSTER_INVITED(
+        "$1You have been invited to the following cluster: $2%s", "Cluster"), CLUSTER_REMOVED(
+        "$1You have been removed from cluster: $2%s", "Cluster"), CLUSTER_KICKED_USER(
+        "$4Successfully kicked the user", "Cluster"), INVALID_CLUSTER(
+        "$1Invalid cluster name: $2%s", "Cluster"), CLUSTER_NOT_ADDED(
+        "$2That player was not added to the plot cluster", "Cluster"), CLUSTER_CANNOT_LEAVE(
+        "$1You must delete or transfer ownership before leaving",
+        "Cluster"), CLUSTER_ADDED_HELPER("$4Successfully added a helper to the cluster",
         "Cluster"), CLUSTER_REMOVED_HELPER("$4Successfully removed a helper from the cluster",
-        "Cluster"),
-
-    CLUSTER_REGENERATED("$4Successfully started cluster regeneration",
+        "Cluster"), CLUSTER_REGENERATED("$4Successfully started cluster regeneration",
         "Cluster"), CLUSTER_TELEPORTING("$4Teleporting...", "Cluster"),
-
     CLUSTER_INFO(
         "$1Current cluster: $2%id%&-$1Name: $2%name%&-$1Owner: $2%owner%&-$1Size: $2%size%&-$1Rights: $2%rights%",
         "Cluster"),
