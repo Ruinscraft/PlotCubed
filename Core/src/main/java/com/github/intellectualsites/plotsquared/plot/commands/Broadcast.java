@@ -38,7 +38,7 @@ public class Broadcast extends SubCommand {
         }
 
         for (PlotPlayer playerInPlot : plot.getPlayersInPlot()) {
-            playerInPlot.sendTitle(msg, "");
+            playerInPlot.sendTitle(Captions.color(msg), "");
             playerInPlot.sendMessage(Captions.color(Captions.BROADCAST_PREFIX.s() + msg));
         }
 
