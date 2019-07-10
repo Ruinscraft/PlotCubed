@@ -439,6 +439,17 @@ public class ClassicPlotManager extends SquarePlotManager {
         return true;
     }
 
+    @Override public boolean regenerateAllPlotWalls() {
+        for (Plot plot : classicPlotWorld.getPlots()) {
+            if (plot.hasOwner()) {
+                setWall(plot.getId(), classicPlotWorld.CLAIMED_WALL_BLOCK);
+            } else {
+                setWall(plot.getId(), classicPlotWorld.WALL_BLOCK);
+            }
+        }
+        return true;
+    }
+
     @Override public boolean startPlotMerge(List<PlotId> plotIds) {
         return true;
     }

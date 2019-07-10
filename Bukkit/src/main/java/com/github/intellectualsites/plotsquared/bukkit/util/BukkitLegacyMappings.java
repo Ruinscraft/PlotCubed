@@ -1,11 +1,13 @@
 package com.github.intellectualsites.plotsquared.bukkit.util;
 
+import com.github.intellectualsites.plotsquared.bukkit.BukkitMain;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.LegacyPlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.StringPlotBlock;
 import com.github.intellectualsites.plotsquared.plot.util.LegacyMappings;
 import com.github.intellectualsites.plotsquared.plot.util.StringComparison;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -126,7 +129,7 @@ public final class BukkitLegacyMappings extends LegacyMappings {
             new LegacyBlock(43, 6, "double_step", "smooth_quartz"),
             new LegacyBlock(43, 8, "double_step", "smooth_stone"),
             new LegacyBlock(43, 9, "double_step", "smooth_sandstone"),
-            new LegacyBlock(44, "step", "stone_slab"),
+            new LegacyBlock(44, "step", "stone_slab", "smooth_stone_slab"),
             new LegacyBlock(44, 1, "step", "sandstone_slab"),
             new LegacyBlock(44, 2, "step", "petrified_oak_slab"),
             new LegacyBlock(44, 3, "step", "cobblestone_slab"),
@@ -147,10 +150,11 @@ public final class BukkitLegacyMappings extends LegacyMappings {
             new LegacyBlock(58, "workbench", "crafting_table"),
             new LegacyBlock(59, "crops", "wheat"), new LegacyBlock(60, "soil", "farmland"),
             new LegacyBlock(61, "furnace"), new LegacyBlock(62, "burning_furnace"),
-            new LegacyBlock(63, "sign_post", "sign"),
+            new LegacyBlock(63, "sign_post", "sign", "oak_sign"),
             new LegacyBlock(64, "wooden_door", "oak_door"), new LegacyBlock(65, "ladder"),
             new LegacyBlock(66, "rails", "rail"), new LegacyBlock(67, "cobblestone_stairs"),
-            new LegacyBlock(68, "wall_sign"), new LegacyBlock(69, "lever"),
+            new LegacyBlock(68, "wall_sign", "wall_sign", "oak_wall_sign"),
+            new LegacyBlock(69, "lever"),
             new LegacyBlock(70, "stone_plate", "stone_pressure_plate"),
             new LegacyBlock(71, "iron_door_block", "iron_door"),
             new LegacyBlock(72, "wood_plate", "oak_pressure_plate"),
@@ -688,9 +692,7 @@ public final class BukkitLegacyMappings extends LegacyMappings {
                     final LegacyBlock missingBlock =
                         new LegacyBlock(material.getId(), materialName, materialName);
                     missing.add(missingBlock);
-                } catch (Exception e) {
-                    Bukkit.getLogger().severe(
-                        "Error creating legacy block: " + materialName + ". Possibly a new block.");
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -713,9 +715,8 @@ public final class BukkitLegacyMappings extends LegacyMappings {
                 try {
                     material = Material.getMaterial(legacyBlock.getLegacyName(), true);
                 } catch (NoSuchMethodError error) {
-                    PlotSquared.log(
-                        "You can't use this version of PlotSquared on a server "
-                            + "less than Minecraft 1.13.2");
+                    PlotSquared.log("You can't use this version of PlotSquared on a server "
+                        + "less than Minecraft 1.13.2");
                     Bukkit.shutdown();
                     break;
                 }
@@ -770,7 +771,9 @@ public final class BukkitLegacyMappings extends LegacyMappings {
             idDataPair = new IdDataPair(Integer.parseInt(string), 0);
         }
         PlotBlock plotBlock;
-        if (NEW_STRING_TO_LEGACY_PLOT_BLOCK.keySet().contains(workingString.toLowerCase())) {
+        if (Material.matchMaterial(workingString) != null) {
+            return PlotBlock.get(workingString);
+        } else if (NEW_STRING_TO_LEGACY_PLOT_BLOCK.keySet().contains(workingString.toLowerCase())) {
             return PlotBlock.get(workingString);
         } else if ((plotBlock = fromLegacyToString(idDataPair)) != null) {
             return plotBlock;
@@ -829,6 +832,20 @@ public final class BukkitLegacyMappings extends LegacyMappings {
 
         LegacyBlock(final int numericalId, final int dataValue, @NonNull final String legacyName) {
             this(numericalId, dataValue, legacyName, legacyName);
+        }
+
+        LegacyBlock(final int numericalId, final int dataValue, @NonNull final String legacyName,
+            @NonNull final String newName, @NonNull final String new14Name) {
+            this(numericalId, dataValue, legacyName,
+                PlotSquared.get().IMP.getServerVersion()[1] == 13 ? newName : new14Name);
+        }
+
+        LegacyBlock(final int numericalId, @NonNull final String legacyName,
+            @NonNull final String newName, @NonNull final String new14Name) {
+            this(numericalId, 0, legacyName,
+                Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1].equals("13") ?
+                    newName :
+                    new14Name);
         }
 
         LegacyBlock(final int numericalId, @NonNull final String legacyName,

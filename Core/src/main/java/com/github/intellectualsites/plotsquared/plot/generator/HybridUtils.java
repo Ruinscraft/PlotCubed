@@ -130,6 +130,16 @@ public abstract class HybridUtils {
         return scheduleRoadUpdate(area, regions, extend);
     }
 
+    public boolean scheduleSingleRegionRoadUpdate(Plot plot, int extend) {
+        if (HybridUtils.UPDATE) {
+            return false;
+        }
+        HybridUtils.UPDATE = true;
+        Set<ChunkLoc> regions = new HashSet<>();
+        regions.add(ChunkManager.manager.getChunkChunk(plot.getCenter()));
+        return scheduleRoadUpdate(plot.getArea(), regions, extend);
+    }
+
     public boolean scheduleRoadUpdate(final PlotArea area, Set<ChunkLoc> rgs, final int extend) {
         HybridUtils.regions = rgs;
         HybridUtils.area = area;
@@ -153,6 +163,9 @@ public abstract class HybridUtils {
                     PlotSquared.debug("PROGRESS: " + 100 * (2048 - chunks.size()) / 2048 + "%");
                 }
                 if (regions.isEmpty() && chunks.isEmpty()) {
+                    PlotSquared.debug("&3Regenerating plot walls");
+                    regeneratePlotWalls(area);
+
                     HybridUtils.UPDATE = false;
                     PlotSquared.debug(Captions.PREFIX.s() + "Finished road conversion");
                     // CANCEL TASK
@@ -376,5 +389,10 @@ public abstract class HybridUtils {
             }
         }
         return false;
+    }
+
+    public boolean regeneratePlotWalls(final PlotArea area) {
+        PlotManager plotManager = area.getPlotManager();
+        return plotManager.regenerateAllPlotWalls();
     }
 }
