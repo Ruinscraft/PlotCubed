@@ -1223,6 +1223,11 @@ import java.util.regex.Pattern;
                     event.setCancelled(true);
                 }
                 break;
+            case KELP:
+                if (Flags.KELP_GROW.isFalse(plot)) {
+                    event.setCancelled(true);
+                }
+                break;
         }
     }
 
@@ -1834,7 +1839,7 @@ import java.util.regex.Pattern;
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         PlotPlayer pp = BukkitUtil.getPlayer(player);
@@ -2379,7 +2384,7 @@ import java.util.regex.Pattern;
                 Captions.PERMISSION_ADMIN_BUILD_UNOWNED);
             event.setCancelled(true);
         } else if (!plot.isAdded(pp.getUUID())) {
-            if (Flags.USE.contains(plot, PlotBlock.get(event.getBucket().getId(), 0))) {
+            if (Flags.USE.contains(plot, PlotBlock.get(event.getBucket().name()))) {
                 return;
             }
             if (Permissions.hasPermission(pp, Captions.PERMISSION_ADMIN_BUILD_OTHER)) {
