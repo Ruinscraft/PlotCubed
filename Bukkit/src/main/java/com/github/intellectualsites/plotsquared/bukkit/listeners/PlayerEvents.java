@@ -1713,8 +1713,7 @@ import java.util.regex.Pattern;
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPotionSplash(LingeringPotionSplashEvent event) {
-        Projectile entity = event.getEntity();
-        Location location = BukkitUtil.getLocation(entity);
+        Location location = BukkitUtil.getLocation(event.getEntity());
         if (!PlotSquared.get().hasPlotArea(location.getWorld())) {
             return;
         }

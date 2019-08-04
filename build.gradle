@@ -46,7 +46,7 @@ ext {
 }
 
 // version = String.format("%s.%s%s%s", rootVersion, date, revision, buildNumber)
-version = String.format("%s.%s", rootVersion, buildNumber)
+version = "4.Ruinscraft"
 
 description = rootProject.name
 
