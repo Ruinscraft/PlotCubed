@@ -1,19 +1,16 @@
 package com.github.intellectualsites.plotsquared.plot.util.block;
 
-import com.github.intellectualsites.plotsquared.plot.object.LegacyPlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal;
-import com.github.intellectualsites.plotsquared.plot.object.StringPlotBlock;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.MathMan;
 import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.registry.LegacyMapper;
-import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ExecutionException;
 
 public abstract class BasicLocalBlockQueue extends LocalBlockQueue {
 
@@ -35,7 +32,8 @@ public abstract class BasicLocalBlockQueue extends LocalBlockQueue {
 
     @Override public abstract PlotBlock getBlock(int x, int y, int z);
 
-    public abstract void setComponents(LocalChunk lc);
+    public abstract void setComponents(LocalChunk lc)
+        throws ExecutionException, InterruptedException;
 
     @Override public final String getWorld() {
         return world;
@@ -52,8 +50,7 @@ public abstract class BasicLocalBlockQueue extends LocalBlockQueue {
                 LocalChunk chunk = chunks.poll();
                 if (chunk != null) {
                     blockChunks.remove(chunk.longHash());
-                    this.execute(chunk);
-                    return true;
+                    return this.execute(chunk);
                 }
             }
         } catch (Throwable e) {
@@ -62,10 +59,8 @@ public abstract class BasicLocalBlockQueue extends LocalBlockQueue {
         return false;
     }
 
-    public final boolean execute(final LocalChunk lc) {
-        if (lc == null) {
-            return false;
-        }
+    public final boolean execute(@NotNull LocalChunk lc)
+        throws ExecutionException, InterruptedException {
         this.setComponents(lc);
         return true;
     }
@@ -106,8 +101,7 @@ public abstract class BasicLocalBlockQueue extends LocalBlockQueue {
                 lastWrappedChunk.setBlock(x & 15, y, z & 15, id);
                 LocalChunk previous = this.blockChunks.put(pair, lastWrappedChunk);
                 if (previous == null) {
-                    chunks.add(lastWrappedChunk);
-                    return true;
+                    return chunks.add(lastWrappedChunk);
                 }
                 this.blockChunks.put(pair, previous);
                 lastWrappedChunk = previous;
@@ -154,7 +148,6 @@ public abstract class BasicLocalBlockQueue extends LocalBlockQueue {
         TaskManager.IMP.sync(new RunnableVal<Object>() {
             @Override public void run(Object value) {
                 while (next()) {
-                    ;
                 }
             }
         });

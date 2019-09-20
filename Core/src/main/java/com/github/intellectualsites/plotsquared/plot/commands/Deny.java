@@ -56,7 +56,7 @@ import java.util.UUID;
                 continue;
             }
             if (plot.isOwner(uuid)) {
-                MainUtil.sendMessage(player, Captions.ALREADY_OWNER, MainUtil.getName(uuid));
+                MainUtil.sendMessage(player, Captions.CANT_REMOVE_OWNER, MainUtil.getName(uuid));
                 return false;
             }
 
@@ -97,15 +97,15 @@ import java.util.UUID;
         if (player.getGameMode() == PlotGameMode.SPECTATOR) {
             player.stopSpectating();
         }
-        Location loc = player.getLocation();
-        Location spawn = WorldUtil.IMP.getSpawn(loc.getWorld());
+        Location location = player.getLocation();
+        Location spawn = WorldUtil.IMP.getSpawn(location.getWorld());
         MainUtil.sendMessage(player, Captions.YOU_GOT_DENIED);
         if (plot.equals(spawn.getPlot())) {
             Location newSpawn =
                 WorldUtil.IMP.getSpawn(PlotSquared.get().getPlotAreaManager().getAllWorlds()[0]);
             if (plot.equals(newSpawn.getPlot())) {
                 // Kick from server if you can't be teleported to spawn
-                player.kick(Captions.YOU_GOT_DENIED.s());
+                player.kick(Captions.YOU_GOT_DENIED.getTranslated());
             } else {
                 player.teleport(newSpawn);
             }

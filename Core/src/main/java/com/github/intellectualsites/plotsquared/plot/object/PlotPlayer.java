@@ -12,9 +12,10 @@ import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAre
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.util.*;
 import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
+import com.google.common.base.Preconditions;
 import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -117,6 +118,9 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
         return meta;
     }
 
+    public ConcurrentHashMap<String, Object> getMeta() {
+        return meta;
+    }
     /**
      * Delete the metadata for a key.
      * - metadata is session only
@@ -170,15 +174,15 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
     }
 
     public int hasPermissionRange(String stub, int range) {
-        if (hasPermission(Captions.PERMISSION_ADMIN.s())) {
+        if (hasPermission(Captions.PERMISSION_ADMIN.getTranslated())) {
             return Integer.MAX_VALUE;
         }
         String[] nodes = stub.split("\\.");
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < (nodes.length - 1); i++) {
             builder.append(nodes[i]).append(".");
-            if (!stub.equals(builder + Captions.PERMISSION_STAR.s())) {
-                if (hasPermission(builder + Captions.PERMISSION_STAR.s())) {
+            if (!stub.equals(builder + Captions.PERMISSION_STAR.getTranslated())) {
+                if (hasPermission(builder + Captions.PERMISSION_STAR.getTranslated())) {
                     return Integer.MAX_VALUE;
                 }
             }
@@ -302,7 +306,7 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
      *
      * @return The location
      */
-    public Location getLocation() {
+    @NotNull public Location getLocation() {
         Location location = getMeta("location");
         if (location != null) {
             return location;
@@ -331,13 +335,14 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
      *
      * @return UUID
      */
-    @Override @Nonnull public abstract UUID getUUID();
+    @Override @NotNull public abstract UUID getUUID();
 
-    public boolean canTeleport(Location loc) {
-        Location current = getLocationFull();
-        teleport(loc);
+    public boolean canTeleport(@NotNull final Location location) {
+        Preconditions.checkNotNull(location, "Specified location cannot be null");
+        final Location current = getLocationFull();
+        teleport(location);
         boolean result = true;
-        if (!getLocation().equals(loc)) {
+        if (!getLocation().equals(location)) {
             result = false;
         }
         teleport(current);
@@ -416,21 +421,21 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
      *
      * @param weather the weather visible to the player
      */
-    public abstract void setWeather(PlotWeather weather);
+    public abstract void setWeather(@NotNull PlotWeather weather);
 
     /**
      * Get this player's gamemode.
      *
      * @return the gamemode of the player.
      */
-    public abstract PlotGameMode getGameMode();
+    @NotNull public abstract PlotGameMode getGameMode();
 
     /**
      * Set this player's gameMode.
      *
      * @param gameMode the gamemode to set
      */
-    public abstract void setGameMode(PlotGameMode gameMode);
+    public abstract void setGameMode(@NotNull PlotGameMode gameMode);
 
     /**
      * Set this player's local time (ticks).
@@ -459,7 +464,7 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
      * @param location where to play the music
      * @param id       the record item id
      */
-    public abstract void playMusic(Location location, PlotBlock id);
+    public abstract void playMusic(@NotNull Location location, @NotNull PlotBlock id);
 
     /**
      * Check if this player is banned.
@@ -488,10 +493,10 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
             ByteBuffer buffer = ByteBuffer.allocate(13);
             buffer.putShort((short) x);
             buffer.putShort((short) z);
-            Location loc = getLocation();
-            buffer.putInt(loc.getX());
-            buffer.put((byte) loc.getY());
-            buffer.putInt(loc.getZ());
+            Location location = getLocation();
+            buffer.putInt(location.getX());
+            buffer.put((byte) location.getY());
+            buffer.putInt(location.getZ());
             setPersistentMeta("quitLoc", buffer.array());
         } else if (hasPersistentMeta("quitLoc")) {
             removePersistentMeta("quitLoc");
@@ -591,11 +596,11 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
                             return;
                         }
 
-                        final Location loc = new Location(plot.getWorldName(), x, y, z);
+                        final Location location = new Location(plot.getWorldName(), x, y, z);
                         if (plot.isLoaded()) {
                             TaskManager.runTask(() -> {
                                 if (getMeta("teleportOnLogin", true)) {
-                                    teleport(loc);
+                                    teleport(location);
                                     sendMessage(
                                         Captions.TELEPORTED_TO_PLOT.f() + " (quitLoc) (" + plotX
                                             + "," + plotZ + ")");
@@ -607,7 +612,7 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
                                     TaskManager.runTask(() -> {
                                         if (getMeta("teleportOnLogin", true)) {
                                             if (plot.isLoaded()) {
-                                                teleport(loc);
+                                                teleport(location);
                                                 sendMessage(Captions.TELEPORTED_TO_PLOT.f()
                                                     + " (quitLoc-unloaded) (" + plotX + "," + plotZ
                                                     + ")");

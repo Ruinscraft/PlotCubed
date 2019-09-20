@@ -12,6 +12,7 @@ import com.github.intellectualsites.plotsquared.plot.util.ReflectionUtils.RefFie
 import com.github.intellectualsites.plotsquared.plot.util.ReflectionUtils.RefMethod;
 import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -42,7 +43,6 @@ public class SendChunk {
      * Constructor.
      */
     public SendChunk() throws ClassNotFoundException, NoSuchMethodException, NoSuchFieldException {
-        RefConstructor tempMapChunk;
         RefClass classCraftPlayer = getRefClass("{cb}.entity.CraftPlayer");
         this.methodGetHandlePlayer = classCraftPlayer.getMethod("getHandle");
         RefClass classCraftChunk = getRefClass("{cb}.CraftChunk");
@@ -50,8 +50,7 @@ public class SendChunk {
         RefClass classChunk = getRefClass("{nms}.Chunk");
         this.methodInitLighting = classChunk.getMethod("initLighting");
         RefClass classMapChunk = getRefClass("{nms}.PacketPlayOutMapChunk");
-        tempMapChunk = classMapChunk.getConstructor(classChunk.getRealClass(), int.class);
-        this.mapChunk = tempMapChunk;
+        this.mapChunk = classMapChunk.getConstructor(classChunk.getRealClass(), int.class);
         RefClass classEntityPlayer = getRefClass("{nms}.EntityPlayer");
         this.connection = classEntityPlayer.getField("playerConnection");
         RefClass classPacket = getRefClass("{nms}.Packet");
@@ -135,7 +134,7 @@ public class SendChunk {
         ArrayList<Chunk> chunks = new ArrayList<>();
         for (ChunkLoc loc : chunkLocations) {
             if (myWorld.isChunkLoaded(loc.x, loc.z)) {
-                chunks.add(myWorld.getChunkAt(loc.x, loc.z));
+                PaperLib.getChunkAtAsync(myWorld, loc.x, loc.z).thenAccept(chunks::add);
             }
         }
         sendChunk(chunks);

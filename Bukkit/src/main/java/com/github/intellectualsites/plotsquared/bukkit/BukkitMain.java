@@ -1,11 +1,19 @@
 package com.github.intellectualsites.plotsquared.bukkit;
 
 import com.github.intellectualsites.plotsquared.bukkit.generator.BukkitPlotGenerator;
-import com.github.intellectualsites.plotsquared.bukkit.listeners.*;
-import com.github.intellectualsites.plotsquared.bukkit.object.BukkitPlotBossBar;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.ChunkListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.EntitySpawnListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.PlayerEvents;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.PlotPlusListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.SingleWorldListener;
+import com.github.intellectualsites.plotsquared.bukkit.listeners.WorldEvents;
 import com.github.intellectualsites.plotsquared.bukkit.util.*;
 import com.github.intellectualsites.plotsquared.bukkit.util.block.BukkitLocalQueue;
-import com.github.intellectualsites.plotsquared.bukkit.uuid.*;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.DefaultUUIDWrapper;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.FileUUIDHandler;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.LowerOfflineUUIDWrapper;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.OfflineUUIDWrapper;
+import com.github.intellectualsites.plotsquared.bukkit.uuid.SQLUUIDHandler;
 import com.github.intellectualsites.plotsquared.configuration.ConfigurationSection;
 import com.github.intellectualsites.plotsquared.plot.IPlotMain;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -16,7 +24,12 @@ import com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper;
 import com.github.intellectualsites.plotsquared.plot.generator.HybridGen;
 import com.github.intellectualsites.plotsquared.plot.generator.HybridUtils;
 import com.github.intellectualsites.plotsquared.plot.generator.IndependentPlotGenerator;
-import com.github.intellectualsites.plotsquared.plot.object.*;
+import com.github.intellectualsites.plotsquared.plot.object.BlockRegistry;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotId;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.SetupObject;
 import com.github.intellectualsites.plotsquared.plot.object.chat.PlainChatManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
@@ -26,9 +39,9 @@ import com.github.intellectualsites.plotsquared.plot.util.*;
 import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
 import com.github.intellectualsites.plotsquared.plot.uuid.UUIDWrapper;
 import com.sk89q.worldedit.WorldEdit;
+import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bukkit.Location;
 import org.bukkit.*;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
@@ -41,11 +54,15 @@ import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 import static com.github.intellectualsites.plotsquared.plot.util.ReflectionUtils.getRefClass;
 
@@ -98,23 +115,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     @Override public void onEnable() {
         this.pluginName = getDescription().getName();
         PlotPlayer.registerConverter(Player.class, BukkitUtil::getPlayer);
-
-        if (Bukkit.getVersion().contains("git-Spigot")) {
-            // Uses System.out.println because the logger isn't initialized yet
-            System.out
-                .println("[P2] ========================== USE PAPER ==========================");
-            System.out.println("[P2] Paper offers a more complete API for us to work with");
-            System.out.println("[P2] and we may come to rely on it in the future.");
-            System.out.println("[P2] It is also recommended out of a performance standpoint as");
-            System.out
-                .println("[P2] it contains many improvements missing from Spigot and Bukkit.");
-            System.out.println("[P2] DOWNLOAD: https://papermc.io/downloads");
-            System.out.println("[P2] GUIDE: https://www.spigotmc.org/threads/21726/");
-            System.out.println("[P2] NOTE: This is only a recommendation");
-            System.out.println("[P2]       Spigot is still supported.");
-            System.out
-                .println("[P2] ===============================================================");
-        }
+        PaperLib.suggestPaper(this);
 
         new PlotSquared(this, "Bukkit");
 
@@ -131,8 +132,8 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
         // Check for updates
         if (PlotSquared.get().getUpdateUtility() != null) {
             final UpdateUtility updateUtility = PlotSquared.get().getUpdateUtility();
-            updateUtility
-                .checkForUpdate(this.getPluginVersionString(), ((updateDescription, throwable) -> {
+            updateUtility.checkForUpdate(PlotSquared.get().getVersion().versionString(),
+                ((updateDescription, throwable) -> {
                     Bukkit.getScheduler().runTask(BukkitMain.this, () -> {
                         getLogger().info("-------- PlotSquared Update Check --------");
                         if (throwable != null) {
@@ -288,9 +289,11 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     @Override public void registerCommands() {
         final BukkitCommand bukkitCommand = new BukkitCommand();
         final PluginCommand plotCommand = getCommand("plots");
-        plotCommand.setExecutor(bukkitCommand);
-        plotCommand.setAliases(Arrays.asList("p", "ps", "plotme", "plot"));
-        plotCommand.setTabCompleter(bukkitCommand);
+        if (plotCommand != null) {
+            plotCommand.setExecutor(bukkitCommand);
+            plotCommand.setAliases(Arrays.asList("p", "ps", "plotme", "plot"));
+            plotCommand.setTabCompleter(bukkitCommand);
+        }
     }
 
     @Override public File getDirectory() {
@@ -597,14 +600,15 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     }
 
     @Override public QueueProvider initBlockQueue() {
-        try {
-            new SendChunk();
-            MainUtil.canSendChunk = true;
-        } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {
-            PlotSquared.debug(
-                SendChunk.class + " does not support " + StringMan.getString(getServerVersion()));
-            MainUtil.canSendChunk = false;
-        }
+        //TODO Figure out why this code is still here yet isn't being called anywhere.
+        //        try {
+        //            new SendChunk();
+        //            MainUtil.canSendChunk = true;
+        //        } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {
+        //            PlotSquared.debug(
+        //                SendChunk.class + " does not support " + StringMan.getString(getServerVersion()));
+        //            MainUtil.canSendChunk = false;
+        //        }
         return QueueProvider.of(BukkitLocalQueue.class, BukkitLocalQueue.class);
     }
 
@@ -698,7 +702,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
                 + " is using Offline Mode UUIDs either because of user preference, or because you are using an old version of "
                 + "Bukkit");
         } else {
-            PlotSquared.log(Captions.PREFIX + " &6" + getPluginName() + " is using online UUIDs");
+            PlotSquared.log(Captions.PREFIX + " " + getPluginName() + " is using online UUIDs");
         }
         if (Settings.UUID.USE_SQLUUIDHANDLER) {
             return new SQLUUIDHandler(wrapper);

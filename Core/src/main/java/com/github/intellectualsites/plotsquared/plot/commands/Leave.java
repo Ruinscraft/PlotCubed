@@ -11,16 +11,17 @@ import com.github.intellectualsites.plotsquared.plot.util.EventUtil;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @CommandDeclaration(command = "leave",
     description = "Removes self from being trusted or a member of the plot",
     permission = "plots.leave", category = CommandCategory.CLAIMING,
-    requiredType = RequiredType.NONE) public class Leave extends Command {
+    requiredType = RequiredType.PLAYER) public class Leave extends Command {
     public Leave() {
         super(MainCommand.getInstance(), true);
     }
 
-    @Override public void execute(PlotPlayer player, String[] args,
+    @Override public CompletableFuture<Boolean> execute(PlotPlayer player, String[] args,
         RunnableVal3<Command, Runnable, Runnable> confirm,
         RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
@@ -44,5 +45,6 @@ import java.util.UUID;
                 MainUtil.sendMessage(player, Captions.REMOVED_PLAYERS, 1);
             }
         }
+        return CompletableFuture.completedFuture(true);
     }
 }

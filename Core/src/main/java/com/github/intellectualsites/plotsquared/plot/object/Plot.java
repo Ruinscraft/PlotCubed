@@ -21,9 +21,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
@@ -46,13 +46,14 @@ import java.util.stream.Collectors;
 public class Plot {
 
     private static final int MAX_HEIGHT = 256;
+
     /**
      * @deprecated raw access is deprecated
      */
     @Deprecated private static HashSet<Plot> connected_cache;
     private static HashSet<RegionWrapper> regions_cache;
 
-    private final PlotId id;
+    @NotNull private final PlotId id;
 
     /**
      * plot owner
@@ -62,10 +63,12 @@ public class Plot {
      * @deprecated
      */
     @Deprecated public UUID owner;
+
     /**
      * Has the plot changed since the last save cycle?
      */
     public boolean countsTowardsMax = true;
+
     /**
      * Represents whatever the database manager needs it to: <br>
      * - A value of -1 usually indicates the plot will not be stored in the DB<br>
@@ -74,6 +77,7 @@ public class Plot {
      * @deprecated magical
      */
     @Deprecated public int temp;
+
     /**
      * Plot creation timestamp (not accurate if the plot was created before this was implemented)<br>
      * - Milliseconds since the epoch<br>
@@ -94,14 +98,17 @@ public class Plot {
      * List of trusted (with plot permissions).
      */
     private HashSet<UUID> trusted;
+
     /**
      * List of members users (with plot permissions).
      */
     private HashSet<UUID> members;
+
     /**
      * List of denied players.
      */
     private HashSet<UUID> denied;
+
     /**
      * External settings class.
      * - Please favor the methods over direct access to this class<br>
@@ -110,6 +117,7 @@ public class Plot {
     private PlotSettings settings;
 
     private PlotArea area;
+
     /**
      * Session only plot metadata (session is until the server stops)<br>
      * <br>
@@ -118,6 +126,7 @@ public class Plot {
      * @see FlagManager
      */
     private ConcurrentHashMap<String, Object> meta;
+
     /**
      * The cached origin plot.
      * - The origin plot is used for plot grouping and relational data
@@ -128,12 +137,12 @@ public class Plot {
      * Constructor for a new plot.
      * (Only changes after plot.create() will be properly set in the database)
      *
-     * @param area  the PlotArea where the plot is located
-     * @param id    the plot id
+     * @param area the PlotArea where the plot is located
+     * @param id the plot id
      * @param owner the plot owner
      * @see Plot#getPlot(Location) for existing plots
      */
-    public Plot(PlotArea area, PlotId id, UUID owner) {
+    public Plot(PlotArea area, @NotNull PlotId id, UUID owner) {
         this.area = area;
         this.id = id;
         this.owner = owner;
@@ -144,10 +153,10 @@ public class Plot {
      * (Only changes after plot.create() will be properly set in the database)
      *
      * @param area the PlotArea where the plot is located
-     * @param id   the plot id
+     * @param id the plot id
      * @see Plot#getPlot(Location) for existing plots
      */
-    public Plot(PlotArea area, PlotId id) {
+    public Plot(PlotArea area, @NotNull PlotId id) {
         this.area = area;
         this.id = id;
     }
@@ -157,13 +166,13 @@ public class Plot {
      * The database will ignore any queries regarding temporary plots.
      * Please note that some bulk plot management functions may still affect temporary plots (TODO: fix this)
      *
-     * @param area  the PlotArea where the plot is located
-     * @param id    the plot id
+     * @param area the PlotArea where the plot is located
+     * @param id the plot id
      * @param owner the owner of the plot
-     * @param temp  Represents whatever the database manager needs it to
+     * @param temp Represents whatever the database manager needs it to
      * @see Plot#getPlot(Location) for existing plots
      */
-    public Plot(PlotArea area, PlotId id, UUID owner, int temp) {
+    public Plot(PlotArea area, @NotNull PlotId id, UUID owner, int temp) {
         this.area = area;
         this.id = id;
         this.owner = owner;
@@ -173,14 +182,14 @@ public class Plot {
     /**
      * Constructor for a saved plots (Used by the database manager when plots are fetched)
      *
-     * @param id      the plot id
-     * @param owner   the plot owner
+     * @param id the plot id
+     * @param owner the plot owner
      * @param trusted the plot trusted players
-     * @param denied  the plot denied players
-     * @param merged  array giving merged plots
+     * @param denied the plot denied players
+     * @param merged an array giving merged plots
      * @see Plot#getPlot(Location) for existing plots
      */
-    public Plot(PlotId id, UUID owner, HashSet<UUID> trusted, HashSet<UUID> members,
+    public Plot(@NotNull PlotId id, UUID owner, HashSet<UUID> trusted, HashSet<UUID> members,
         HashSet<UUID> denied, String alias, BlockLoc position, Collection<Flag> flags,
         PlotArea area, boolean[] merged, long timestamp, int temp) {
         this.id = id;
@@ -205,8 +214,8 @@ public class Plot {
     /**
      * Gets a plot from a string e.g. [area];[id]
      *
-     * @param defaultArea If no area is specified
-     * @param string      plot id/area + id
+     * @param defaultArea if no area is specified
+     * @param string plot id/area + id
      * @return New or existing plot object
      */
     public static Plot fromString(PlotArea defaultArea, String string) {
@@ -337,7 +346,7 @@ public class Plot {
      * @param uuid the player uuid
      * @return if the provided uuid is the owner of the plot
      */
-    public boolean isOwner(@Nonnull UUID uuid) {
+    public boolean isOwner(@NotNull UUID uuid) {
         if (uuid.equals(this.getOwner())) {
             return true;
         }
@@ -463,7 +472,7 @@ public class Plot {
      *
      * @return the PlotId for this plot
      */
-    public PlotId getId() {
+    @NotNull public PlotId getId() {
         return this.id;
     }
 
@@ -873,7 +882,7 @@ public class Plot {
     /**
      * Sets the plot owner (and update the database)
      *
-     * @param owner     uuid to set as owner
+     * @param owner uuid to set as owner
      * @param initiator player initiating set owner
      * @return boolean
      */
@@ -956,13 +965,20 @@ public class Plot {
                             manager.claimPlot(current);
                         }
                     }
-                    GlobalBlockQueue.IMP.addTask(run);
+                    GlobalBlockQueue.IMP.addEmptyTask(run);
                     return;
                 }
                 Plot current = queue.poll();
                 if (Plot.this.area.TERRAIN != 0) {
-                    ChunkManager.manager
-                        .regenerateRegion(current.getBottomAbs(), current.getTopAbs(), false, this);
+                    try {
+                        ChunkManager.manager
+                            .regenerateRegion(current.getBottomAbs(), current.getTopAbs(), false,
+                                this);
+                    } catch (UnsupportedOperationException exception) {
+                        MainUtil.sendMessage(null,
+                            "Please ask md_5 to fix regenerateChunk() because it breaks plugins. We apologize for the inconvenience");
+                        return;
+                    }
                     return;
                 }
                 manager.clearPlot(current, this);
@@ -1004,7 +1020,7 @@ public class Plot {
                         ChunkManager.manager.loadChunk(getWorldName(), loc, false);
                         MainUtil.setBiome(getWorldName(), value[2], value[3], value[4], value[5],
                             biome);
-                        ChunkManager.manager.unloadChunk(getWorldName(), loc, true, true);
+                        ChunkManager.manager.unloadChunk(getWorldName(), loc, true);
                     }
                 }, this, 5);
 
@@ -1016,8 +1032,8 @@ public class Plot {
     /**
      * Unlink the plot and all connected plots.
      *
-     * @param createSign whether to recreate signs
      * @param createRoad whether to recreate road
+     * @param createSign whether to recreate signs
      * @return success/!cancelled
      */
     public boolean unlinkPlot(boolean createRoad, boolean createSign) {
@@ -1062,7 +1078,7 @@ public class Plot {
             current.setMerged(merged);
         }
         if (createSign) {
-            GlobalBlockQueue.IMP.addTask(() -> {
+            GlobalBlockQueue.IMP.addEmptyTask(() -> {
                 for (Plot current : plots) {
                     current.setSign(MainUtil.getName(current.owner));
                 }
@@ -1079,7 +1095,7 @@ public class Plot {
      *
      * @param name name
      */
-    public void setSign(@Nonnull String name) {
+    public void setSign(@NotNull String name) {
         if (!isLoaded()) {
             return;
         }
@@ -1089,7 +1105,7 @@ public class Plot {
         }
         PlotManager manager = this.area.getPlotManager();
         if (this.area.ALLOW_SIGNS) {
-            Location loc = manager.getSignLoc(this);
+            Location location = manager.getSignLoc(this);
             String id = this.id.x + ";" + this.id.y;
             String[] lines =
                 new String[] {Captions.OWNER_SIGN_LINE_1.formatted().replaceAll("%id%", id),
@@ -1099,7 +1115,9 @@ public class Plot {
                         "%plr%", name),
                     Captions.OWNER_SIGN_LINE_4.formatted().replaceAll("%id%", id).replaceAll(
                         "%plr%", name)};
-            WorldUtil.IMP.setSign(this.getWorldName(), loc.getX(), loc.getY(), loc.getZ(), lines);
+            WorldUtil.IMP
+                .setSign(this.getWorldName(), location.getX(), location.getY(), location.getZ(),
+                    lines);
         }
     }
 
@@ -1296,18 +1314,18 @@ public class Plot {
         Location[] corners = getCorners();
         Location top = corners[0];
         Location bot = corners[1];
-        Location loc = new Location(this.getWorldName(), MathMan.average(bot.getX(), top.getX()),
+        Location location =
+            new Location(this.getWorldName(), MathMan.average(bot.getX(), top.getX()),
             MathMan.average(bot.getY(), top.getY()), MathMan.average(bot.getZ(), top.getZ()));
         if (!isLoaded()) {
-            return loc;
+            return location;
         }
-        int y =
-            isLoaded() ? WorldUtil.IMP.getHighestBlock(getWorldName(), loc.getX(), loc.getZ()) : 62;
+        int y = WorldUtil.IMP.getHighestBlock(getWorldName(), location.getX(), location.getZ());
         if (area.ALLOW_SIGNS) {
             y = Math.max(y, getManager().getSignLoc(this).getY());
         }
-        loc.setY(1 + y);
-        return loc;
+        location.setY(1 + y);
+        return location;
     }
 
     public Location getSide() {
@@ -1332,18 +1350,19 @@ public class Plot {
         if (home == null || home.x == 0 && home.z == 0) {
             return this.getDefaultHome(true);
         } else {
-            Location bot = this.getBottomAbs();
-            Location loc = new Location(bot.getWorld(), bot.getX() + home.x, bot.getY() + home.y,
-                bot.getZ() + home.z, home.yaw, home.pitch);
+            Location bottom = this.getBottomAbs();
+            Location location =
+                new Location(bottom.getWorld(), bottom.getX() + home.x, bottom.getY() + home.y,
+                    bottom.getZ() + home.z, home.yaw, home.pitch);
             if (!isLoaded()) {
-                return loc;
+                return location;
             }
-            if (!WorldUtil.IMP.getBlock(loc).isAir()) {
-                loc.setY(Math.max(
-                    1 + WorldUtil.IMP.getHighestBlock(this.getWorldName(), loc.getX(), loc.getZ()),
-                    bot.getY()));
+            if (!WorldUtil.IMP.getBlock(location).isAir()) {
+                location.setY(Math.max(1 + WorldUtil.IMP
+                        .getHighestBlock(this.getWorldName(), location.getX(), location.getZ()),
+                    bottom.getY()));
             }
-            return loc;
+            return location;
         }
     }
 
@@ -1510,9 +1529,9 @@ public class Plot {
         if (!this.area.ALLOW_SIGNS) {
             return;
         }
-        Location loc = manager.getSignLoc(this);
+        Location location = manager.getSignLoc(this);
         LocalBlockQueue queue = GlobalBlockQueue.IMP.getNewQueue(getWorldName(), false);
-        queue.setBlock(loc.getX(), loc.getY(), loc.getZ(), PlotBlock.get("air"));
+        queue.setBlock(location.getX(), location.getY(), location.getZ(), PlotBlock.get("air"));
         queue.flush();
     }
 
@@ -1607,7 +1626,7 @@ public class Plot {
      * @param notify notify
      * @return true if plot was created successfully
      */
-    public boolean create(@Nonnull UUID uuid, final boolean notify) {
+    public boolean create(@NotNull UUID uuid, final boolean notify) {
         this.owner = uuid;
         Plot existing = this.area.getOwnedPlotAbs(this.id);
         if (existing != null) {
@@ -1629,7 +1648,7 @@ public class Plot {
             DBFunc.createPlotAndSettings(this, () -> {
                 PlotArea plotworld = Plot.this.area;
                 if (notify && plotworld.AUTO_MERGE) {
-                    Plot.this.autoMerge(-1, Integer.MAX_VALUE, uuid, true);
+                    Plot.this.autoMerge(Direction.ALL, Integer.MAX_VALUE, uuid, true);
                 }
             });
             return true;
@@ -1652,8 +1671,8 @@ public class Plot {
      * @return the name of the biome
      */
     public String getBiome() {
-        Location loc = this.getCenter();
-        return WorldUtil.IMP.getBiome(loc.getWorld(), loc.getX(), loc.getZ());
+        Location location = this.getCenter();
+        return WorldUtil.IMP.getBiome(location.getWorld(), location.getX(), location.getZ());
     }
 
     //TODO Better documentation needed.
@@ -1673,9 +1692,9 @@ public class Plot {
      * Returns the bottom location for the plot.
      */
     public Location getBottomAbs() {
-        Location loc = getManager().getPlotBottomLocAbs(this.id);
-        loc.setWorld(getWorldName());
-        return loc;
+        Location location = getManager().getPlotBottomLocAbs(this.id);
+        location.setWorld(getWorldName());
+        return location;
     }
 
     /**
@@ -1724,7 +1743,7 @@ public class Plot {
     /**
      * Moves the settings for a plot.
      *
-     * @param plot     the plot to move
+     * @param plot the plot to move
      * @param whenDone
      * @return
      */
@@ -2106,17 +2125,11 @@ public class Plot {
      * Sets the raw merge data<br>
      * - Updates DB<br>
      * - Does not modify terrain<br>
-     * ----------<br>
-     * 0 = north<br>
-     * 1 = east<br>
-     * 2 = south<br>
-     * 3 = west<br>
-     * ----------<br>
      *
      * @param direction
      * @param value
      */
-    public void setMerged(int direction, boolean value) {
+    public void setMerged(Direction direction, boolean value) {
         if (this.getSettings().setMerged(direction, value)) {
             if (value) {
                 Plot other = this.getRelative(direction).getBasePlot(false);
@@ -2221,11 +2234,12 @@ public class Plot {
             return null;
         }
         try {
-            final Location loc = this.getManager().getSignLoc(this);
+            final Location location = this.getManager().getSignLoc(this);
             String[] lines = TaskManager.IMP.sync(new RunnableVal<String[]>() {
                 @Override public void run(String[] value) {
-                    ChunkManager.manager.loadChunk(loc.getWorld(), loc.getChunkLoc(), false);
-                    this.value = WorldUtil.IMP.getSign(loc);
+                    ChunkManager.manager
+                        .loadChunk(location.getWorld(), location.getChunkLoc(), false);
+                    this.value = WorldUtil.IMP.getSign(location);
                 }
             });
             if (lines == null) {
@@ -2233,7 +2247,7 @@ public class Plot {
             }
             loop:
             for (int i = 4; i > 0; i--) {
-                String caption = Captions.valueOf("OWNER_SIGN_LINE_" + i).s();
+                String caption = Captions.valueOf("OWNER_SIGN_LINE_" + i).getTranslated();
                 int index = caption.indexOf("%plr%");
                 if (index < 0) {
                     continue;
@@ -2295,24 +2309,21 @@ public class Plot {
     }
 
     /**
-     * Auto merge a plot in a specific direction<br>
+     * Auto merge a plot in a specific direction.
      *
-     * @param dir         The direction to merge<br>
-     *                    -1 = All directions<br>
-     *                    0 = north<br>
-     *                    1 = east<br>
-     *                    2 = south<br>
-     *                    3 = west<br>
-     * @param max         The max number of merges to do
-     * @param uuid        The UUID it is allowed to merge with
-     * @param removeRoads Whether to remove roads
+     * @param dir the direction to merge
+     * @param max the max number of merges to do
+     * @param uuid the UUID it is allowed to merge with
+     * @param removeRoads whether to remove roads
      * @return true if a merge takes place
      */
-    public boolean autoMerge(int dir, int max, UUID uuid, boolean removeRoads) {
+    public boolean autoMerge(Direction dir, int max, UUID uuid, boolean removeRoads) {
+        //Ignore merging if there is no owner for the plot
         if (this.owner == null) {
             return false;
         }
-        if (!EventUtil.manager.callMerge(this, dir, max)) {
+        //Call the merge event
+        if (!EventUtil.manager.callMerge(this, dir.getIndex(), max)) {
             return false;
         }
         Set<Plot> connected = this.getConnectedPlots();
@@ -2328,7 +2339,7 @@ public class Plot {
             }
             visited.add(current);
             Set<Plot> plots;
-            if ((dir == -1 || dir == 0) && !getMerged(Direction.NORTH)) {
+            if ((dir == Direction.ALL || dir == Direction.NORTH) && !getMerged(Direction.NORTH)) {
                 Plot other = current.getRelative(Direction.NORTH);
                 if (other != null && other.isOwner(uuid) && (
                     other.getBasePlot(false).equals(current.getBasePlot(false))
@@ -2347,7 +2358,8 @@ public class Plot {
                     }
                 }
             }
-            if (max >= 0 && (dir == -1 || dir == 1) && !current.getMerged(Direction.EAST)) {
+            if (max >= 0 && (dir == Direction.ALL || dir == Direction.EAST) && !current
+                .getMerged(Direction.EAST)) {
                 Plot other = current.getRelative(Direction.EAST);
                 if (other != null && other.isOwner(uuid) && (
                     other.getBasePlot(false).equals(current.getBasePlot(false))
@@ -2366,7 +2378,8 @@ public class Plot {
                     }
                 }
             }
-            if (max >= 0 && (dir == -1 || dir == 2) && !getMerged(Direction.SOUTH)) {
+            if (max >= 0 && (dir == Direction.ALL || dir == Direction.SOUTH) && !getMerged(
+                Direction.SOUTH)) {
                 Plot other = current.getRelative(Direction.SOUTH);
                 if (other != null && other.isOwner(uuid) && (
                     other.getBasePlot(false).equals(current.getBasePlot(false))
@@ -2385,7 +2398,8 @@ public class Plot {
                     }
                 }
             }
-            if (max >= 0 && (dir == -1 || dir == 3) && !getMerged(Direction.WEST)) {
+            if (max >= 0 && (dir == Direction.ALL || dir == Direction.WEST) && !getMerged(
+                Direction.WEST)) {
                 Plot other = current.getRelative(Direction.WEST);
                 if (other != null && other.isOwner(uuid) && (
                     other.getBasePlot(false).equals(current.getBasePlot(false))
@@ -2500,20 +2514,16 @@ public class Plot {
      * @param direction
      * @return
      */
-    public Plot getRelative(int direction) {
+    @Deprecated public Plot getRelative(int direction) {
         return this.area.getPlotAbs(this.id.getRelative(direction));
     }
 
     /**
-     * Gets the plot in a relative direction<br>
-     * 0 = north<br>
-     * 1 = east<br>
-     * 2 = south<br>
-     * 3 = west<br>
+     * Gets the plot in a relative direction
      * Note: May be null if the partial plot area does not include the relative location
      *
      * @param direction
-     * @return
+     * @return the plot relative to this one
      */
     public Plot getRelative(Direction direction) {
         return this.area.getPlotAbs(this.id.getRelative(direction));
@@ -2523,7 +2533,7 @@ public class Plot {
      * Gets a set of plots connected (and including) this plot<br>
      * - This result is cached globally
      *
-     * @return
+     * @return a Set of Plots connected to this Plot
      */
     public Set<Plot> getConnectedPlots() {
         if (this.settings == null) {
@@ -2548,10 +2558,10 @@ public class Plot {
                 // invalid merge
                 PlotSquared.debug("Fixing invalid merge: " + this);
                 if (tmp.isOwnerAbs(this.owner)) {
-                    tmp.getSettings().setMerged(2, true);
+                    tmp.getSettings().setMerged(Direction.SOUTH, true);
                     DBFunc.setMerged(tmp, tmp.getSettings().getMerged());
                 } else {
-                    this.getSettings().setMerged(0, false);
+                    this.getSettings().setMerged(Direction.NORTH, false);
                     DBFunc.setMerged(this, this.getSettings().getMerged());
                 }
             }
@@ -2564,10 +2574,10 @@ public class Plot {
                 // invalid merge
                 PlotSquared.debug("Fixing invalid merge: " + this);
                 if (tmp.isOwnerAbs(this.owner)) {
-                    tmp.getSettings().setMerged(3, true);
+                    tmp.getSettings().setMerged(Direction.WEST, true);
                     DBFunc.setMerged(tmp, tmp.getSettings().getMerged());
                 } else {
-                    this.getSettings().setMerged(1, false);
+                    this.getSettings().setMerged(Direction.EAST, false);
                     DBFunc.setMerged(this, this.getSettings().getMerged());
                 }
             }
@@ -2580,10 +2590,10 @@ public class Plot {
                 // invalid merge
                 PlotSquared.debug("Fixing invalid merge: " + this);
                 if (tmp.isOwnerAbs(this.owner)) {
-                    tmp.getSettings().setMerged(0, true);
+                    tmp.getSettings().setMerged(Direction.NORTH, true);
                     DBFunc.setMerged(tmp, tmp.getSettings().getMerged());
                 } else {
-                    this.getSettings().setMerged(2, false);
+                    this.getSettings().setMerged(Direction.SOUTH, false);
                     DBFunc.setMerged(this, this.getSettings().getMerged());
                 }
             }
@@ -2596,10 +2606,10 @@ public class Plot {
                 // invalid merge
                 PlotSquared.debug("Fixing invalid merge: " + this);
                 if (tmp.isOwnerAbs(this.owner)) {
-                    tmp.getSettings().setMerged(1, true);
+                    tmp.getSettings().setMerged(Direction.EAST, true);
                     DBFunc.setMerged(tmp, tmp.getSettings().getMerged());
                 } else {
-                    this.getSettings().setMerged(3, false);
+                    this.getSettings().setMerged(Direction.WEST, false);
                     DBFunc.setMerged(this, this.getSettings().getMerged());
                 }
             }
@@ -2657,7 +2667,7 @@ public class Plot {
      *
      * @return
      */
-    @Nonnull public HashSet<RegionWrapper> getRegions() {
+    @NotNull public HashSet<RegionWrapper> getRegions() {
         if (regions_cache != null && connected_cache != null && connected_cache.contains(this)) {
             return regions_cache;
         }
@@ -2954,13 +2964,14 @@ public class Plot {
     }
 
     /**
-     * Merges 2 plots Removes the road in-between <br>- Assumes plots are directly next to each other <br> - saves to DB
+     * Merges two plots. <br>- Assumes plots are directly next to each other <br> - saves to DB
      *
      * @param lesserPlot
      * @param removeRoads
      */
     public void mergePlot(Plot lesserPlot, boolean removeRoads) {
         Plot greaterPlot = this;
+        lesserPlot.removeSign();
         if (lesserPlot.getId().x == greaterPlot.getId().x) {
             if (lesserPlot.getId().y > greaterPlot.getId().y) {
                 Plot tmp = lesserPlot;
@@ -2970,10 +2981,11 @@ public class Plot {
             if (!lesserPlot.getMerged(Direction.SOUTH)) {
                 lesserPlot.clearRatings();
                 greaterPlot.clearRatings();
-                lesserPlot.setMerged(2, true);
-                greaterPlot.setMerged(0, true);
+                lesserPlot.setMerged(Direction.SOUTH, true);
+                greaterPlot.setMerged(Direction.NORTH, true);
                 lesserPlot.mergeData(greaterPlot);
                 if (removeRoads) {
+                    //lesserPlot.removeSign();
                     lesserPlot.removeRoadSouth();
                     Plot diagonal = greaterPlot.getRelative(Direction.EAST);
                     if (diagonal.getMerged(Direction.NORTHWEST)) {
@@ -2994,10 +3006,11 @@ public class Plot {
             if (!lesserPlot.getMerged(Direction.EAST)) {
                 lesserPlot.clearRatings();
                 greaterPlot.clearRatings();
-                lesserPlot.setMerged(1, true);
-                greaterPlot.setMerged(3, true);
+                lesserPlot.setMerged(Direction.EAST, true);
+                greaterPlot.setMerged(Direction.WEST, true);
                 lesserPlot.mergeData(greaterPlot);
                 if (removeRoads) {
+                    //lesserPlot.removeSign();
                     Plot diagonal = greaterPlot.getRelative(Direction.SOUTH);
                     if (diagonal.getMerged(Direction.NORTHWEST)) {
                         lesserPlot.removeRoadSouthEast();
@@ -3010,6 +3023,7 @@ public class Plot {
                 }
             }
         }
+
     }
 
     /**
@@ -3192,23 +3206,23 @@ public class Plot {
         return getFlags().containsKey(flag);
     }
 
-    @SuppressWarnings("deprecation") public boolean removeComment(PlotComment comment) {
+    public boolean removeComment(PlotComment comment) {
         return getSettings().removeComment(comment);
     }
 
-    @SuppressWarnings("deprecation") public void removeComments(List<PlotComment> comments) {
+    public void removeComments(List<PlotComment> comments) {
         getSettings().removeComments(comments);
     }
 
-    @SuppressWarnings("deprecation") public List<PlotComment> getComments(String inbox) {
+    public List<PlotComment> getComments(String inbox) {
         return getSettings().getComments(inbox);
     }
 
-    @SuppressWarnings("deprecation") public void addComment(PlotComment comment) {
+    public void addComment(PlotComment comment) {
         getSettings().addComment(comment);
     }
 
-    @SuppressWarnings("deprecation") public void setComments(List<PlotComment> list) {
+    public void setComments(List<PlotComment> list) {
         getSettings().setComments(list);
     }
 

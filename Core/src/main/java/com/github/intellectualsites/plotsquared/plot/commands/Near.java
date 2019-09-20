@@ -9,7 +9,7 @@ import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 
-import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 @CommandDeclaration(command = "near", aliases = "n", description = "Display nearby players",
     usage = "/plot near", category = CommandCategory.INFO, requiredType = RequiredType.PLAYER)
@@ -18,7 +18,7 @@ public class Near extends Command {
         super(MainCommand.getInstance(), true);
     }
 
-    @Override public void execute(PlotPlayer player, String[] args,
+    @Override public CompletableFuture<Boolean> execute(PlotPlayer player, String[] args,
         RunnableVal3<Command, Runnable, Runnable> confirm,
         RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);

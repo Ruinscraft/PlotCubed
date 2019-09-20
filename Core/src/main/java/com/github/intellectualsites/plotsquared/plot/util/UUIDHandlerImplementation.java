@@ -15,7 +15,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +30,6 @@ public abstract class UUIDHandlerImplementation {
     protected UUIDWrapper uuidWrapper;
     private boolean cached = false;
     private BiMap<StringWrapper, UUID> uuidMap = HashBiMap.create(new HashMap<>());
-    //    private BiMap<UUID, StringWrapper> nameMap = uuidMap.inverse();
 
     public UUIDHandlerImplementation(UUIDWrapper wrapper) {
         this.uuidWrapper = wrapper;

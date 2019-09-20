@@ -291,7 +291,7 @@ public abstract class SchematicHandler {
                 parent.list((dir, name) -> name.endsWith(".schematic") || name.endsWith(".schem"));
             if (rawNames != null) {
                 final List<String> transformed = Arrays.stream(rawNames)
-                    .map(rawName -> rawName.substring(0, rawName.length() - 10))
+                    //.map(rawName -> rawName.substring(0, rawName.length() - 10))
                     .collect(Collectors.toList());
                 names.addAll(transformed);
             }
@@ -327,9 +327,9 @@ public abstract class SchematicHandler {
 
     public Schematic getSchematic(@NotNull URL url) {
         try {
-            ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-            InputStream is = Channels.newInputStream(rbc);
-            return getSchematic(is);
+            ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
+            InputStream inputStream = Channels.newInputStream(readableByteChannel);
+            return getSchematic(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -338,15 +338,15 @@ public abstract class SchematicHandler {
 
     public Schematic getSchematic(@NotNull InputStream is) {
         try {
-            SpongeSchematicReader ssr =
+            SpongeSchematicReader schematicReader =
                 new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
-            BlockArrayClipboard clip = (BlockArrayClipboard) ssr.read();
+            BlockArrayClipboard clip = (BlockArrayClipboard) schematicReader.read();
             return new Schematic(clip);
         } catch (IOException ignored) {
             try {
-                MCEditSchematicReader msr =
+                MCEditSchematicReader schematicReader =
                     new MCEditSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
-                BlockArrayClipboard clip = (BlockArrayClipboard) msr.read();
+                BlockArrayClipboard clip = (BlockArrayClipboard) schematicReader.read();
                 return new Schematic(clip);
             } catch (IOException e) {
                 e.printStackTrace();

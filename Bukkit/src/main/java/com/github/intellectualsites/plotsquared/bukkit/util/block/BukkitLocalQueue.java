@@ -10,9 +10,9 @@ import com.github.intellectualsites.plotsquared.plot.util.block.BasicLocalBlockQ
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import io.papermc.lib.PaperLib;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -20,6 +20,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class BukkitLocalQueue extends BasicLocalBlockQueue {
 
@@ -69,53 +70,50 @@ public class BukkitLocalQueue extends BasicLocalBlockQueue {
         }
     }
 
-    @Override public final void setComponents(LocalChunk lc) {
+    @Override public final void setComponents(LocalChunk lc)
+        throws ExecutionException, InterruptedException {
         setBaseBlocks(lc);
     }
 
-    public World getBukkitWorld() {
-        return Bukkit.getWorld(getWorld());
-    }
-
-    public Chunk getChunk(int x, int z) {
-        return getBukkitWorld().getChunkAt(x, z);
-    }
-
-    public void setBaseBlocks(LocalChunk lc) {
+    public void setBaseBlocks(LocalChunk localChunk) {
         World worldObj = Bukkit.getWorld(getWorld());
-        Chunk chunk = worldObj.getChunkAt(lc.getX(), lc.getZ());
-        chunk.load(true);
-        for (int layer = 0; layer < lc.baseblocks.length; layer++) {
-            BaseBlock[] blocksLayer = lc.baseblocks[layer];
-            if (blocksLayer != null) {
-                for (int j = 0; j < blocksLayer.length; j++) {
-                    if (blocksLayer[j] != null) {
-                        BaseBlock block = blocksLayer[j];
-                        int x = MainUtil.x_loc[layer][j];
-                        int y = MainUtil.y_loc[layer][j];
-                        int z = MainUtil.z_loc[layer][j];
+        if (worldObj == null) {
+            throw new NullPointerException("World cannot be null.");
+        }
+        PaperLib.getChunkAtAsync(worldObj, localChunk.getX(), localChunk.getZ(), true)
+            .thenAccept(chunk -> {
+                for (int layer = 0; layer < localChunk.baseblocks.length; layer++) {
+                    BaseBlock[] blocksLayer = localChunk.baseblocks[layer];
+                    if (blocksLayer != null) {
+                        for (int j = 0; j < blocksLayer.length; j++) {
+                            if (blocksLayer[j] != null) {
+                                BaseBlock block = blocksLayer[j];
+                                int x = MainUtil.x_loc[layer][j];
+                                int y = MainUtil.y_loc[layer][j];
+                                int z = MainUtil.z_loc[layer][j];
 
-                        BlockData blockData = BukkitAdapter.adapt(block);
+                                BlockData blockData = BukkitAdapter.adapt(block);
 
-                        Block existing = chunk.getBlock(x, y, z);
-                        if (equals(PlotBlock.get(block), existing) && existing.getBlockData()
-                            .matches(blockData)) {
-                            continue;
-                        }
+                                Block existing = chunk.getBlock(x, y, z);
+                                if (equals(PlotBlock.get(block), existing) && existing
+                                    .getBlockData().matches(blockData)) {
+                                    continue;
+                                }
 
-                        existing.setType(BukkitAdapter.adapt(block.getBlockType()), false);
-                        existing.setBlockData(blockData, false);
-                        if (block.hasNbtData()) {
-                            CompoundTag tag = block.getNbtData();
-                            StateWrapper sw = new StateWrapper(tag);
+                                existing.setType(BukkitAdapter.adapt(block.getBlockType()), false);
+                                existing.setBlockData(blockData, false);
+                                if (block.hasNbtData()) {
+                                    CompoundTag tag = block.getNbtData();
+                                    StateWrapper sw = new StateWrapper(tag);
 
-                            sw.restoreTag(worldObj.getName(), existing.getX(), existing.getY(),
-                                existing.getZ());
+                                    sw.restoreTag(worldObj.getName(), existing.getX(),
+                                        existing.getY(), existing.getZ());
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
+            });
     }
 
     private void setMaterial(@NonNull final PlotBlock plotBlock, @NonNull final Block block) {

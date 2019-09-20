@@ -11,6 +11,7 @@ import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
 import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * PlotSquared command class.
@@ -185,6 +186,8 @@ public class MainCommand extends Command {
                 @Override public void run(Command cmd, CommandResult result) {
                     // Post command stuff!?
                 }
+            }).thenAccept(result -> {
+                // TODO: Something with the command result
             });
         } catch (CommandException e) {
             e.perform(player);
@@ -193,25 +196,25 @@ public class MainCommand extends Command {
         return true;
     }
 
-    @Override public void execute(final PlotPlayer player, String[] args,
+    @Override public CompletableFuture<Boolean> execute(final PlotPlayer player, String[] args,
         RunnableVal3<Command, Runnable, Runnable> confirm,
         RunnableVal2<Command, CommandResult> whenDone) {
         // Clear perm caching //
         player.deleteMeta("perm");
         // Optional command scope //
-        Location loc = null;
+        Location location = null;
         Plot plot = null;
         boolean tp = false;
         if (args.length >= 2) {
             PlotArea area = player.getApplicablePlotArea();
             Plot newPlot = Plot.fromString(area, args[0]);
             if (newPlot != null && (player instanceof ConsolePlayer || newPlot.getArea()
-                .equals(area) || Permissions.hasPermission(player, Captions.PERMISSION_ADMIN))
+                .equals(area) || Permissions.hasPermission(player, Captions.PERMISSION_ADMIN) || Permissions.hasPermission(player, Captions.PERMISSION_ADMIN_SUDO_AREA))
                 && !newPlot.isDenied(player.getUUID())) {
                 Location newLoc = newPlot.getCenter();
                 if (player.canTeleport(newLoc)) {
                     // Save meta
-                    loc = player.getMeta(PlotPlayer.META_LOCATION);
+                    location = player.getMeta(PlotPlayer.META_LOCATION);
                     plot = player.getMeta(PlotPlayer.META_LAST_PLOT);
                     tp = true;
                     // Set loc
@@ -224,37 +227,32 @@ public class MainCommand extends Command {
                 args = Arrays.copyOfRange(args, 1, args.length);
             }
             if (args.length >= 2 && !args[0].isEmpty() && args[0].charAt(0) == '-') {
-                switch (args[0].substring(1)) {
-                    case "f":
-                        confirm = new RunnableVal3<Command, Runnable, Runnable>() {
-                            @Override
-                            public void run(Command cmd, Runnable success, Runnable failure) {
-                                if (EconHandler.manager != null) {
-                                    PlotArea area = player.getApplicablePlotArea();
-                                    if (area != null) {
-                                        Expression<Double> priceEval =
-                                            area.PRICES.get(cmd.getFullId());
-                                        Double price =
-                                            priceEval != null ? priceEval.evaluate(0d) : 0d;
-                                        if (price != 0d
-                                            && EconHandler.manager.getMoney(player) < price) {
-                                            if (failure != null) {
-                                                failure.run();
-                                            }
-                                            return;
+                if ("f".equals(args[0].substring(1))) {
+                    confirm = new RunnableVal3<Command, Runnable, Runnable>() {
+                        @Override public void run(Command cmd, Runnable success, Runnable failure) {
+                            if (EconHandler.manager != null) {
+                                PlotArea area = player.getApplicablePlotArea();
+                                if (area != null) {
+                                    Expression<Double> priceEval = area.PRICES.get(cmd.getFullId());
+                                    Double price = priceEval != null ? priceEval.evaluate(0d) : 0d;
+                                    if (price != 0d
+                                        && EconHandler.manager.getMoney(player) < price) {
+                                        if (failure != null) {
+                                            failure.run();
                                         }
+                                        return;
                                     }
                                 }
-                                if (success != null) {
-                                    success.run();
-                                }
                             }
-                        };
-                        args = Arrays.copyOfRange(args, 1, args.length);
-                        break;
-                    default:
-                        Captions.INVALID_COMMAND_FLAG.send(player);
-                        return;
+                            if (success != null) {
+                                success.run();
+                            }
+                        }
+                    };
+                    args = Arrays.copyOfRange(args, 1, args.length);
+                } else {
+                    Captions.INVALID_COMMAND_FLAG.send(player);
+                    return CompletableFuture.completedFuture(false);
                 }
             }
         }
@@ -273,10 +271,10 @@ public class MainCommand extends Command {
         }
         // Reset command scope //
         if (tp && !(player instanceof ConsolePlayer)) {
-            if (loc == null) {
+            if (location == null) {
                 player.deleteMeta(PlotPlayer.META_LOCATION);
             } else {
-                player.setMeta(PlotPlayer.META_LOCATION, loc);
+                player.setMeta(PlotPlayer.META_LOCATION, location);
             }
             if (plot == null) {
                 player.deleteMeta(PlotPlayer.META_LAST_PLOT);
@@ -284,6 +282,7 @@ public class MainCommand extends Command {
                 player.setMeta(PlotPlayer.META_LAST_PLOT, plot);
             }
         }
+        return CompletableFuture.completedFuture(true);
     }
 
     @Override public boolean canExecute(CommandCaller player, boolean message) {
