@@ -675,12 +675,6 @@ public enum Captions {
     COMMAND_CATEGORY_INFO("Info", "Category"),
     COMMAND_CATEGORY_DEBUG("Debug", "Category"),
     COMMAND_CATEGORY_ADMINISTRATION("Admin", "Category"),
-    COMMAND_CATEGORY_CLAIMING("Claiming", "Category"), COMMAND_CATEGORY_TELEPPORT("Teleport",
-        "Category"), COMMAND_CATEGORY_SETTINGS("Protection", "Category"), COMMAND_CATEGORY_CHAT(
-        "Chat", "Category"), COMMAND_CATEGORY_SCHEMATIC("Web",
-        "Category"), COMMAND_CATEGORY_APPEARANCE("Cosmetic", "Category"), COMMAND_CATEGORY_INFO(
-        "Info", "Category"), COMMAND_CATEGORY_DEBUG("Debug",
-        "Category"), COMMAND_CATEGORY_ADMINISTRATION("Admin", "Category"),
     // PlotCubed start
     COMMAND_CATEGORY_ROLEPLAY("Roleplay", "Category"),
     // PlotCubed end

@@ -1789,7 +1789,7 @@ import java.util.zip.ZipInputStream;
         o.put("color.4", "b");
         // PlotCubed end
         if (!this.style.contains("color")) {
-            for (Entry<String, Object> node : object.entrySet()) {
+            for (Entry<String, Object> node : o.entrySet()) {
                 this.style.set(node.getKey(), node.getValue());
             }
         }

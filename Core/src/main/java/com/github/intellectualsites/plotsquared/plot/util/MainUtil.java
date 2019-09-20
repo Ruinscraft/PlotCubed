@@ -901,7 +901,7 @@ public class MainUtil {
     // PlotCubed start
     public static String getWarpsList(HashSet<PlotWarp> warps) {
         if (warps == null || warps.isEmpty()) {
-            return Captions.NONE.s();
+            return Captions.NONE.getTranslated();
         }
 
         List<String> warpNames = new ArrayList<>();

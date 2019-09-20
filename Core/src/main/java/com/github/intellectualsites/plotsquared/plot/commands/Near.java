@@ -9,6 +9,8 @@ import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @CommandDeclaration(command = "near", aliases = "n", description = "Display nearby players",
@@ -23,13 +25,14 @@ public class Near extends Command {
         RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
         // PlotCubed start
-        java.util.Set<PlotPlayer> toList = new HashSet<>();
+        Set<PlotPlayer> toList = new HashSet<>();
         for (PlotPlayer inPlot : plot.getPlayersInPlot()) {
             if (player.canSee(inPlot)) {
                 toList.add(inPlot);
             }
         }
         Captions.PLOT_NEAR.send(player, StringMan.join(toList, ", "));
+        return CompletableFuture.completedFuture(true);
         // PlotCubed end
     }
 }

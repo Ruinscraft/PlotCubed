@@ -24,8 +24,8 @@ public class AddWarp extends SubCommand {
             return sendMessage(player, Captions.NOT_IN_PLOT);
         }
 
-        if (!plot.isOwner(player.getUUID()) && !player.hasPermission(Captions.PERMISSION_ADDWARP_OTHER.s())) {
-            return sendMessage(player, Captions.NO_PERMISSION, Captions.PERMISSION_ADDWARP_OTHER.s());
+        if (!plot.isOwner(player.getUUID()) && !player.hasPermission(Captions.PERMISSION_ADDWARP_OTHER.getTranslated())) {
+            return sendMessage(player, Captions.NO_PERMISSION, Captions.PERMISSION_ADDWARP_OTHER.getTranslated());
         }
 
         Location bottom = plot.getBottomAbs();

@@ -25,8 +25,8 @@ public class Broadcast extends SubCommand {
             return !sendMessage(player, Captions.NOT_IN_PLOT);
         }
 
-        if (!plot.isOwner(player.getUUID()) && !player.hasPermission(Captions.PERMISSION_USE_BROADCAST_OTHER.s())) {
-            return !sendMessage(player, Captions.NO_PERMISSION, Captions.PERMISSION_USE_BROADCAST_OTHER.s());
+        if (!plot.isOwner(player.getUUID()) && !player.hasPermission(Captions.PERMISSION_USE_BROADCAST_OTHER.getTranslated())) {
+            return !sendMessage(player, Captions.NO_PERMISSION, Captions.PERMISSION_USE_BROADCAST_OTHER.getTranslated());
         }
 
         String msg = String.join(" ", args);
@@ -39,7 +39,7 @@ public class Broadcast extends SubCommand {
 
         for (PlotPlayer playerInPlot : plot.getPlayersInPlot()) {
             playerInPlot.sendTitle(Captions.color(msg), "");
-            playerInPlot.sendMessage(Captions.color(Captions.BROADCAST_PREFIX.s() + msg));
+            playerInPlot.sendMessage(Captions.color(Captions.BROADCAST_PREFIX.getTranslated() + msg));
         }
 
         return true;

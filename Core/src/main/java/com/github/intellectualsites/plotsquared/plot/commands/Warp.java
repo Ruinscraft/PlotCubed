@@ -28,7 +28,7 @@ public class Warp extends SubCommand {
         // TODO: somehow clean this up, it's really hacky
         if (args.length < 1) {
             PlotMessage clickableWarps = new PlotMessage(
-                    Captions.color(Captions.PLOT_INFO_WARPS.s() // .color doesn't work here?
+                    Captions.color(Captions.PLOT_INFO_WARPS.getTranslated() // .color doesn't work here?
                             .replaceAll("%warpcount%", Integer.toString(plot.getWarps().size()))
                             .replaceAll("%warps%", ""))).color("$1"); // basically ignore %warps%
 
