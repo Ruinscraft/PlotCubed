@@ -44,7 +44,7 @@ ext {
     }
 }
 
-version = String.format("%s.%s", rootVersion, buildNumber)
+version = String.format("%s.%s", rootVersion, "9999")  // PlotCubed - use arbitrary build number
 
 description = rootProject.name
 
