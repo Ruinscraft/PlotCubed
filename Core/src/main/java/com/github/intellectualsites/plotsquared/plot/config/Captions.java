@@ -28,7 +28,6 @@ public enum Captions {
     FLAG_PVP("pvp", "static.flags"),
     FLAG_HANGING_PLACE("hanging-place", "static.flags"),
     FLAG_HANGING_BREAK("hanging-break", "static.flags"),
-    FLAG_HANGING_INTERACT("hanging-interact", "static.flags"),
     FLAG_MISC_INTERACT("misc-interact", "static.flags"),
     FLAG_MISC_BREAK("misc-break", "static.flags"),
     FLAG_MISC_PLACE("misc-place", "static.flags"),
@@ -550,25 +549,6 @@ public enum Captions {
 
     NEED_ON_OFF("$2You need to specify a value. Possible values: $1on$2, $1off",
         "Rain"), SETTING_UPDATED("$4You successfully updated the setting", "Rain"),
-    /*
-     * Flag
-     */
-
-    FLAG_KEY("$2Key: %s", "Flag"), FLAG_TYPE("$2Type: %s", "Flag"),
-
-    FLAG_DESC("$2Desc: %s", "Flag"), NOT_VALID_FLAG("$2That is not a valid flag", "Flag"),
-
-    NOT_VALID_FLAG_SUGGESTED("$2That is not a valid flag. Did you mean: $1%s",
-        "Flag"), NOT_VALID_VALUE("$2Flag values must be alphanumerical", "Flag"),
-
-    FLAG_NOT_IN_PLOT("$2The plot does not have that flag", "Flag"), FLAG_NOT_REMOVED(
-        "$2The flag could not be removed", "Flag"),
-
-    FLAG_NOT_ADDED("$2The flag could not be added", "Flag"), FLAG_REMOVED(
-        "$4Successfully removed flag", "Flag"),
-
-    FLAG_ADDED("$4Successfully added flag", "Flag"), FLAG_TUTORIAL_USAGE(
-        "$1Have an admin set the flag: $2%s", "CommandConfig"),
 
     // PlotCubed start
     /*
@@ -613,32 +593,50 @@ public enum Captions {
     TOP_ITEM_NAME("$1%s0's plot", "Top"),
     // PlotCubed end
 
-    /*
-        "$1Have an admin set the flag: $2%s", "CommandConfig"),
-    /*
-     * Trusted
-     */
-
-    TRUSTED_ADDED("$4You successfully trusted a user to the plot", "Trusted"), TRUSTED_REMOVED(
-        "$4You successfully removed a trusted user from the plot", "Trusted"),
-
-    WAS_NOT_ADDED("$2That player was not trusted on this plot", "Trusted"), PLOT_REMOVED_USER(
-        "$1Plot %s of which you were added to has been deleted due to owner inactivity",
-        "Trusted"),
-    /*
-     * Member
-     */
-
-    REMOVED_PLAYERS("$2Removed %s players from this plot.", "Member"), ALREADY_OWNER(
-        "$2That user is already the plot owner: %s0", "Member"),
-
-    ALREADY_ADDED("$2That user is already added to that category: %s0", "Member"), MEMBER_ADDED(
-        "$4That user can now build while the plot owner is online", "Member"),
-
     MEMBER_REMOVED("$1You successfully removed a user from the plot",
         "Member"), MEMBER_WAS_NOT_ADDED("$2That player was not added as a user on this plot",
         "Member"),
 
+    //<editor-fold desc="Flag">
+    FLAG_KEY("$2Key: %s", "Flag"),
+    FLAG_TYPE("$2Type: %s", "Flag"),
+    FLAG_DESC("$2Desc: %s", "Flag"),
+    NOT_VALID_FLAG("$2That is not a valid flag", "Flag"),
+    NOT_VALID_FLAG_SUGGESTED("$2That is not a valid flag. Did you mean: $1%s", "Flag"),
+    NOT_VALID_VALUE("$2Flag values must be alphanumerical", "Flag"),
+    FLAG_NOT_REMOVED("$2The flag could not be removed", "Flag"),
+    FLAG_NOT_ADDED("$2The flag could not be added", "Flag"),
+    FLAG_REMOVED("$4Successfully removed flag", "Flag"),
+    FLAG_ADDED("$4Successfully added flag", "Flag"),
+    FLAG_TUTORIAL_USAGE("$1Have an admin set the flag: $2%s", "CommandConfig"),
+    FLAG_LIST_ENTRY("$2%s: $1%s", "Flag"),
+    //</editor-fold>
+    //<editor-fold desc="Flag category captions">
+    FLAG_CATEGORY_STRING("String Flags", "Flags"),
+    FLAG_CATEGORY_INTEGERS("Integer Flags", "Flags"),
+    FLAG_CATEGORY_TELEPORT_DENY("Teleport Deny Flag", "Flags"),
+    FLAG_CATEGORY_STRING_LIST("String List Flags", "Flags"),
+    FLAG_CATEGORY_WEATHER("Weather Flags", "Flags"),
+    FLAG_CATEGORY_BLOCK_LIST("Material Flags", "Flags"),
+    FLAG_CATEGORY_INTERVALS("Interval Flags", "Flags"),
+    FLAG_CATEGORY_INTEGER_LIST("Integer List Flags", "Flags"),
+    FLAG_CATEGORY_GAMEMODE("Game Mode Flags", "Flags"),
+    FLAG_CATEGORY_ENUM("Generic Enum Flags", "Flags"),
+    FLAG_CATEGORY_DECIMAL("Decimal Flags", "Flags"),
+    FLAG_CATEGORY_BOOLEAN("Boolean Flags", "Flags"),
+    FLAG_CATEGORY_MIXED("Mixed Value Flags", "Flags"),
+    //</editor-fold>
+
+    //<editor-fold desc="Trusted">
+    TRUSTED_ADDED("$4You successfully trusted a user to the plot", "Trusted"),
+    WAS_NOT_ADDED("$2That player was not trusted on this plot", "Trusted"),
+    PLOT_REMOVED_USER("$1Plot %s of which you were added to has been deleted due to owner inactivity", "Trusted"),
+    //</editor-fold>
+    //<editor-fold desc="Member">
+    REMOVED_PLAYERS("$2Removed %s players from this plot.", "Member"),
+    ALREADY_OWNER("$2That user is already the plot owner: %s0", "Member"),
+    ALREADY_ADDED("$2That user is already added to that category: %s0", "Member"),
+    MEMBER_ADDED("$4That user can now build while the plot owner is online", "Member"),
     PLOT_MAX_MEMBERS("$2You are not allowed to add any more players to this plot", "Member"),
     //</editor-fold>
     //<editor-fold desc="Set Owner">
@@ -663,9 +661,7 @@ public enum Captions {
     //</editor-fold>
     BUCKET_ENTRIES_IGNORED("$2Total bucket values add up to 1 or more. Blocks without a specified chance will be ignored","Generator_Bucket"),
 
-    /**
-     * Command Categories
-     */
+    //<editor-fold desc="Command Categories">
     COMMAND_CATEGORY_CLAIMING("Claiming", "Category"),
     COMMAND_CATEGORY_TELEPORT("Teleport", "Category"),
     COMMAND_CATEGORY_SETTINGS("Protection", "Category"),
@@ -675,6 +671,7 @@ public enum Captions {
     COMMAND_CATEGORY_INFO("Info", "Category"),
     COMMAND_CATEGORY_DEBUG("Debug", "Category"),
     COMMAND_CATEGORY_ADMINISTRATION("Admin", "Category"),
+    //</editor-fold>
     // PlotCubed start
     COMMAND_CATEGORY_ROLEPLAY("Roleplay", "Category"),
     // PlotCubed end
