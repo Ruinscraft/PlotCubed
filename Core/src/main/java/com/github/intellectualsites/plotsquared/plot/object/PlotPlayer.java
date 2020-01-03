@@ -10,9 +10,17 @@ import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-import com.github.intellectualsites.plotsquared.plot.util.*;
+import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
+import com.github.intellectualsites.plotsquared.plot.util.EventUtil;
+import com.github.intellectualsites.plotsquared.plot.util.Permissions;
+import com.github.intellectualsites.plotsquared.plot.util.PlotWeather;
+import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
+import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
 import com.google.common.base.Preconditions;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldedit.world.item.ItemType;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,6 +86,8 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
     public static PlotPlayer get(String name) {
         return UUIDHandler.getPlayer(name);
     }
+
+    public abstract Actor toActor();
 
     /**
      * Set some session only metadata for this player.
@@ -428,14 +438,14 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
      *
      * @return the gamemode of the player.
      */
-    @NotNull public abstract PlotGameMode getGameMode();
+    public abstract @NotNull GameMode getGameMode();
 
     /**
      * Set this player's gameMode.
      *
      * @param gameMode the gamemode to set
      */
-    public abstract void setGameMode(@NotNull PlotGameMode gameMode);
+    public abstract void setGameMode(@NotNull GameMode gameMode);
 
     /**
      * Set this player's local time (ticks).
@@ -464,7 +474,7 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
      * @param location where to play the music
      * @param id       the record item id
      */
-    public abstract void playMusic(@NotNull Location location, @NotNull PlotBlock id);
+    public abstract void playMusic(@NotNull Location location, @NotNull ItemType id);
 
     /**
      * Check if this player is banned.
@@ -602,7 +612,8 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
                                 if (getMeta("teleportOnLogin", true)) {
                                     teleport(location);
                                     sendMessage(
-                                        Captions.TELEPORTED_TO_PLOT.f() + " (quitLoc) (" + plotX
+                                        Captions.format(Captions.TELEPORTED_TO_PLOT.getTranslated())
+                                            + " (quitLoc) (" + plotX
                                             + "," + plotZ + ")");
                                 }
                             });
@@ -613,7 +624,8 @@ public abstract class PlotPlayer implements CommandCaller, OfflinePlotPlayer {
                                         if (getMeta("teleportOnLogin", true)) {
                                             if (plot.isLoaded()) {
                                                 teleport(location);
-                                                sendMessage(Captions.TELEPORTED_TO_PLOT.f()
+                                                sendMessage(Captions.format(
+                                                    Captions.TELEPORTED_TO_PLOT.getTranslated())
                                                     + " (quitLoc-unloaded) (" + plotX + "," + plotZ
                                                     + ")");
                                             }

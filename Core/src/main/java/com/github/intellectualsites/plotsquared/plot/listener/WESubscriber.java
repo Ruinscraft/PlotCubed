@@ -5,7 +5,6 @@ import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 import com.sk89q.worldedit.WorldEdit;
@@ -13,18 +12,18 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.EventHandler.Priority;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.World;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class WESubscriber {
 
     @Subscribe(priority = Priority.VERY_EARLY) public void onEditSession(EditSessionEvent event) {
-        WorldEdit worldedit = PlotSquared.get().worldedit;
-        if (worldedit == null) {
+        if (!Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS) {
             WorldEdit.getInstance().getEventBus().unregister(this);
             return;
         }
@@ -37,7 +36,7 @@ public class WESubscriber {
         if (actor != null && actor.isPlayer()) {
             String name = actor.getName();
             PlotPlayer plotPlayer = PlotPlayer.wrap(name);
-            HashSet<RegionWrapper> mask;
+            Set<CuboidRegion> mask;
             if (plotPlayer == null) {
                 Player player = (Player) actor;
                 Location location = player.getLocation();

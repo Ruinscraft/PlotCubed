@@ -40,7 +40,7 @@ public final class Flags {
         }
 
         @Override public String getValueDescription() {
-            return "Flag value must be a positive number.";
+            return Captions.FLAG_ERROR_PRICE.getTranslated();
         }
     };
     public static final BooleanFlag EXPLOSION = new BooleanFlag("explosion");
@@ -58,9 +58,9 @@ public final class Flags {
     public static final BooleanFlag BLOCK_IGNITION = new BooleanFlag("block-ignition");
     public static final BooleanFlag SOIL_DRY = new BooleanFlag("soil-dry");
     public static final StringListFlag BLOCKED_CMDS = new StringListFlag("blocked-cmds");
-    public static final PlotBlockListFlag USE = new PlotBlockListFlag("use");
-    public static final PlotBlockListFlag BREAK = new PlotBlockListFlag("break");
-    public static final PlotBlockListFlag PLACE = new PlotBlockListFlag("place");
+    public static final BlockStateListFlag USE = new BlockStateListFlag("use");
+    public static final BlockStateListFlag BREAK = new BlockStateListFlag("break");
+    public static final BlockStateListFlag PLACE = new BlockStateListFlag("place");
     public static final BooleanFlag DEVICE_INTERACT = new BooleanFlag("device-interact");
     public static final BooleanFlag VEHICLE_BREAK = new BooleanFlag("vehicle-break");
     public static final BooleanFlag VEHICLE_PLACE = new BooleanFlag("vehicle-place");
@@ -114,11 +114,12 @@ public final class Flags {
         }
 
         @Override public String getValueDescription() {
-            return "Flag value must be a timestamp or a boolean";
+            return Captions.FLAG_ERROR_KEEP.getTranslated();
         }
     };
     public static final TeleportDenyFlag DENY_TELEPORT = new TeleportDenyFlag("deny-teleport");
     public static final BooleanFlag DENY_EXIT = new BooleanFlag("deny-exit");
+    public static final BooleanFlag UNTRUSTED_VISIT = new BooleanFlag("untrusted-visit");
 
 
     private static final HashMap<String, Flag<?>> flags;

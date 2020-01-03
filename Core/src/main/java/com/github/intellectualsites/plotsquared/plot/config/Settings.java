@@ -16,10 +16,10 @@ public class Settings extends Config {
 
     @Comment("These first 7 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
-    public static final String ISSUES = "https://github.com/IntellectualSites/PlotSquared/issues";
-    @Final public static final String SUGGESTION =
+    public static String ISSUES = "https://github.com/IntellectualSites/PlotSquared/issues";
+    @Final public static String SUGGESTION =
         "https://github.com/IntellectualSites/PlotSquaredSuggestions";
-    @Final public static final String WIKI =
+    @Final public static String WIKI =
         "https://github.com/IntellectualSites/PlotSquared/wiki";
     @Final public static String DATE; // These values are set from P2 before loading
     @Final public static String BUILD; // These values are set from P2 before loading
@@ -28,7 +28,7 @@ public class Settings extends Config {
 
     @Comment("Show additional information in console") public static boolean DEBUG = false;
     @Comment({"The big annoying text that appears when you enter a plot",
-        "For a single plot: `/plot flag set titles false`", "For just you: `/plot toggle titles`"})
+        "For a single plot: `/plot flag set titles false`", "For just you: `/plot toggle titles`", "For all plots: Add `titles: false` in the worlds.yml flags block"})
     public static boolean TITLES = true;
 
     @Create // This value will be generated automatically
@@ -292,7 +292,7 @@ public class Settings extends Config {
         @Comment("Teleport to your plot on death") public static boolean ON_DEATH = false;
         @Comment("Teleport to your plot on login") public static boolean ON_LOGIN = false;
         @Comment("Teleport to your plot on claim") public static boolean ON_CLAIM = true;
-        @Comment("Add a delay to all teleport commands") public static int DELAY = 0;
+        @Comment({"Add a delay to all teleport commands", "Assign `plots.teleport.delay.bypass` to bypass the cooldown."}) public static int DELAY = 0;
         @Comment("The visit command is ordered by world instead of globally") public static boolean
             PER_WORLD_VISIT = false;
     }
@@ -331,7 +331,7 @@ public class Settings extends Config {
             true;
         @Comment("The UUID cacher is used to resolve player names") public static boolean
             UUID_CACHE = true;
-        @Comment("The plugin auto updater") public static boolean UPDATER = true;
+        @Comment("The plugin auto updater will notify you if updates are available.") public static boolean UPDATER = true;
         @Comment("Stores user metadata in a database") public static boolean PERSISTENT_META = true;
         @Comment("Optimizes permission checks") public static boolean PERMISSION_CACHE = true;
         @Comment("Optimizes block changing code") public static boolean BLOCK_CACHE = true;

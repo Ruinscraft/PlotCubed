@@ -1,6 +1,5 @@
 package com.github.intellectualsites.plotsquared.plot.flag;
 
-
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 
 public class StringFlag extends Flag<String> {
@@ -18,6 +17,6 @@ public class StringFlag extends Flag<String> {
     }
 
     @Override public String getValueDescription() {
-        return "Flag value must be alphanumeric. Some special characters are allowed.";
+        return Captions.FLAG_ERROR_STRING.getTranslated();
     }
 }

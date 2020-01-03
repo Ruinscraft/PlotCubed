@@ -20,30 +20,78 @@ import com.github.intellectualsites.plotsquared.plot.generator.HybridUtils;
 import com.github.intellectualsites.plotsquared.plot.generator.IndependentPlotGenerator;
 import com.github.intellectualsites.plotsquared.plot.listener.WESubscriber;
 import com.github.intellectualsites.plotsquared.plot.logger.ILogger;
-import com.github.intellectualsites.plotsquared.plot.object.*;
+import com.github.intellectualsites.plotsquared.plot.object.BlockBucket;
+import com.github.intellectualsites.plotsquared.plot.object.Location;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotCluster;
+import com.github.intellectualsites.plotsquared.plot.object.PlotFilter;
+import com.github.intellectualsites.plotsquared.plot.object.PlotId;
+import com.github.intellectualsites.plotsquared.plot.object.PlotManager;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.StringWrapper;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.DefaultPlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.PlotAreaManager;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotArea;
 import com.github.intellectualsites.plotsquared.plot.object.worlds.SinglePlotAreaManager;
-import com.github.intellectualsites.plotsquared.plot.util.*;
+import com.github.intellectualsites.plotsquared.plot.util.ChatManager;
+import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
+import com.github.intellectualsites.plotsquared.plot.util.CommentManager;
+import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
+import com.github.intellectualsites.plotsquared.plot.util.EventUtil;
+import com.github.intellectualsites.plotsquared.plot.util.InventoryUtil;
+import com.github.intellectualsites.plotsquared.plot.util.LegacyConverter;
+import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
+import com.github.intellectualsites.plotsquared.plot.util.MathMan;
+import com.github.intellectualsites.plotsquared.plot.util.ReflectionUtils;
+import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
+import com.github.intellectualsites.plotsquared.plot.util.SetupUtils;
+import com.github.intellectualsites.plotsquared.plot.util.StringMan;
+import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
+import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
+import com.github.intellectualsites.plotsquared.plot.util.UpdateUtility;
+import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
 import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpiryTask;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -105,7 +153,7 @@ import java.util.zip.ZipInputStream;
         //
         // Register configuration serializable classes
         //
-        ConfigurationSerialization.registerClass(PlotBlock.class, "PlotBlock");
+//        ConfigurationSerialization.registerClass(BlockState.class, "BlockState");
         ConfigurationSerialization.registerClass(BlockBucket.class, "BlockBucket");
 
         try {
@@ -197,7 +245,7 @@ import java.util.zip.ZipInputStream;
             if (Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS) {
                 try {
                     if (this.IMP.initWorldEdit()) {
-                        PlotSquared.debug(IMP.getPluginName() + " hooked into WorldEdit.");
+                        PlotSquared.log(Captions.PREFIX + "&6" + IMP.getPluginName() + " hooked into WorldEdit.");
                         this.worldedit = WorldEdit.getInstance();
                         WorldEdit.getInstance().getEventBus().register(new WESubscriber());
                         if (Settings.Enabled_Components.COMMANDS) {
@@ -269,7 +317,8 @@ import java.util.zip.ZipInputStream;
             e.printStackTrace();
         }
 
-        PlotSquared.log(Captions.ENABLED.f(IMP.getPluginName()));
+        PlotSquared.log(Captions.PREFIX + Captions
+            .format(Captions.ENABLED.getTranslated(), IMP.getPluginName()));
     }
 
     /**
@@ -1272,7 +1321,7 @@ import java.util.zip.ZipInputStream;
                 .filter(validArgument -> args.toLowerCase(Locale.ENGLISH).contains(validArgument))
                 .count();
 
-            String[] split = args.toLowerCase(Locale.ENGLISH).split(",");
+            String[] split = args.toLowerCase(Locale.ENGLISH).split(",(?![^\\(\\[]*[\\]\\)])");
 
             if (split.length > expected) {
                 // This means we have multi-block block buckets
@@ -1781,15 +1830,26 @@ import java.util.zip.ZipInputStream;
         if (this.version != null) {
             this.style.set("Version", this.version.toString());
         }
-        Map<String, Object> o = new HashMap<>(4);
-        // PlotCubed start
-        o.put("color.1", "3");
-        o.put("color.2", "7");
-        o.put("color.3", "8");
-        o.put("color.4", "b");
-        // PlotCubed end
+        this.style.set("Information", "Left Row: PlotSquared color codes ($), right row: Minecraft color codes (&)");
+        Map<String, Object> object = new HashMap<>(16);
+        object.put("color.1", "3");
+        object.put("color.2", "7");
+        object.put("color.3", "8");
+        object.put("color.4", "b");
+        object.put("color.5", "1");
+        object.put("color.6", "2");
+        object.put("color.7", "4");
+        object.put("color.8", "5");
+        object.put("color.9", "9");
+        object.put("color.10", "0");
+        object.put("color.11", "a");
+        object.put("color.12", "b");
+        object.put("color.13", "c");
+        object.put("color.14", "d");
+        object.put("color.15", "e");
+        object.put("color.16", "f");
         if (!this.style.contains("color")) {
-            for (Entry<String, Object> node : o.entrySet()) {
+            for (Entry<String, Object> node : object.entrySet()) {
                 this.style.set(node.getKey(), node.getValue());
             }
         }
@@ -1964,7 +2024,7 @@ import java.util.zip.ZipInputStream;
         return Collections.unmodifiableSet(result);
     }
 
-    public Set<PlotArea> getPlotAreas(final String world, final RegionWrapper region) {
+    public Set<PlotArea> getPlotAreas(final String world, final CuboidRegion region) {
         final PlotArea[] areas = plotAreaManager.getPlotAreas(world, region);
         final Set<PlotArea> set = new HashSet<>();
         Collections.addAll(set, areas);

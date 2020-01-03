@@ -11,7 +11,13 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotMessage;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.object.Rating;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
-import com.github.intellectualsites.plotsquared.plot.util.*;
+import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
+import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
+import com.github.intellectualsites.plotsquared.plot.util.MathMan;
+import com.github.intellectualsites.plotsquared.plot.util.Permissions;
+import com.github.intellectualsites.plotsquared.plot.util.StringComparison;
+import com.github.intellectualsites.plotsquared.plot.util.StringMan;
+import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.github.intellectualsites.plotsquared.plot.util.expiry.ExpireManager;
 
 import java.util.ArrayList;
@@ -131,9 +137,10 @@ public class ListCmd extends SubCommand {
                     return false;
                 }
                 if (!Permissions
-                    .hasPermission(player, Captions.PERMISSION_LIST_WORLD_NAME.f(world))) {
+                    .hasPermission(player,
+                        Captions.format(Captions.PERMISSION_LIST_WORLD_NAME.getTranslated(), world))) {
                     MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                        Captions.PERMISSION_LIST_WORLD_NAME.f(world));
+                        Captions.format(Captions.PERMISSION_LIST_WORLD_NAME.getTranslated(), world));
                     return false;
                 }
                 plots = new ArrayList<>(PlotSquared.get().getPlots(world));
@@ -155,9 +162,10 @@ public class ListCmd extends SubCommand {
                     return false;
                 }
                 if (!Permissions
-                    .hasPermission(player, Captions.PERMISSION_LIST_WORLD_NAME.f(world))) {
+                    .hasPermission(player,
+                        Captions.format(Captions.PERMISSION_LIST_WORLD_NAME.getTranslated(), world))) {
                     MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                        Captions.PERMISSION_LIST_WORLD_NAME.f(world));
+                        Captions.format(Captions.PERMISSION_LIST_WORLD_NAME.getTranslated(), world));
                     return false;
                 }
                 plots = area == null ? new ArrayList<Plot>() : new ArrayList<>(area.getPlots());
@@ -302,9 +310,10 @@ public class ListCmd extends SubCommand {
                         return false;
                     }
                     if (!Permissions
-                        .hasPermission(player, Captions.PERMISSION_LIST_WORLD_NAME.f(args[0]))) {
-                        MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                            Captions.PERMISSION_LIST_WORLD_NAME.f(args[0]));
+                        .hasPermission(player, Captions
+                            .format(Captions.PERMISSION_LIST_WORLD_NAME.getTranslated(), args[0]))) {
+                        MainUtil.sendMessage(player, Captions.NO_PERMISSION, Captions
+                            .format(Captions.PERMISSION_LIST_WORLD_NAME.getTranslated(), args[0]));
                         return false;
                     }
                     plots = new ArrayList<>(PlotSquared.get().getPlots(args[0]));

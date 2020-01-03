@@ -4,16 +4,21 @@ import com.github.intellectualsites.plotsquared.bukkit.util.BukkitUtil;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
 import com.github.intellectualsites.plotsquared.plot.util.MathMan;
-import com.github.intellectualsites.plotsquared.plot.util.PlotGameMode;
 import com.github.intellectualsites.plotsquared.plot.util.PlotWeather;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.world.item.ItemType;
+import com.sk89q.worldedit.world.item.ItemTypes;
 import io.papermc.lib.PaperLib;
 import org.bukkit.*;
+import org.bukkit.GameMode;
+import org.bukkit.Sound;
+import org.bukkit.WeatherType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -26,6 +31,11 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.sk89q.worldedit.world.gamemode.GameModes.ADVENTURE;
+import static com.sk89q.worldedit.world.gamemode.GameModes.CREATIVE;
+import static com.sk89q.worldedit.world.gamemode.GameModes.SPECTATOR;
+import static com.sk89q.worldedit.world.gamemode.GameModes.SURVIVAL;
 
 public class BukkitPlayer extends PlotPlayer {
 
@@ -50,6 +60,10 @@ public class BukkitPlayer extends PlotPlayer {
         this.player = player;
         this.offline = offline;
         super.populatePersistentMetaMap();
+    }
+
+    @Override public Actor toActor() {
+        return BukkitAdapter.adapt(player);
     }
 
     @NotNull @Override public Location getLocation() {
@@ -225,36 +239,29 @@ public class BukkitPlayer extends PlotPlayer {
         }
     }
 
-    @NotNull @Override public PlotGameMode getGameMode() {
+    @NotNull @Override public com.sk89q.worldedit.world.gamemode.GameMode getGameMode() {
         switch (this.player.getGameMode()) {
             case ADVENTURE:
-                return PlotGameMode.ADVENTURE;
+                return ADVENTURE;
             case CREATIVE:
-                return PlotGameMode.CREATIVE;
+                return CREATIVE;
             case SPECTATOR:
-                return PlotGameMode.SPECTATOR;
+                return SPECTATOR;
             case SURVIVAL:
-                return PlotGameMode.SURVIVAL;
             default:
-                return PlotGameMode.NOT_SET;
+                return SURVIVAL;
         }
     }
 
-    @Override public void setGameMode(@NotNull final PlotGameMode gameMode) {
-        switch (gameMode) {
-            case ADVENTURE:
-                this.player.setGameMode(GameMode.ADVENTURE);
-                break;
-            case CREATIVE:
-                this.player.setGameMode(GameMode.CREATIVE);
-                break;
-            case SPECTATOR:
-                this.player.setGameMode(GameMode.SPECTATOR);
-                break;
-            case SURVIVAL:
-            default:
-                this.player.setGameMode(GameMode.SURVIVAL);
-                break;
+    @Override public void setGameMode(@NotNull final com.sk89q.worldedit.world.gamemode.GameMode gameMode) {
+        if (ADVENTURE.equals(gameMode)) {
+            this.player.setGameMode(GameMode.ADVENTURE);
+        } else if (CREATIVE.equals(gameMode)) {
+            this.player.setGameMode(GameMode.CREATIVE);
+        } else if (SPECTATOR.equals(gameMode)) {
+            this.player.setGameMode(GameMode.SPECTATOR);
+        } else {
+            this.player.setGameMode(GameMode.SURVIVAL);
         }
     }
 
@@ -274,8 +281,8 @@ public class BukkitPlayer extends PlotPlayer {
         this.player.setAllowFlight(fly);
     }
 
-    @Override public void playMusic(@NotNull final Location location, @NotNull final PlotBlock id) {
-        if (PlotBlock.isEverything(id) || id.isAir()) {
+    @Override public void playMusic(@NotNull final Location location, @NotNull final ItemType id) {
+        if (id == ItemTypes.AIR) {
             // Let's just stop all the discs because why not?
             for (final Sound sound : Arrays.stream(Sound.values())
                 .filter(sound -> sound.name().contains("DISC")).collect(Collectors.toList())) {
@@ -285,7 +292,7 @@ public class BukkitPlayer extends PlotPlayer {
         } else {
             // this.player.playEffect(BukkitUtil.getLocation(location), Effect.RECORD_PLAY, id.to(Material.class));
             this.player.playSound(BukkitUtil.getLocation(location),
-                Sound.valueOf(id.to(Material.class).name()), Float.MAX_VALUE, 1f);
+                Sound.valueOf(BukkitAdapter.adapt(id).name()), Float.MAX_VALUE, 1f);
         }
     }
 
@@ -294,7 +301,7 @@ public class BukkitPlayer extends PlotPlayer {
     }
 
     @Override public void stopSpectating() {
-        if (getGameMode() == PlotGameMode.SPECTATOR) {
+        if (getGameMode() == SPECTATOR) {
             this.player.setSpectatorTarget(null);
         }
     }

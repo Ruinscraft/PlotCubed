@@ -3,7 +3,6 @@ package com.github.intellectualsites.plotsquared.plot.listener;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
-import com.github.intellectualsites.plotsquared.plot.object.RegionWrapper;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -12,6 +11,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -19,11 +19,11 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
+import java.util.Set;
 
 public class ProcessedWEExtent extends AbstractDelegateExtent {
 
-    private final HashSet<RegionWrapper> mask;
+    private final Set<CuboidRegion> mask;
     private final String world;
     private final int max;
     int BScount = 0;
@@ -33,7 +33,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
     private int count;
     private Extent parent;
 
-    public ProcessedWEExtent(String world, HashSet<RegionWrapper> mask, int max, Extent child,
+    public ProcessedWEExtent(String world, Set<CuboidRegion> mask, int max, Extent child,
         Extent parent) {
         super(child);
         this.mask = mask;

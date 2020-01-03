@@ -4,15 +4,25 @@ import com.github.intellectualsites.plotsquared.plot.generator.GeneratorWrapper;
 import com.github.intellectualsites.plotsquared.plot.generator.HybridUtils;
 import com.github.intellectualsites.plotsquared.plot.generator.IndependentPlotGenerator;
 import com.github.intellectualsites.plotsquared.plot.logger.ILogger;
-import com.github.intellectualsites.plotsquared.plot.object.BlockRegistry;
 import com.github.intellectualsites.plotsquared.plot.object.PlotBossBar;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.util.*;
+import com.github.intellectualsites.plotsquared.plot.util.ChatManager;
+import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;
+import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
+import com.github.intellectualsites.plotsquared.plot.util.EventUtil;
+import com.github.intellectualsites.plotsquared.plot.util.InventoryUtil;
+import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
+import com.github.intellectualsites.plotsquared.plot.util.SetupUtils;
+import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
+import com.github.intellectualsites.plotsquared.plot.util.UUIDHandlerImplementation;
+import com.github.intellectualsites.plotsquared.plot.util.WorldUtil;
 import com.github.intellectualsites.plotsquared.plot.util.block.QueueProvider;
+import com.sk89q.worldedit.extension.platform.Actor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public interface IPlotMain extends ILogger {
 
@@ -236,11 +246,9 @@ public interface IPlotMain extends ILogger {
      */
     @NotNull IndependentPlotGenerator getDefaultGenerator();
 
-    List<String> getPluginIds();
+    List<Map.Entry<Map.Entry<String, String>, Boolean>> getPluginIds();
 
-    BlockRegistry<?> getBlockRegistry();
-
-    LegacyMappings getLegacyMappings();
+    Actor getConsole();
 
     // PlotCubed start
     PlotBossBar createBossBar(String title, PlotBossBar.PlotBarColor color, PlotBossBar.PlotBarStyle style);

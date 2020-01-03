@@ -14,18 +14,33 @@ import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
 import com.github.intellectualsites.plotsquared.plot.util.EventUtil;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.MathMan;
-import com.github.intellectualsites.plotsquared.plot.util.PlotGameMode;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
 import com.github.intellectualsites.plotsquared.plot.util.area.QuadMap;
 import com.github.intellectualsites.plotsquared.plot.util.block.GlobalBlockQueue;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
+import com.github.intellectualsites.plotsquared.plot.util.world.RegionUtil;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.gamemode.GameMode;
+import com.sk89q.worldedit.world.gamemode.GameModes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -42,14 +57,13 @@ public abstract class PlotArea {
     private final PlotId min;
     private final PlotId max;
     @NotNull private final IndependentPlotGenerator generator;
-    private final BlockBucket[][] blockBucketChunk;
     public int MAX_PLOT_MEMBERS = 128;
     public boolean AUTO_MERGE = false;
     public boolean ALLOW_SIGNS = true;
     public boolean MISC_SPAWN_UNOWNED = false;
     public boolean MOB_SPAWNING = false;
     public boolean MOB_SPAWNER_SPAWNING = false;
-    public String PLOT_BIOME = "FOREST";
+    public BiomeType PLOT_BIOME = BiomeTypes.FOREST;
     public boolean PLOT_CHAT = false;
     public boolean SCHEMATIC_CLAIM_SPECIFY = false;
     public boolean SCHEMATIC_ON_CLAIM = false;
@@ -69,9 +83,9 @@ public abstract class PlotArea {
     public PlotLoc DEFAULT_HOME;
     public int MAX_BUILD_HEIGHT = 256;
     public int MIN_BUILD_HEIGHT = 1;
-    public PlotGameMode GAMEMODE = PlotGameMode.CREATIVE;
+    public GameMode GAMEMODE = GameModes.CREATIVE;
     private int hash;
-    private RegionWrapper region;
+    private CuboidRegion region;
     private ConcurrentHashMap<String, Object> meta;
     private QuadMap<PlotCluster> clusters;
 
@@ -94,11 +108,6 @@ public abstract class PlotArea {
             this.max = max;
         }
         this.worldhash = worldName.hashCode();
-        if (Settings.Enabled_Components.PLOT_EXPIRY) {
-            blockBucketChunk = generator.generateBlockBucketChunk(this);
-        } else {
-            blockBucketChunk = null;
-        }
     }
 
     @NotNull protected abstract PlotManager createManager();
@@ -108,28 +117,16 @@ public abstract class PlotArea {
     }
 
     /**
-     * Get an array of BlockBuckets corresponding to a chunk of a plot
-     *
-     * @return BlockBucket[][]
-     */
-    public BlockBucket[][] getBlockBucketChunk() {
-        if (blockBucketChunk != null) {
-            return blockBucketChunk;
-        }
-        return generator.generateBlockBucketChunk(this);
-    }
-
-    /**
-     * Returns the region for this PlotArea or a RegionWrapper encompassing
+     * Returns the region for this PlotArea, or a CuboidRegion encompassing
      * the whole world if none exists.
      *
-     * @return RegionWrapper
+     * @return CuboidRegion
      */
-    public RegionWrapper getRegion() {
+    public CuboidRegion getRegion() {
         this.region = getRegionAbs();
         if (this.region == null) {
-            return new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE,
-                Integer.MAX_VALUE);
+            return new CuboidRegion(BlockVector3.at(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE),
+                BlockVector3.at(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
         }
         return this.region;
     }
@@ -137,15 +134,16 @@ public abstract class PlotArea {
     /**
      * Returns the region for this PlotArea.
      *
-     * @return RegionWrapper or null if no applicable region
+     * @return CuboidRegion or null if no applicable region
      */
-    private RegionWrapper getRegionAbs() {
+    private CuboidRegion getRegionAbs() {
         if (this.region == null) {
             if (this.min != null) {
                 Location bot = getPlotManager().getPlotBottomLocAbs(this.min);
                 Location top = getPlotManager().getPlotTopLocAbs(this.max);
-                this.region = new RegionWrapper(bot.getX() - 1, top.getX() + 1, bot.getZ() - 1,
-                    top.getZ() + 1);
+                BlockVector3 pos1 = bot.getBlockVector3().subtract(BlockVector3.ONE);
+                BlockVector3 pos2 = top.getBlockVector3().add(BlockVector3.ONE);
+                this.region = new CuboidRegion(pos1, pos2);
             }
         }
         return this.region;
@@ -258,27 +256,25 @@ public abstract class PlotArea {
         this.MIN_BUILD_HEIGHT = config.getInt("world.min_height");
 
         switch (config.getString("world.gamemode").toLowerCase()) {
-            case "survival":
-            case "s":
-            case "0":
-                this.GAMEMODE = PlotGameMode.SURVIVAL;
-                break;
             case "creative":
             case "c":
             case "1":
-                this.GAMEMODE = PlotGameMode.CREATIVE;
+                this.GAMEMODE = GameModes.CREATIVE;
                 break;
             case "adventure":
             case "a":
             case "2":
-                this.GAMEMODE = PlotGameMode.ADVENTURE;
+                this.GAMEMODE = GameModes.ADVENTURE;
                 break;
             case "spectator":
             case "3":
-                this.GAMEMODE = PlotGameMode.SPECTATOR;
+                this.GAMEMODE = GameModes.SPECTATOR;
                 break;
+            case "survival":
+            case "s":
+            case "0":
             default:
-                this.GAMEMODE = PlotGameMode.NOT_SET;
+                this.GAMEMODE = GameModes.SURVIVAL;
                 break;
         }
 
@@ -373,7 +369,7 @@ public abstract class PlotArea {
         options.put("home.nonmembers", position);
         options.put("world.max_height", this.MAX_BUILD_HEIGHT);
         options.put("world.min_height", this.MIN_BUILD_HEIGHT);
-        options.put("world.gamemode", this.GAMEMODE.name().toLowerCase());
+        options.put("world.gamemode", this.GAMEMODE.getName().toLowerCase());
 
         if (this.TYPE != 0) {
             options.put("generator.terrain", this.TERRAIN);
@@ -496,7 +492,7 @@ public abstract class PlotArea {
     }
 
     public boolean contains(final int x, final int z) {
-        return this.TYPE != 2 || getRegionAbs().isIn(x, z);
+        return this.TYPE != 2 || RegionUtil.contains(getRegionAbs(), x, z);
     }
 
     public boolean contains(@NotNull final PlotId id) {
@@ -506,7 +502,7 @@ public abstract class PlotArea {
 
     public boolean contains(@NotNull final Location location) {
         return StringMan.isEqual(location.getWorld(), this.worldname) && (getRegionAbs() == null
-            || this.region.isIn(location.getX(), location.getZ()));
+            || this.region.contains(location.getBlockVector3()));
     }
 
     @NotNull Set<Plot> getPlotsAbs(final UUID uuid) {
@@ -638,7 +634,7 @@ public abstract class PlotArea {
         this.meta.put(key, value);
     }
 
-    @NotNull public <T> T getMeta(@Nullable final String key, @NotNull final T def) {
+    @NotNull public <T> T getMeta(@NotNull final String key, @NotNull final T def) {
         final Object v = getMeta(key);
         return v == null ? def : (T) v;
     }
@@ -648,7 +644,8 @@ public abstract class PlotArea {
      * <br>
      * For persistent metadata use the flag system
      */
-    @Nullable public Object getMeta(@NotNull final String key) {
+    @Nullable
+    public Object getMeta(@NotNull final String key) {
         if (this.meta != null) {
             return this.meta.get(key);
         }
@@ -710,7 +707,7 @@ public abstract class PlotArea {
         PlotId max = getMax();
         if (TYPE == 2) {
             center = new PlotId(MathMan.average(min.x, max.x), MathMan.average(min.y, max.y));
-            plots = Math.max(max.x - min.x, max.y - min.y) + 1;
+            plots = Math.max(max.x - min.x + 1, max.y - min.y + 1) + 1;
             if (start != null) {
                 start = new PlotId(start.x - center.x, start.y - center.y);
             }
@@ -727,7 +724,7 @@ public abstract class PlotArea {
             PlotId currentId = new PlotId(center.x + start.x, center.y + start.y);
             Plot plot = getPlotAbs(currentId);
             if (plot != null && plot.canClaim(player)) {
-                setMeta("lastPlot", currentId);
+                setMeta("lastPlot", start);
                 return plot;
             }
         }
@@ -939,9 +936,10 @@ public abstract class PlotArea {
     public void addCluster(@Nullable final PlotCluster plotCluster) {
         if (this.clusters == null) {
             this.clusters = new QuadMap<PlotCluster>(Integer.MAX_VALUE, 0, 0, 62) {
-                @Override public RegionWrapper getRegion(PlotCluster value) {
-                    return new RegionWrapper(value.getP1().x, value.getP2().x, value.getP1().y,
-                        value.getP2().y);
+                @Override public CuboidRegion getRegion(PlotCluster value) {
+                    BlockVector2 pos1 = BlockVector2.at(value.getP1().x, value.getP1().y);
+                    BlockVector2 pos2 = BlockVector2.at(value.getP2().x, value.getP2().y);
+                    return new CuboidRegion(pos1.toBlockVector3(), pos2.toBlockVector3(Plot.MAX_HEIGHT - 1));
                 }
             };
         }

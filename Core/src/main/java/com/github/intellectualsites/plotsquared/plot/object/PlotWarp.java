@@ -20,11 +20,11 @@ public class PlotWarp {
 
         Location bottom = plot.getBottomAbs();
 
-        x = bottom.getX() + blockLoc.x;
-        z = bottom.getZ() + blockLoc.z;
-        y = blockLoc.y;
-        yaw = blockLoc.yaw;
-        pitch = blockLoc.pitch;
+        x = bottom.getX() + blockLoc.getX();
+        z = bottom.getZ() + blockLoc.getZ();
+        y = blockLoc.getY();
+        yaw = blockLoc.getYaw();
+        pitch = blockLoc.getPitch();
 
         return new Location(plot.getWorldName(), x, y, z, yaw, pitch);
     }

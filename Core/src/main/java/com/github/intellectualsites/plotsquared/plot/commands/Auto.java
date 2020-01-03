@@ -5,14 +5,20 @@ import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
 import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
-import com.github.intellectualsites.plotsquared.plot.object.*;
-import com.github.intellectualsites.plotsquared.plot.util.ByteArrayUtilities;
+import com.github.intellectualsites.plotsquared.plot.object.Direction;
+import com.github.intellectualsites.plotsquared.plot.object.Expression;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotId;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal;
 import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
-
+import com.google.common.primitives.Ints;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Set;
 
 @CommandDeclaration(command = "auto", permission = "plots.auto",
@@ -41,8 +47,7 @@ public class Auto extends SubCommand {
                 MainUtil.sendMessage(player, Captions.CANT_CLAIM_MORE_PLOTS_NUM, -diff + "");
                 return false;
             } else if (player.hasPersistentMeta("grantedPlots")) {
-                int grantedPlots =
-                    ByteArrayUtilities.bytesToInteger(player.getPersistentMeta("grantedPlots"));
+                int grantedPlots = Ints.fromByteArray(player.getPersistentMeta("grantedPlots"));
                 if (grantedPlots - diff < sizeX * sizeZ) {
                     player.removePersistentMeta("grantedPlots");
                     MainUtil.sendMessage(player, Captions.CANT_CLAIM_MORE_PLOTS);
@@ -52,8 +57,7 @@ public class Auto extends SubCommand {
                     if (left == 0) {
                         player.removePersistentMeta("grantedPlots");
                     } else {
-                        player.setPersistentMeta("grantedPlots",
-                            ByteArrayUtilities.integerToBytes(left));
+                        player.setPersistentMeta("grantedPlots", Ints.toByteArray(left));
                     }
                     MainUtil.sendMessage(player, Captions.REMOVED_GRANTED_PLOT, "" + left,
                         "" + (grantedPlots - left));
@@ -170,10 +174,16 @@ public class Auto extends SubCommand {
             if (Permissions.hasPermission(player, Captions.PERMISSION_AUTO_MEGA)) {
                 try {
                     String[] split = args[0].split(",|;");
-                    size_x = Integer.parseInt(split[0]);
-                    size_z = Integer.parseInt(split[1]);
+                    if (split[1] == null) {
+                        MainUtil.sendMessage(player,"Correct use /plot auto [length,width]");
+                        size_x = 1;
+                        size_z = 1;
+                    } else {
+                        size_x = Integer.parseInt(split[0]);
+                        size_z = Integer.parseInt(split[1]);
+                    }
                     if (size_x < 1 || size_z < 1) {
-                        MainUtil.sendMessage(player, "&cError: size<=0");
+                        MainUtil.sendMessage(player, "Error: size<=0");
                     }
                     if (args.length > 1) {
                         schematic = args[1];
@@ -208,11 +218,12 @@ public class Auto extends SubCommand {
                 sendMessage(player, Captions.SCHEMATIC_INVALID, "non-existent: " + schematic);
                 return true;
             }
-            if (!Permissions.hasPermission(player, Captions.PERMISSION_CLAIM_SCHEMATIC.f(schematic))
+            if (!Permissions.hasPermission(player,
+                Captions.format(Captions.PERMISSION_CLAIM_SCHEMATIC.getTranslated(), schematic))
                 && !Permissions
                 .hasPermission(player, Captions.PERMISSION_ADMIN_COMMAND_SCHEMATIC)) {
                 MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                    Captions.PERMISSION_CLAIM_SCHEMATIC.f(schematic));
+                    Captions.format(Captions.PERMISSION_CLAIM_SCHEMATIC.getTranslated(), schematic));
                 return true;
             }
         }

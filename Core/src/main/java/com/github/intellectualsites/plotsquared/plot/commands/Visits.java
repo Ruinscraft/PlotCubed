@@ -73,9 +73,10 @@ public class Visits extends SubCommand {
             }
 
             final List<TopInventoryEntry> inventoryEntries = new ArrayList<>();
-            final String inventoryName = Captions.TOP_INVENTORY_NAME.f(optionName);
+            final String inventoryName = Captions.format(Captions.TOP_INVENTORY_NAME, optionName);
             final PlotInventory inventory = new PlotInventory(player, INVENTORY_ROWS, inventoryName) {
-                @Override public boolean onClick(final int index) {
+                @Override
+                public boolean onClick(final int index) {
                     if (inventoryEntries.size() - 1 < index) return false;
                     TopInventoryEntry entry = inventoryEntries.get(index);
                     Plot plot = entry.plot;
@@ -109,7 +110,7 @@ public class Visits extends SubCommand {
                 if (inventoryEntries.size() < i + 1) break;
                 TopInventoryEntry entry = inventoryEntries.get(i);
                 String plotOwnerName = MainUtil.getName(entry.plot.guessOwner());
-                String itemName = Captions.color(Captions.TOP_ITEM_NAME.f(plotOwnerName));
+                String itemName = Captions.color(Captions.format(Captions.TOP_ITEM_NAME, plotOwnerName));
                 PlotItemStack itemStack = new PlotItemStack(
                         itemStackBlockId,
                         INVENTORY_ITEM_STACK_AMT,
@@ -129,6 +130,7 @@ public class Visits extends SubCommand {
     private static final class TopInventoryEntry {
         public final Plot plot;
         public final int visits;
+
         public TopInventoryEntry(Plot plot, int visits) {
             this.plot = plot;
             this.visits = visits;

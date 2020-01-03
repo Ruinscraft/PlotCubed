@@ -14,11 +14,26 @@ import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
 import com.google.common.base.Charsets;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -355,7 +370,7 @@ import java.util.concurrent.atomic.AtomicInteger;
                                 if (statement.isClosed()) {
                                     statement = null;
                                 }
-                            } catch (AbstractMethodError ignore) {
+                            } catch (NullPointerException | AbstractMethodError ignore) {
                             }
                         }
                         lastTask = task;
@@ -858,10 +873,10 @@ import java.util.concurrent.atomic.AtomicInteger;
                 statement.setInt(i * 10 + 9, hash);
                 BlockLoc loc = pair.settings.getPosition();
                 String position;
-                if (loc.y == 0) {
+                if (loc.getY() == 0) {
                     position = "DEFAULT";
                 } else {
-                    position = loc.x + "," + loc.y + ',' + loc.z;
+                    position = loc.getX() + "," + loc.getY() + ',' + loc.getZ();
                 }
                 statement.setString(i * 10 + 10, position);
             }
@@ -899,10 +914,10 @@ import java.util.concurrent.atomic.AtomicInteger;
                 stmt.setInt(i * 10 + 9, n);
                 BlockLoc loc = pair.settings.getPosition();
                 String position;
-                if (loc.y == 0) {
+                if (loc.getY() == 0) {
                     position = "DEFAULT";
                 } else {
-                    position = loc.x + "," + loc.y + ',' + loc.z;
+                    position = loc.getX() + "," + loc.getY() + ',' + loc.getZ();
                 }
                 stmt.setString(i * 10 + 10, position);
             }

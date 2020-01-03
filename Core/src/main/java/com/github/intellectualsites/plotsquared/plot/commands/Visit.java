@@ -5,13 +5,22 @@ import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
-import com.github.intellectualsites.plotsquared.plot.object.*;
+import com.github.intellectualsites.plotsquared.plot.flag.Flags;
+import com.github.intellectualsites.plotsquared.plot.object.Plot;
+import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
+import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal2;
+import com.github.intellectualsites.plotsquared.plot.object.RunnableVal3;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.MathMan;
 import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @CommandDeclaration(command = "visit", permission = "plots.visit",
@@ -129,7 +138,8 @@ import java.util.concurrent.CompletableFuture;
                 return CompletableFuture.completedFuture(false);
             }
         } else {
-            if (!Permissions.hasPermission(player, Captions.PERMISSION_VISIT_OTHER)) {
+            if (!Permissions.hasPermission(player, Captions.PERMISSION_VISIT_OTHER) &&
+                !Flags.UNTRUSTED_VISIT.isTrue(plot)) {
                 Captions.NO_PERMISSION.send(player, Captions.PERMISSION_VISIT_OTHER);
                 return CompletableFuture.completedFuture(false);
             }

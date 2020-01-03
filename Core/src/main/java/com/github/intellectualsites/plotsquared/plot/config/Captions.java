@@ -488,13 +488,9 @@ public enum Captions {
 
     PLOT_INFO_TRUSTED("$1Trusted:$2 %trusted%", "Info"), PLOT_INFO_MEMBERS("$1Members:$2 %members%",
         "Info"),
-
     PLOT_INFO_DENIED("$1Denied:$2 %denied%", "Info"), PLOT_INFO_FLAGS("$1Flags:$2 %flags%", "Info"),
-
     PLOT_INFO_BIOME("$1Biome:$2 %biome%", "Info"), PLOT_INFO_RATING("$1Rating:$2 %rating%", "Info"),
-
     PLOT_INFO_LIKES("$1Like Ratio:$2 %likes%%", "Info"),
-
     PLOT_INFO_OWNER("$1Owner:$2 %owner%", "Info"), PLOT_INFO_ID("$1ID:$2 %id%", "Info"),
 
     // PlotCubed start
@@ -503,9 +499,7 @@ public enum Captions {
     // PlotCubed end
 
     PLOT_INFO_ALIAS("$1Alias:$2 %alias%", "Info"), PLOT_INFO_SIZE("$1Size:$2 %size%", "Info"),
-
     PLOT_INFO_SEEN("$1Seen:$2 %seen%", "Info"), PLOT_USER_LIST(" $1%user%$2,", "Info"),
-
     PLOT_FLAG_LIST("$1%s0:%s1$2", "Info"), INFO_SYNTAX_CONSOLE("$2/plot info X;Y", "Info"),
     /*
      * Generating
@@ -626,7 +620,21 @@ public enum Captions {
     FLAG_CATEGORY_BOOLEAN("Boolean Flags", "Flags"),
     FLAG_CATEGORY_MIXED("Mixed Value Flags", "Flags"),
     //</editor-fold>
-
+    //<editor-fold desc="Flag category errors">
+    FLAG_ERROR_BOOLEAN("Flag value must be a boolean (true|false)", "Flags"),
+    FLAG_ERROR_ENUM("Must be one of: %s", "Flags"),
+    FLAG_ERROR_GAMEMODE("Flag value must be a gamemode: 'survival', 'creative', 'adventure' or 'spectator.", "Flags"),
+    FLAG_ERROR_INTEGER("Flag value must be a whole number", "Flags"),
+    FLAG_ERROR_INTEGER_LIST("Flag value must be an integer list", "Flags"),
+    FLAG_ERROR_INTERVAL("Value(s) must be numeric. /plot set flag <flag> <interval> [amount]", "Flags"),
+    FLAG_ERROR_KEEP("Flag value must be a timestamp or a boolean", "Flags"),
+    FLAG_ERROR_LONG("Flag value must be a whole number (large numbers allowed)", "Flags"),
+    FLAG_ERROR_PLOTBLOCKLIST("Flag value must be a block list", "Flags"),
+    FLAG_ERROR_PRICE("Flag value must be a positive number.", "Flags"),
+    FLAG_ERROR_STRING("Flag value must be alphanumeric. Some special characters are allowed.", "Flags"),
+    FLAG_ERROR_STRINGLIST("Flag value must be a string list", "Flags"),
+    FLAG_ERROR_WEATHER("Flag must be a weather: 'rain' or 'sun'", "Flags"),
+    //</editor-fold>
     //<editor-fold desc="Trusted">
     TRUSTED_ADDED("$4You successfully trusted a user to the plot", "Trusted"),
     WAS_NOT_ADDED("$2That player was not trusted on this plot", "Trusted"),
@@ -634,14 +642,17 @@ public enum Captions {
     //</editor-fold>
     //<editor-fold desc="Member">
     REMOVED_PLAYERS("$2Removed %s players from this plot.", "Member"),
+    PLOT_LEFT("$2%s left the plot.", "Member"),
     ALREADY_OWNER("$2That user is already the plot owner: %s0", "Member"),
     ALREADY_ADDED("$2That user is already added to that category: %s0", "Member"),
     MEMBER_ADDED("$4That user can now build while the plot owner is online", "Member"),
     PLOT_MAX_MEMBERS("$2You are not allowed to add any more players to this plot", "Member"),
+    NOT_ADDED_TRUSTED("$2You must be added or trusted to the plot to run that command", "Member"),
     //</editor-fold>
     //<editor-fold desc="Set Owner">
     SET_OWNER("$4You successfully set the plot owner", "Owner"),
     SET_OWNER_CANCELLED("$2The set owner action was cancelled", "Owner"),
+    SET_OWNER_MISSING_PLAYER("$1You need to specify a new owner. Correct usage is: $2/plot setowner <owner>", "Owner"),
     NOW_OWNER("$4You are now owner of plot %s", "Owner"),
     //</editor-fold>
     //<editor-fold desc="Signs">
@@ -839,10 +850,6 @@ public enum Captions {
         } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace();
         }
-    }
-
-    @Deprecated public String f(final Object... args) {
-        return format(getTranslated(), args);
     }
 
     @Override public String toString() {

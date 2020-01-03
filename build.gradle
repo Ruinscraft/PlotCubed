@@ -12,14 +12,14 @@ buildscript {
     configurations.all {
         resolutionStrategy {
             force("org.ow2.asm:asm:7.2")
-            force("org.jetbrains:annotations:17.0.0")
+            force("org.jetbrains:annotations:18.0.0")
         }
     }
 }
 
 plugins {
     id "maven-publish"
-    id "org.ajoberstar.grgit" version "3.1.1"
+    id "org.ajoberstar.grgit" version "4.0.1"
 }
 
 group = "com.github.intellectualsites.plotsquared"
@@ -47,6 +47,14 @@ ext {
 version = String.format("%s.%s", rootVersion, "9999")  // PlotCubed - use arbitrary build number
 
 description = rootProject.name
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "1000"
+        }
+    }
+}
 
 subprojects {
     apply(plugin: "java")
@@ -86,7 +94,7 @@ subprojects {
         resolutionStrategy {
             force("junit:junit:4.12")
             force("com.google.guava:guava:21.0")
-            force("org.jetbrains:annotations:17.0.0")
+            force("org.jetbrains:annotations:18.0.0")
             force("com.google.code.findbugs:jsr305:3.0.2")
         }
     }

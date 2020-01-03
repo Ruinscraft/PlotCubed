@@ -5,15 +5,14 @@ import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
 import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
+import com.github.intellectualsites.plotsquared.plot.flag.BlockStateListFlag;
 import com.github.intellectualsites.plotsquared.plot.flag.Flag;
 import com.github.intellectualsites.plotsquared.plot.flag.FlagManager;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.flag.IntegerFlag;
 import com.github.intellectualsites.plotsquared.plot.flag.ListFlag;
-import com.github.intellectualsites.plotsquared.plot.flag.PlotBlockListFlag;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBlock;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.MathMan;
@@ -21,8 +20,18 @@ import com.github.intellectualsites.plotsquared.plot.util.Permissions;
 import com.github.intellectualsites.plotsquared.plot.util.PlotWeather;
 import com.github.intellectualsites.plotsquared.plot.util.StringComparison;
 import com.github.intellectualsites.plotsquared.plot.util.StringMan;
+import com.sk89q.worldedit.world.block.BlockType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @CommandDeclaration(command = "setflag", aliases = {"f", "flag",
     "setflag"}, usage = "/plot flag <set|remove|add|list|info> <flag> <value>", description = "Set plot flags", category = CommandCategory.SETTINGS, requiredType = RequiredType.NONE, permission = "plots.flag")
@@ -31,8 +40,9 @@ public class FlagCmd extends SubCommand {
     private boolean checkPermValue(PlotPlayer player, Flag flag, String key, String value) {
         key = key.toLowerCase();
         value = value.toLowerCase();
-        String perm =
-            Captions.PERMISSION_SET_FLAG_KEY_VALUE.f(key.toLowerCase(), value.toLowerCase());
+        String perm = Captions
+            .format(Captions.PERMISSION_SET_FLAG_KEY_VALUE.getTranslated(), key.toLowerCase(),
+                value.toLowerCase());
         if (flag instanceof IntegerFlag && MathMan.isInteger(value)) {
             try {
                 int numeric = Integer.parseInt(value);
@@ -43,26 +53,27 @@ public class FlagCmd extends SubCommand {
                         Settings.Limit.MAX_PLOTS;
                     final boolean result = player.hasPermissionRange(perm, checkRange) >= numeric;
                     if (!result) {
-                        MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                            Captions.PERMISSION_SET_FLAG_KEY_VALUE
-                                .f(key.toLowerCase(), value.toLowerCase()));
+                        MainUtil.sendMessage(player, Captions.NO_PERMISSION, Captions
+                            .format(Captions.PERMISSION_SET_FLAG_KEY_VALUE.getTranslated(),
+                                key.toLowerCase(), value.toLowerCase()));
                     }
                     return result;
                 }
 
             } catch (NumberFormatException ignore) {
             }
-        } else if (flag instanceof PlotBlockListFlag) {
-            final PlotBlockListFlag blockListFlag = (PlotBlockListFlag) flag;
-            final HashSet<PlotBlock> parsedBlocks = blockListFlag.parseValue(value);
-            for (final PlotBlock block : parsedBlocks) {
-                final String permission = Captions.PERMISSION_SET_FLAG_KEY_VALUE
-                    .f(key.toLowerCase(), block.getRawId().toString().toLowerCase());
+        } else if (flag instanceof BlockStateListFlag) {
+            final BlockStateListFlag blockListFlag = (BlockStateListFlag) flag;
+            Set<BlockType> parsedBlocks = blockListFlag.parseValue(value);
+            for (final BlockType block : parsedBlocks) {
+                final String permission = Captions
+                    .format(Captions.PERMISSION_SET_FLAG_KEY_VALUE.getTranslated(),
+                        key.toLowerCase(), block.toString().toLowerCase());
                 final boolean result = Permissions.hasPermission(player, permission);
                 if (!result) {
-                    MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                        Captions.PERMISSION_SET_FLAG_KEY_VALUE
-                            .f(key.toLowerCase(), value.toLowerCase()));
+                    MainUtil.sendMessage(player, Captions.NO_PERMISSION, Captions
+                        .format(Captions.PERMISSION_SET_FLAG_KEY_VALUE.getTranslated(),
+                            key.toLowerCase(), value.toLowerCase()));
                     return false;
                 }
             }
@@ -70,8 +81,9 @@ public class FlagCmd extends SubCommand {
         }
         final boolean result = Permissions.hasPermission(player, perm);
         if (!result) {
-            MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                Captions.PERMISSION_SET_FLAG_KEY_VALUE.f(key.toLowerCase(), value.toLowerCase()));
+            MainUtil.sendMessage(player, Captions.NO_PERMISSION, Captions
+                .format(Captions.PERMISSION_SET_FLAG_KEY_VALUE.getTranslated(), key.toLowerCase(),
+                    value.toLowerCase()));
         }
         return result;
     }
@@ -187,11 +199,13 @@ public class FlagCmd extends SubCommand {
                         "/plot flag remove <flag> [values]");
                     return false;
                 }
-                if (!Permissions.hasPermission(player,
-                    Captions.PERMISSION_SET_FLAG_KEY.f(args[1].toLowerCase()))) {
+                if (!Permissions.hasPermission(player, Captions
+                    .format(Captions.PERMISSION_SET_FLAG_KEY.getTranslated(),
+                        args[1].toLowerCase()))) {
                     if (args.length != 3) {
-                        MainUtil.sendMessage(player, Captions.NO_PERMISSION,
-                            Captions.PERMISSION_SET_FLAG_KEY.f(args[1].toLowerCase()));
+                        MainUtil.sendMessage(player, Captions.NO_PERMISSION, Captions
+                            .format(Captions.PERMISSION_SET_FLAG_KEY.getTranslated(),
+                                args[1].toLowerCase()));
                         return false;
                     }
                     for (String entry : args[2].split(",")) {
