@@ -124,6 +124,7 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     private Method methodUnloadChunk0;
     private boolean methodUnloadSetup = false;
     private boolean metricsStarted;
+    private static final int BSTATS_ID = 1404;
 
     @Override public int[] getServerVersion() {
         if (this.version == null) {
@@ -687,12 +688,14 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
         return new BukkitSetupUtils();
     }
 
+    @Deprecated
+    // Metrics are controlled via bstats config
     @Override public void startMetrics() {
         if (this.metricsStarted) {
             return;
         }
         this.metricsStarted = true;
-        Metrics metrics = new Metrics(this);// bstats
+        Metrics metrics = new Metrics(this, BSTATS_ID);// bstats
         PlotSquared.log(Captions.PREFIX + "&6Metrics enabled.");
     }
 
