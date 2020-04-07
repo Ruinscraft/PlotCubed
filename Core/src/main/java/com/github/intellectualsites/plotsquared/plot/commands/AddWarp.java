@@ -28,7 +28,8 @@ public class AddWarp extends SubCommand {
             return sendMessage(player, Captions.NO_PERMISSION, Captions.PERMISSION_ADDWARP_OTHER.getTranslated());
         }
 
-        Location bottom = plot.getBottomAbs();
+        Plot base = plot.getBasePlot(false);
+        Location bottom = base.getBottomAbs();
         Location playerLoc = player.getLocationFull();
         BlockLoc plotRelLoc = new BlockLoc(playerLoc.getX() - bottom.getX(), playerLoc.getY(), playerLoc.getZ() - bottom.getZ(), playerLoc.getYaw(), playerLoc.getPitch());
 
