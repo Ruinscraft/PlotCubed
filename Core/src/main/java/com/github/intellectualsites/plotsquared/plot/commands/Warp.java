@@ -14,7 +14,7 @@ import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
         permission = "plots.warp",
         aliases = {"warps"},
         category = CommandCategory.TELEPORT,
-        requiredType = RequiredType.NONE)
+        requiredType = RequiredType.PLAYER)
 public class Warp extends SubCommand {
 
     @Override

@@ -12,7 +12,7 @@ import com.github.intellectualsites.plotsquared.plot.util.StringMan;
         aliases = {"setwarp", "warpadd", "warpset"},
         permission = "plots.addwarp",
         category = CommandCategory.TELEPORT,
-        requiredType = RequiredType.NONE)
+        requiredType = RequiredType.PLAYER)
 public class AddWarp extends SubCommand {
 
     @Override

@@ -19,7 +19,7 @@ import java.util.Map;
         aliases = {"popular", "top"},
         permission = "plots.visits",
         category = CommandCategory.TELEPORT,
-        requiredType = RequiredType.NONE)
+        requiredType = RequiredType.PLAYER)
 public class Visits extends SubCommand {
 
     private static final int INVENTORY_ITEM_STACK_AMT = 1;

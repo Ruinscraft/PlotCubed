@@ -12,7 +12,7 @@ import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
         permission = "plots.delwarp",
         aliases = {"removewarp", "deletewarp", "warpdel"},
         category = CommandCategory.TELEPORT,
-        requiredType = RequiredType.NONE)
+        requiredType = RequiredType.PLAYER)
 public class DelWarp extends SubCommand {
 
     @Override

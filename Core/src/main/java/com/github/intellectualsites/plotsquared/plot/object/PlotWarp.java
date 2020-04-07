@@ -18,7 +18,8 @@ public class PlotWarp {
         float yaw;
         float pitch;
 
-        Location bottom = plot.getBottomAbs();
+        Plot base = plot.getBasePlot(false);
+        Location bottom = base.getBottomAbs();
 
         x = bottom.getX() + blockLoc.getX();
         z = bottom.getZ() + blockLoc.getZ();
@@ -26,7 +27,7 @@ public class PlotWarp {
         yaw = blockLoc.getYaw();
         pitch = blockLoc.getPitch();
 
-        return new Location(plot.getWorldName(), x, y, z, yaw, pitch);
+        return new Location(base.getWorldName(), x, y, z, yaw, pitch);
     }
 }
 // PlotCubed end
