@@ -1777,7 +1777,15 @@ import java.util.regex.Pattern;
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPotionSplash(LingeringPotionSplashEvent event) {
-        Location location = BukkitUtil.getLocation(event.getEntity());
+        // PlotCubed start
+        // fix for https://hub.spigotmc.org/jira/browse/SPIGOT-5167
+        Location location;
+        try {
+            location = BukkitUtil.getLocation(event.getEntity());
+        } catch (Exception e) {
+            location = BukkitUtil.getLocation(event.getHitBlock().getLocation());
+        }
+        // PlotCubed end
         if (!PlotSquared.get().hasPlotArea(location.getWorld())) {
             return;
         }
