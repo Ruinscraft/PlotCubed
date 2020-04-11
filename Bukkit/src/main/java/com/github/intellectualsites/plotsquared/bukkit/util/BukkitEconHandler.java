@@ -72,7 +72,8 @@ public class BukkitEconHandler extends EconHandler {
         return this.econ.getBalance(player.getName());
     }
 
-    public void setPermission(String world, String player, String perm, boolean value) {
+    // PlotCubed -- Override setPermission in EconHandler
+    @Override public void setPermission(String world, String player, String perm, boolean value) {
         if (value) {
             this.perms.playerAdd(world, player, perm);
         } else {

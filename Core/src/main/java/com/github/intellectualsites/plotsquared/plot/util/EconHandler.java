@@ -38,4 +38,8 @@ public abstract class EconHandler {
     public boolean hasPermission(String player, String perm) {
         return hasPermission(null, player, perm);
     }
+
+    // PlotCubed start -- add setPermission to API to be used in commands
+    public abstract void setPermission(String world, String player, String perm, boolean value);
+    // PlotCubed end
 }

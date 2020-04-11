@@ -166,6 +166,7 @@ public enum Captions {
             "plots.addwarp.other", "static.permissions"),
     PERMISSION_USE_TIMER_OTHER("plots.timer.other", "static.permissions"),
     PERMISSION_USE_BROADCAST_OTHER("plots.broadcast.other", "static.permissions"),
+    PERMISSION_ADMIN_COMMAND_GIVE("plots.give", "static/permissions"),
     // PlotCubed end
 
     /*
@@ -585,6 +586,11 @@ public enum Captions {
      */
     TOP_INVENTORY_NAME("Most popular plots (%s0)", "Top"),
     TOP_ITEM_NAME("$1%s0's plot", "Top"),
+
+    /*
+     * Give
+     */
+    GIVE_GAVE_PLOT("Gave %s0 %s1 plots.", "Give"),
     // PlotCubed end
 
     MEMBER_REMOVED("$1You successfully removed a user from the plot",

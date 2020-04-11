@@ -114,6 +114,7 @@ public class MainCommand extends Command {
             new Timer();
             new Visits();
             new Warp();
+            new Give();
             // PlotCubed end
 
             if (Settings.Ratings.USE_LIKES) {
