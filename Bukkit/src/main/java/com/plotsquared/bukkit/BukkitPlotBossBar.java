@@ -1,8 +1,9 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.bukkit.object;
+package com.plotsquared.bukkit;
 
-import com.github.intellectualsites.plotsquared.plot.object.PlotBossBar;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.plotsquared.bukkit.player.BukkitPlayer;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.PlotBossBar;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
