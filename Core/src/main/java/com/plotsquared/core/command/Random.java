@@ -35,8 +35,10 @@ public class Random extends SubCommand {
 
             TaskManager.runTask(() -> {
                 if (player != null && player.isOnline()) {
-                    player.teleport(finalPlot.getHome());
-                    sendMessage(player, Captions.RANDOM_TELEPORTED);
+                    finalPlot.getHome(result -> {
+                        player.teleport(result);
+                        sendMessage(player, Captions.RANDOM_TELEPORTED);
+                    });
                 }
             });
         });
