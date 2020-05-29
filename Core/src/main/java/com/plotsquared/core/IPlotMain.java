@@ -30,6 +30,7 @@ import com.plotsquared.core.generator.GeneratorWrapper;
 import com.plotsquared.core.generator.HybridUtils;
 import com.plotsquared.core.generator.IndependentPlotGenerator;
 import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.PlotBossBar;
 import com.plotsquared.core.queue.QueueProvider;
 import com.plotsquared.core.util.ChatManager;
 import com.plotsquared.core.util.ChunkManager;
@@ -275,7 +276,6 @@ public interface IPlotMain<P> extends ILogger {
     // PlotCubed start
     PlotBossBar createBossBar(String title, PlotBossBar.PlotBarColor color, PlotBossBar.PlotBarStyle style);
     // PlotCubed end
-
 
     /**
      * Get the backup manager instance

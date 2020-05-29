@@ -228,7 +228,7 @@ public abstract class PlotArea {
     // PlotCubed start
     public int getDefaultPlotSize() {
         ConfigurationSection section = PlotSquared.get().worlds.getConfigurationSection("worlds");
-        return section.getInt(worldname + ".plot.size", 0);
+        return section.getInt(getWorldName() + ".plot.size", 0);
     }
     // PlotCubed end
 

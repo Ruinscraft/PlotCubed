@@ -1,22 +1,32 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.object;
+package com.plotsquared.core.plot;
+
+import com.plotsquared.core.player.PlotPlayer;
 
 import java.util.Set;
 
 public abstract class PlotBossBar {
 
     public abstract void setTitle(String title);
+
     public abstract void setColor(PlotBarColor color);
+
     public abstract void setStyle(PlotBarStyle style);
+
     public abstract void setPct(double pct);
 
     public abstract void addPlayer(PlotPlayer player);
+
     public abstract void removePlayer(PlotPlayer player);
 
     public abstract String getTitle();
+
     public abstract PlotBarColor getColor();
+
     public abstract PlotBarStyle getStyle();
+
     public abstract double getPct();
+
     public abstract Set<PlotPlayer> getPlayers();
 
     public enum PlotBarStyle {

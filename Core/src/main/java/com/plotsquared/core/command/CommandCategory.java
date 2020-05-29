@@ -72,7 +72,10 @@ public enum CommandCategory {
     /**
      * Administration commands.
      */
-    ADMINISTRATION(Captions.COMMAND_CATEGORY_ADMINISTRATION);
+    ADMINISTRATION(Captions.COMMAND_CATEGORY_ADMINISTRATION),
+    // PlotCubed start
+    ROLEPLAY(Captions.COMMAND_CATEGORY_ROLEPLAY);
+    // PlotCubed end
     /**
      * The category name (Readable).
      */

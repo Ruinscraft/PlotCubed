@@ -25,10 +25,7 @@
  */
 package com.plotsquared.core.database;
 
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotArea;
-import com.plotsquared.core.plot.PlotCluster;
-import com.plotsquared.core.plot.PlotId;
+import com.plotsquared.core.plot.*;
 import com.plotsquared.core.plot.comment.PlotComment;
 import com.plotsquared.core.plot.flag.PlotFlag;
 import com.plotsquared.core.util.task.RunnableVal;

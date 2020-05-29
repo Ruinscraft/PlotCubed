@@ -1,5 +1,8 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.object;
+package com.plotsquared.core.plot;
+
+import com.plotsquared.core.location.BlockLoc;
+import com.plotsquared.core.location.Location;
 
 public class PlotWarp {
 
