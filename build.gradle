@@ -8,11 +8,13 @@ buildscript {
     }
     dependencies {
         classpath("com.github.jengelman.gradle.plugins:shadow:5.0.0")
+        classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     }
     configurations.all {
         resolutionStrategy {
-            force("org.ow2.asm:asm:7.2")
-            force("org.jetbrains:annotations:18.0.0")
+            force("org.ow2.asm:asm:8.0.1")
+            force("org.jetbrains:annotations:19.0.0")
         }
     }
 }
@@ -22,37 +24,42 @@ plugins {
     id "org.ajoberstar.grgit" version "4.0.1"
 }
 
-group = "com.github.intellectualsites.plotsquared"
+group = "com.plotsquared"
 
-def rootVersion = "4"
-def revision = ""
-def buildNumber = ""
-def date = ""
 ext {
     git = Grgit.open(dir: new File(rootDir.toString() + "/.git"))
-    date = git.head().getDate().format("yy.MM.dd")
-    revision = "-${git.head().abbreviatedId}"
-    parents = git.head().parentIds
-    if (project.hasProperty("buildnumber")) {
-        buildNumber = "$buildnumber"
-    } else {
-        index = -2042  // Offset to match CI
-        for (; parents != null && !parents.isEmpty(); index++) {
-            parents = git.getResolve().toCommit(parents.get(0)).getParentIds()
-        }
-        buildNumber = "${index}"
-    }
 }
 
-version = String.format("%s.%s", rootVersion, "9999")  // PlotCubed - use arbitrary build number
+def ver = "5.12.0"
+def versuffix = ""
+ext {
+    if (project.hasProperty("versionsuffix")) {
+        versuffix = "-$versionsuffix"
+    }
+}
+version = ver + versuffix
 
 description = rootProject.name
 
 allprojects {
+    apply(plugin: 'com.github.hierynomus.license')
+    apply(plugin: 'com.bmuschko.nexus')
+
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xmaxerrs" << "1000"
         }
+    }
+    license {
+        header rootProject.file('HEADER')
+        mapping 'java', 'SLASHSTAR_STYLE'
+        ext.year = 2020
+        includes(["**/*.java","**/*.js"])
+    }
+    nexus {
+        sign = false
+        repositoryUrl = 'https://mvn.intellectualsites.com/content/repositories/releases/'
+        snapshotRepositoryUrl = 'https://mvn.intellectualsites.com/content/repositories/snapshots/'
     }
 }
 
@@ -63,18 +70,21 @@ subprojects {
     apply(plugin: "idea")
     apply(plugin: "com.github.johnrengelman.shadow")
 
-    group = "com.github.intellectualsites.plotsquared"
+    group = "com.plotsquared"
 
     clean.doFirst {
         delete("../target")
     }
 
     dependencies {
+        compile group: 'org.json', name: 'json', version: '20200518'
+
         implementation("com.sk89q.worldedit:worldedit-core:7.0.0") {
             exclude(module: "bukkit-classloader-check")
             exclude(module: "mockito-core")
             exclude(module: "dummypermscompat")
         }
+
         implementation("net.kyori:text-api:3.0.2")
         implementation("net.kyori:text-serializer-gson:3.0.2")
         implementation("net.kyori:text-serializer-legacy:3.0.2")
@@ -82,9 +92,9 @@ subprojects {
         implementation("com.google.guava:guava:21.0") {
             because("Minecraft uses Guava 21 as of 1.13")
         }
-        compileOnly("org.jetbrains:annotations:17.0.0")
-        compileClasspath("org.projectlombok:lombok:1.18.10")
-        testCompileOnly("org.projectlombok:lombok:1.18.8")
+        compileOnly("org.jetbrains:annotations:19.0.0")
+        compileClasspath("org.projectlombok:lombok:1.18.12")
+        testCompileOnly("org.projectlombok:lombok:1.18.12")
         annotationProcessor("org.projectlombok:lombok:1.18.8")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.8")
         testImplementation("junit:junit:4.13")
@@ -94,7 +104,7 @@ subprojects {
         resolutionStrategy {
             force("junit:junit:4.12")
             force("com.google.guava:guava:21.0")
-            force("org.jetbrains:annotations:18.0.0")
+            force("org.jetbrains:annotations:19.0.0")
             force("com.google.code.findbugs:jsr305:3.0.2")
         }
     }
@@ -108,13 +118,19 @@ subprojects {
 
     shadowJar {
         dependencies {
+            include(dependency("org.json:json:20200518"))
             include(dependency("net.kyori:text-api:3.0.2"))
         }
-        relocate("io.papermc.lib", "com.github.intellectualsites.plotsquared.bukkit.paperlib")
+        relocate("io.papermc.lib", "com.plotsquared.bukkit.paperlib")
+        relocate("org.json", "com.plotsquared.json") {
+            exclude "org/json/simple/**"
+        }
         // relocate('org.mcstats', 'com.plotsquared.stats')
-        archiveFileName = "${parent.name}-${project.name}-${parent.version}.jar"
+        archiveFileName = "${project.name}-${parent.version}.jar"
         destinationDirectory = file "../target"
     }
+
+    version = rootProject.version
 }
 
 task aggregatedJavadocs(type: Javadoc, description: "Generate javadocs from all child projects as if it was a single project", group: "Documentation") {

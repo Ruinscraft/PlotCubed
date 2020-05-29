@@ -4,29 +4,39 @@ plugins {
 repositories {
     maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
     maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url = "http://nexus.hc.to/content/repositories/pub_releases" }
+    maven { url = "https://jitpack.io" }
     maven { url = "https://repo.codemc.org/repository/maven-public" }
+    maven { url = "http://repo.extendedclip.com/content/repositories/placeholderapi/" }
     maven {
         name = "papermc"
         url = "https://papermc.io/repo/repository/maven-public/"
     }
+    maven { url = "https://ci.ender.zone/plugin/repository/everything/" }
+    maven { url = "https://mvn.intellectualsites.com/content/repositories/snapshots" }
+    maven { url = "https://repo.wea-ondara.net/repository/public/" }
     mavenLocal()
 }
 
 
 dependencies {
-    implementation(project(":Core"))
-    compile(project(":Core"))
-    compile("com.destroystokyo.paper:paper-api:1.14.4-R0.1-SNAPSHOT")
+    implementation(project(":PlotSquared-Core"))
+    compile("org.bstats:bstats-bukkit:1.7")
+    compile(project(":PlotSquared-Core"))
+    compile("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
     //implementation 'com.onarandombox.multiversecore:Multiverse-Core:3.0.0-SNAPSHOT'
     implementation("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
     compile(group: "com.sk89q.worldedit", name: "worldedit-bukkit", version: "7.0.1")
     compile("io.papermc:paperlib:1.0.2")
-    compile(group: "com.squareup.retrofit2", name: "retrofit", version: "2.4.0")
     implementation("net.kyori:text-adapter-bukkit:3.0.3")
-    compile("net.milkbowl.vault:VaultAPI:1.7") {
+    compile("com.github.MilkBowl:VaultAPI:1.7") {
         exclude(module: "bukkit")
     }
+    implementation("me.clip:placeholderapi:2.10.6")
+    implementation("net.luckperms:api:5.1")
+    implementation("net.ess3:EssentialsX:2.17.2")
+    implementation("net.alpenblock:BungeePerms:4.0-dev-106")
+    compile("se.hyperver.hyperverse:Core:0.6.0-SNAPSHOT"){ transitive = false }
+    compile('com.sk89q:squirrelid:1.0.0-SNAPSHOT'){ transitive = false }
 }
 
 sourceCompatibility = 1.8
@@ -43,34 +53,35 @@ processResources {
 }
 
 //noinspection GroovyAssignabilityCheck
-jar.archiveFileName = "PlotSquared-BukkitAPI-${project.parent.version}.jar"
-jar.destinationDirectory = file("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-BukkitAPI/" + project.parent.version)
+jar.archiveFileName = "PlotSquared-Bukkit-${project.parent.version}.jar"
+jar.destinationDirectory = file("../mvn/com/plotsquared/PlotSquared-Bukkit/" + project.parent.version)
 task createPom {
     doLast {
         pom {
             project {
-                groupId = "com.github.intellectualsites.plotsquared"
-                artifactId = "PlotSquared-BukkitAPI"
-                version = project.parent.version
+                groupId = rootProject.group
+                artifactId = "PlotSquared-Bukkit"
+                version = rootProject.version
             }
-        }.writeTo("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-BukkitAPI/${project.parent.version}/PlotSquared-BukkitAPI-${project.parent.version}.pom")
+        }.writeTo("../mvn/com/plotsquared/PlotSquared-Bukkit/${project.parent.version}/PlotSquared-Bukkit-${project.parent.version}.pom")
         pom {
             project {
-                groupId = "com.github.intellectualsites.plotsquared"
-                artifactId = "PlotSquared-BukkitAPI"
+                groupId = rootProject.group
+                artifactId = "PlotSquared-Bukkit"
                 version = "latest"
             }
-        }.writeTo("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-BukkitAPI/latest/PlotSquared-BukkitAPI-latest.pom")
+        }.writeTo("../mvn/com/plotsquared/PlotSquared-Bukkit/latest/PlotSquared-Bukkit-latest.pom")
+         .writeTo("pom.xml")
     }
 }
 
 task copyFiles {
     doLast {
         copy {
-            from("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-BukkitAPI/${project.parent.version}/")
-            into("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-BukkitAPI/latest/")
-            include("PlotSquared-BukkitAPI*.jar")
-            rename("PlotSquared-BukkitAPI-${project.parent.version}.jar", "PlotSquared-BukkitAPI-latest.jar")
+            from("../mvn/com/plotsquared/PlotSquared-Bukkit/${project.parent.version}/")
+            into("../mvn/com/plotsquared/PlotSquared-Bukkit/latest/")
+            include("PlotSquared-Bukkit*.jar")
+            rename("PlotSquared-Bukkit-${project.parent.version}.jar", "PlotSquared-Bukkit-latest.jar")
         }
     }
 }
@@ -78,19 +89,19 @@ task copyFiles {
 
 shadowJar {
     dependencies {
-        include(dependency(":Core"))
-        // update notification stuff
-        include(dependency("com.github.Sauilitired:Jenkins4J:2.0-SNAPSHOT"))
-        include(dependency("com.squareup.retrofit2:retrofit:2.4.0"))
-        include(dependency("com.squareup.okhttp3:okhttp:4.2.2"))
-        include(dependency("com.squareup.okio:okio:2.4.1"))
-        include(dependency("org.jetbrains.kotlin:kotlin-stdlib:1.3.61"))
+        include(dependency(":PlotSquared-Core"))
         include(dependency("io.papermc:paperlib:1.0.2"))
         include(dependency("net.kyori:text-adapter-bukkit:3.0.3"))
+        include(dependency("org.bstats:bstats-bukkit:1.7"))
+        include(dependency("org.khelekore:prtree:1.7.0-SNAPSHOT"))
+        include(dependency("com.sk89q:squirrelid:1.0.0-SNAPSHOT"))
     }
-    relocate('net.kyori.text', 'com.github.intellectualsites.plotsquared.formatting.text')
-    relocate("io.papermc.lib", "com.github.intellectualsites.plotsquared.bukkit.paperlib")
-    archiveFileName = "${parent.name}-${project.name}-${parent.version}.jar"
+    relocate('net.kyori.text', 'com.plotsquared.formatting.text')
+    relocate("io.papermc.lib", "com.plotsquared.bukkit.paperlib")
+    relocate("org.bstats", "com.plotsquared.metrics")
+    relocate('com.sk89q.squirrelid', 'com.plotsquared.squirrelid')
+    relocate('org.khelekore.prtree', 'com.plotsquared.prtree')
+    archiveFileName = "${project.name}-${parent.version}.jar"
     destinationDirectory = file "../target"
 }
 
