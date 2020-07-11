@@ -17,7 +17,7 @@ public class Give extends SubCommand {
 
     @Override
     public boolean onCommand(PlotPlayer player, String[] args) {
-        checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
+        checkTrue(args.length >= 1, Captions.COMMAND_SYNTAX, getUsage());
         String username = args[0];
         int amount = 1;
 
@@ -34,7 +34,11 @@ public class Give extends SubCommand {
         int updated = current + amount;
         String permission = "plots.plot." + updated;
 
-        // TODO: world context??
+        /*
+         * NOTE:
+         * If using LuckPerms, set "vault-server" option in the LuckPerms config
+         * to provide a specific server context to the permission being assigned here
+         */
         EconHandler.getEconHandler().setPermission(null, target.getName(), permission, true);
 
         Captions.GIVE_GAVE_PLOT.send(player, target.getName(), amount);
