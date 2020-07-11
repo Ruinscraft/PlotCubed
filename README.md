@@ -8,6 +8,7 @@ Some additional features include:
 - Plot timers
 - Plot broadcast
 - /plot random
+- /plot give \<username\> [amt] - Give a user permissions to claim additional plots
 - Custom /plot info with more relevant information
 - Bossbar API
 - Various minor PlotSquared tweaks/improvements
