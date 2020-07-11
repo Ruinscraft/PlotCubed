@@ -591,6 +591,7 @@ public enum Captions {
      * Give
      */
     GIVE_GAVE_PLOT("Gave %s0 %s1 plots.", "Give"),
+    GIVE_MAX_PLOTS("%s0 already has the maximum number of plots.", "Give"),
     // PlotCubed end
 
     MEMBER_REMOVED("$1You successfully removed a user from the plot",

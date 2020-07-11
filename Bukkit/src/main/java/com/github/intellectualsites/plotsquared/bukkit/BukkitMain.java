@@ -635,15 +635,13 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain 
     }
 
     @Override public EconHandler getEconomyHandler() {
-        try {
-            BukkitEconHandler econ = new BukkitEconHandler();
-            if (econ.init()) {
-                return econ;
-            }
-        } catch (Throwable ignored) {
-            PlotSquared.debug("No economy detected!");
+        BukkitEconHandler econ = new BukkitEconHandler();
+        // PlotCubed start - Fix NPE with getting EconomyHandler
+        if (!econ.init()) {
+            PlotSquared.debug("Could not initialize EconomyHandler");
         }
-        return null;
+        return econ;
+        // PlotCubed end
     }
 
     @Override public QueueProvider initBlockQueue() {

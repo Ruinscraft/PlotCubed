@@ -259,10 +259,7 @@ import java.util.zip.ZipInputStream;
                 }
             }
             // Economy
-            if (Settings.Enabled_Components.ECONOMY) {
-                TaskManager
-                    .runTask(() -> EconHandler.manager = PlotSquared.this.IMP.getEconomyHandler());
-            }
+            TaskManager.runTask(() -> EconHandler.manager = PlotSquared.this.IMP.getEconomyHandler());
 
             // World generators:
             final ConfigurationSection section = this.worlds.getConfigurationSection("worlds");

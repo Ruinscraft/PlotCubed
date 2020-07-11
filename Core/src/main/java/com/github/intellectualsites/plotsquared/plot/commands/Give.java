@@ -3,6 +3,7 @@ package com.github.intellectualsites.plotsquared.plot.commands;
 
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
 import com.github.intellectualsites.plotsquared.plot.config.Captions;
+import com.github.intellectualsites.plotsquared.plot.config.Settings;
 import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
 import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
 import com.github.intellectualsites.plotsquared.plot.util.MathMan;
@@ -31,12 +32,18 @@ public class Give extends SubCommand {
         checkTrue(target != null, Captions.INVALID_PLAYER, getUsage());
 
         int current = target.getAllowedPlots();
+
+        if (current >= Settings.Limit.MAX_PLOTS || current < 0) {
+            Captions.GIVE_MAX_PLOTS.send(player, target.getName());
+            return true;
+        }
+
         int updated = current + amount;
         String permission = "plots.plot." + updated;
 
         /*
          * NOTE:
-         * If using LuckPerms, set "vault-server" option in the LuckPerms config
+         * If using LuckPerms, set "vault-server" option in the LuckPerms config and enable "use-vault-server"
          * to provide a specific server context to the permission being assigned here
          */
         EconHandler.getEconHandler().setPermission(null, target.getName(), permission, true);
