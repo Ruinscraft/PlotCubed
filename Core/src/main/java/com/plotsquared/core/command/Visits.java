@@ -1,13 +1,16 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.commands;
+package com.plotsquared.core.command;
 
-import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.database.DBFunc;
-import com.github.intellectualsites.plotsquared.plot.object.*;
-import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
-import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
+import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.Captions;
+import com.plotsquared.core.database.DBFunc;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
+import com.plotsquared.core.plot.PlotInventory;
+import com.plotsquared.core.plot.PlotItemStack;
+import com.plotsquared.core.util.MainUtil;
+import com.plotsquared.core.util.task.TaskManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +112,7 @@ public class Visits extends SubCommand {
             for (int i = 0; i < INVENTORY_ROWS * 9; i++) {
                 if (inventoryEntries.size() < i + 1) break;
                 TopInventoryEntry entry = inventoryEntries.get(i);
-                String plotOwnerName = MainUtil.getName(entry.plot.guessOwner());
+                String plotOwnerName = MainUtil.getName(entry.plot.getOwner());
                 String itemName = Captions.color(Captions.format(Captions.TOP_ITEM_NAME, plotOwnerName));
                 PlotItemStack itemStack = new PlotItemStack(
                         itemStackBlockId,

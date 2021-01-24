@@ -33,6 +33,9 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public enum CommandCategory {
+    // PlotCubed start
+    ROLEPLAY(Captions.COMMAND_CATEGORY_ROLEPLAY),
+    // PlotCubed end
     /**
      * Claiming CommandConfig.
      * Such as: /plot claim

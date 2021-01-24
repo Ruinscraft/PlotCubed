@@ -1,5 +1,7 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.object;
+package com.plotsquared.core.plot;
+
+import com.plotsquared.core.player.PlotPlayer;
 
 import java.util.Set;
 

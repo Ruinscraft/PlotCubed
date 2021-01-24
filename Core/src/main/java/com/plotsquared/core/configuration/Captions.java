@@ -557,12 +557,6 @@ public enum Captions implements Caption {
         "Info"),
     PLOT_INFO_DENIED("$1Denied:$2 %denied%", "Info"), PLOT_INFO_FLAGS("$1Flags:$2 %flags%", "Info"),
     PLOT_INFO_BIOME("$1Biome:$2 %biome%", "Info"), PLOT_INFO_RATING("$1Rating:$2 %rating%", "Info"),
-    PLOT_INFO_TRUSTED("$1Trusted:$2%trusted%", "Info"),
-    PLOT_INFO_MEMBERS("$1Members:$2%members%", "Info"),
-    PLOT_INFO_DENIED("$1Denied:$2%denied%", "Info"),
-    PLOT_INFO_FLAGS("$1Flags:$2 %flags%", "Info"),
-    PLOT_INFO_BIOME("$1Biome:$2 %biome%", "Info"),
-    PLOT_INFO_RATING("$1Rating:$2 %rating%", "Info"),
     PLOT_INFO_LIKES("$1Like Ratio:$2 %likes%%", "Info"),
     PLOT_INFO_OWNER("$1Owner:$2 %owner%", "Info"), PLOT_INFO_ID("$1ID:$2 %id%", "Info"),
 
@@ -578,15 +572,7 @@ public enum Captions implements Caption {
      * Generating
      */
 
-    PLOT_INFO_OWNER("$1Owner:$2%owner%", "Info"),
-    PLOT_INFO_ID("$1ID:$2 %id%", "Info"),
-    PLOT_INFO_ALIAS("$1Alias:$2 %alias%", "Info"),
-    PLOT_INFO_SIZE("$1Size:$2 %size%", "Info"),
-    PLOT_INFO_SEEN("$1Seen:$2 %seen%", "Info"),
-    PLOT_USER_LIST(" $1%user%$2,", "Info"),
-    PLOT_FLAG_LIST("$2%s0:%s1$3", "Info"),
     PLOT_NO_DESCRIPTION("No description set.", "Info"),
-    INFO_SYNTAX_CONSOLE("$2/plot info X;Z", "Info"),
     //</editor-fold>
     //<editor-fold desc="Working">
     GENERATING_COMPONENT("$1Started generating component from your settings", "Working"),

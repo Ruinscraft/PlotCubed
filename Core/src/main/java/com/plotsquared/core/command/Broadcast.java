@@ -1,10 +1,9 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.commands;
+package com.plotsquared.core.command;
 
-import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
+import com.plotsquared.core.configuration.Captions;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
 
 @CommandDeclaration(command = "broadcast",
         description = "Broadcast a message to a plot",

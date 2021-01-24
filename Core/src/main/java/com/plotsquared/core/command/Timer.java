@@ -1,14 +1,13 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.commands;
+package com.plotsquared.core.command;
 
-import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.PlotSquared;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.github.intellectualsites.plotsquared.plot.object.PlotBossBar;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
-import com.github.intellectualsites.plotsquared.plot.util.TaskManager;
+import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.Captions;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotBossBar;
+import com.plotsquared.core.util.MainUtil;
+import com.plotsquared.core.util.task.TaskManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -122,7 +121,7 @@ public class Timer extends SubCommand {
     }
 
     @Override
-    public boolean onCommand(PlotPlayer player, String[] args) {
+    public boolean onCommand(PlotPlayer<?> player, String[] args) {
         checkTrue(args.length >= 1, Captions.COMMAND_SYNTAX, getUsage());
 
         if (taskID == -1) {

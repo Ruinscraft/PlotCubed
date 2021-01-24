@@ -1,12 +1,13 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.plot.commands;
+package com.plotsquared.core.command;
 
-import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
-import com.github.intellectualsites.plotsquared.plot.config.Captions;
-import com.github.intellectualsites.plotsquared.plot.config.Settings;
-import com.github.intellectualsites.plotsquared.plot.object.PlotPlayer;
-import com.github.intellectualsites.plotsquared.plot.util.EconHandler;
-import com.github.intellectualsites.plotsquared.plot.util.MathMan;
+import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.Captions;
+import com.plotsquared.core.configuration.Settings;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.util.EconHandler;
+import com.plotsquared.core.util.MathMan;
+import com.plotsquared.core.util.PermHandler;
 
 @CommandDeclaration(command = "give",
         description = "Give additional plots to users",
@@ -28,7 +29,7 @@ public class Give extends SubCommand {
             }
         }
 
-        PlotPlayer target = PlotPlayer.get(username);
+        PlotPlayer target = PlotPlayer.from(username);
         checkTrue(target != null, Captions.INVALID_PLAYER, getUsage());
 
         int current = target.getAllowedPlots();
@@ -46,7 +47,9 @@ public class Give extends SubCommand {
          * If using LuckPerms, set "vault-server" option in the LuckPerms config and enable "use-vault-server"
          * to provide a specific server context to the permission being assigned here
          */
-        EconHandler.getEconHandler().setPermission(null, target.getName(), permission, true);
+
+        // PLOTCUBED TODO
+//        EconHandler.getEconHandler().setPermission(null, target.getName(), permission, true);
 
         Captions.GIVE_GAVE_PLOT.send(player, target.getName(), amount);
 

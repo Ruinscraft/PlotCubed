@@ -36,11 +36,7 @@ import com.plotsquared.core.database.DBFunc;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.player.ConsolePlayer;
 import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotArea;
-import com.plotsquared.core.plot.PlotAreaTerrainType;
-import com.plotsquared.core.plot.PlotAreaType;
-import com.plotsquared.core.plot.PlotId;
+import com.plotsquared.core.plot.*;
 import com.plotsquared.core.plot.expiration.ExpireManager;
 import com.plotsquared.core.plot.flag.PlotFlag;
 import com.plotsquared.core.plot.flag.implementations.DescriptionFlag;
@@ -824,7 +820,7 @@ public class MainUtil {
      * @param whenDone
      */
     public static void format(final String iInfo, final Plot plot, PlotPlayer player,
-        final boolean full, final RunnableVal<String> whenDone) {
+                              final boolean full, final RunnableVal<String> whenDone) {
         int num = plot.getConnectedPlots().size();
         String alias = !plot.getAlias().isEmpty() ? plot.getAlias() : Captions.NONE.getTranslated();
         Location bot = plot.getCorners()[0];
@@ -854,95 +850,6 @@ public class MainUtil {
                 description = Captions.PLOT_NO_DESCRIPTION.getTranslated();
             }
 
-        StringBuilder flags = new StringBuilder();
-        HashMap<Flag<?>, Object> flagMap =
-            FlagManager.getPlotFlags(plot.getArea(), plot.getSettings(), true);
-        if (flagMap.isEmpty()) {
-            flags.append(Captions.NONE.getTranslated());
-        } else {
-            String prefix = "";
-            for (Entry<Flag<?>, Object> entry : flagMap.entrySet()) {
-                Object value = entry.getValue();
-                if (entry.getKey() instanceof DoubleFlag && !Settings.General.SCIENTIFIC) {
-                    DecimalFormat df = new DecimalFormat("0");
-                    df.setMaximumFractionDigits(340);
-                    value = df.format(value);
-                }
-                flags.append(prefix)
-                    .append(Captions
-                        .format(Captions.PLOT_FLAG_LIST.getTranslated(), entry.getKey().getName(),
-                            value));
-                prefix = ", ";
-            }
-        }
-        boolean build = plot.isAdded(player.getUUID());
-        String owner = plot.getOwners().isEmpty() ? "unowned" : getPlayerList(plot.getOwners());
-        // PlotCubed start
-        /* Plot size */
-        int plotCount = plot.getConnectedPlots().size();
-        int plotSize = plot.getArea().getDefaultPlotSize();
-        String size = String.format("%d %dx%d plot%s",
-                plotCount, plotSize, plotSize,
-                plotCount > 1 ? "s" : "");
-
-        /* Plot warps */
-        String warps = getWarpsList(plot.getWarps());
-        // PlotCubed end
-        info = info.replace("%id%", plot.getId().toString());
-        info = info.replace("%alias%", alias);
-        info = info.replace("%num%", String.valueOf(num));
-        info = info.replace("%desc%", description);
-        info = info.replace("%biome%", biome.toString().toLowerCase());
-        info = info.replace("%owner%", owner);
-        // PlotCubed start
-        info = info.replace("%size%", size);
-        // PlotCubed end
-        info = info.replace("%members%", members);
-        info = info.replace("%player%", player.getName());
-        info = info.replace("%trusted%", trusted);
-        info = info.replace("%helpers%", members);
-        info = info.replace("%denied%", denied);
-        // PlotCubed start
-        info = info.replace("%warps%", warps);
-        // PlotCubed end
-        info = info.replace("%seen%", seen);
-        info = info.replace("%flags%", flags);
-        info = info.replace("%build%", String.valueOf(build));
-        info = info.replace("%desc%", "No description set.");
-        if (info.contains("%rating%")) {
-            final String newInfo = info;
-            TaskManager.runTaskAsync(() -> {
-                String info1;
-                if (Settings.Ratings.USE_LIKES) {
-                    info1 = newInfo.replaceAll("%rating%",
-                        String.format("%.0f%%", Like.getLikesPercentage(plot) * 100D));
-                } else {
-                    int max = 10;
-                    if (Settings.Ratings.CATEGORIES != null && !Settings.Ratings.CATEGORIES
-                        .isEmpty()) {
-                        max = 8;
-                    }
-                    if (full && Settings.Ratings.CATEGORIES != null
-                        && Settings.Ratings.CATEGORIES.size() > 1) {
-                        double[] ratings = MainUtil.getAverageRatings(plot);
-                        String rating = "";
-                        String prefix = "";
-                        for (int i = 0; i < ratings.length; i++) {
-                            rating += prefix + Settings.Ratings.CATEGORIES.get(i) + '=' + String
-                                .format("%.1f", ratings[i]);
-                            prefix = ",";
-                        }
-                        info1 = newInfo.replaceAll("%rating%", rating);
-                    } else {
-                        info1 = newInfo.replaceAll("%rating%",
-                            String.format("%.1f", plot.getAverageRating()) + '/' + max);
-                    }
-                }
-                whenDone.run(info1);
-            });
-            return;
-        }
-        whenDone.run(info);
             StringBuilder flags = new StringBuilder();
             Collection<PlotFlag<?, ?>> flagCollection = plot.getApplicableFlags(true);
             if (flagCollection.isEmpty()) {
@@ -957,8 +864,8 @@ public class MainUtil {
                         value = flag.toString();
                     }
                     flags.append(prefix).append(CaptionUtility
-                        .format(player, Captions.PLOT_FLAG_LIST.getTranslated(), flag.getName(),
-                            CaptionUtility.formatRaw(player, value.toString(), "")));
+                            .format(player, Captions.PLOT_FLAG_LIST.getTranslated(), flag.getName(),
+                                    CaptionUtility.formatRaw(player, value.toString(), "")));
                     prefix = ", ";
                 }
             }
@@ -966,9 +873,9 @@ public class MainUtil {
             String owner = plot.getOwners().isEmpty() ? "unowned" : getPlayerList(plot.getOwners());
             if (plot.getArea() != null) {
                 info = info.replace("%area%",
-                    plot.getArea().getWorldName() + (plot.getArea().getId() == null ?
-                        "" :
-                        "(" + plot.getArea().getId() + ")"));
+                        plot.getArea().getWorldName() + (plot.getArea().getId() == null ?
+                                "" :
+                                "(" + plot.getArea().getId() + ")"));
             } else {
                 info = info.replace("%area%", Captions.NONE.getTranslated());
             }
@@ -992,27 +899,27 @@ public class MainUtil {
                     String info1;
                     if (Settings.Ratings.USE_LIKES) {
                         info1 = newInfo.replaceAll("%rating%",
-                            String.format("%.0f%%", Like.getLikesPercentage(plot) * 100D));
+                                String.format("%.0f%%", Like.getLikesPercentage(plot) * 100D));
                     } else {
                         int max = 10;
                         if (Settings.Ratings.CATEGORIES != null && !Settings.Ratings.CATEGORIES
-                            .isEmpty()) {
+                                .isEmpty()) {
                             max = 8;
                         }
                         if (full && Settings.Ratings.CATEGORIES != null
-                            && Settings.Ratings.CATEGORIES.size() > 1) {
+                                && Settings.Ratings.CATEGORIES.size() > 1) {
                             double[] ratings = MainUtil.getAverageRatings(plot);
                             String rating = "";
                             String prefix = "";
                             for (int i = 0; i < ratings.length; i++) {
                                 rating += prefix + Settings.Ratings.CATEGORIES.get(i) + '=' + String
-                                    .format("%.1f", ratings[i]);
+                                        .format("%.1f", ratings[i]);
                                 prefix = ",";
                             }
                             info1 = newInfo.replaceAll("%rating%", rating);
                         } else {
                             info1 = newInfo.replaceAll("%rating%",
-                                String.format("%.1f", plot.getAverageRating()) + '/' + max);
+                                    String.format("%.1f", plot.getAverageRating()) + '/' + max);
                         }
                     }
                     whenDone.run(info1);
@@ -1116,8 +1023,8 @@ public class MainUtil {
     }
 
     public static Collection<String> getVisiblePlayersInPlot(PlotPlayer player, Plot plot) {
-        List<PlotPlayer> playersInPlot = plot.getPlayersInPlot();
-        List<PlotPlayer> visiblePlayers = new ArrayList<>();
+        List<PlotPlayer<?>> playersInPlot = plot.getPlayersInPlot();
+        List<PlotPlayer<?>> visiblePlayers = new ArrayList<>();
 
         for (PlotPlayer otherPlayer : playersInPlot) {
             if (player.canSee(otherPlayer) && !player.equals(otherPlayer)) {

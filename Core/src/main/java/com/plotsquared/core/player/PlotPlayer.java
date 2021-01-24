@@ -744,8 +744,6 @@ public abstract class PlotPlayer<P> implements CommandCaller, OfflinePlotPlayer 
     public abstract void stopSpectating();
 
     // PlotCubed start
-    public abstract boolean canSee(PlotPlayer player);
-
     public int distance(PlotPlayer player) {
         return (int) getLocation().getEuclideanDistance(player.getLocation());
     }
