@@ -1,23 +1,24 @@
 repositories {
     maven { url = "https://jitpack.io" }
+    maven { url = "https://mvn.intellectualsites.com/content/repositories/snapshots" }
 }
 def textVersion = "3.0.2"
 
 dependencies {
-    implementation("org.yaml:snakeyaml:1.25")
+    implementation("org.yaml:snakeyaml:1.26")
     implementation("com.google.code.gson:gson:2.8.6") {
         because("Minecraft uses GSON 2.8.0")
         force = true
     }
-    implementation("org.projectlombok:lombok:1.18.10")
-    compileOnly("org.projectlombok:lombok:1.18.8")
+    implementation("org.projectlombok:lombok:1.18.12")
+    compileOnly("org.projectlombok:lombok:1.18.12")
     testCompileOnly("org.projectlombok:lombok:1.18.8")
     annotationProcessor("org.projectlombok:lombok:1.18.8")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.8")
-    implementation("com.github.Sauilitired:Jenkins4J:2.0-SNAPSHOT")
-    implementation("com.squareup.okhttp3:okhttp:4.2.2")
-    implementation("com.squareup.okio:okio:2.4.1")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.61")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.0")
+    implementation("org.jetbrains:annotations:20.1.0")
+    implementation("org.khelekore:prtree:1.7.0-SNAPSHOT")
+    implementation("com.intellectualsites.paster:Paster:1.0.2-SNAPSHOT"){ transitive = false }
 }
 
 sourceCompatibility = 1.8
@@ -36,34 +37,35 @@ processResources {
 }
 
 //noinspection GroovyAssignabilityCheck
-jar.archiveFileName = "PlotSquared-API-${project.parent.version}.jar"
-jar.destinationDirectory = file("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/" + project.parent.version)
+jar.archiveFileName = "PlotSquared-${project.parent.version}.jar"
+jar.destinationDirectory = file("../mvn/com/plotsquared/PlotSquared/" + project.parent.version)
 task createPom {
     doLast {
         pom {
             project {
-                groupId = "com.github.intellectualsites.plotsquared"
-                artifactId = "PlotSquared-API"
+                groupId = rootProject.group
+                artifactId = "PlotSquared"
                 version = project.parent.version
             }
-        }.writeTo("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/${project.parent.version}/PlotSquared-API-${project.parent.version}.pom")
+        }.writeTo("../mvn/com/plotsquared/PlotSquared/${project.parent.version}/PlotSquared-${project.parent.version}.pom")
         pom {
             project {
-                groupId = "com.github.intellectualsites.plotsquared"
-                artifactId = "PlotSquared-API"
+                groupId = rootProject.group
+                artifactId = "PlotSquared"
                 version = "latest"
             }
-        }.writeTo("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/PlotSquared-API-latest.pom")
+        }.writeTo("../mvn/com/plotsquared/PlotSquared/latest/PlotSquared-latest.pom")
+         .writeTo("pom.xml")
     }
 }
 
 task copyFiles {
     doLast {
         copy {
-            from("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/${project.parent.version}/")
-            into("../mvn/com/github/intellectualsites/plotsquared/PlotSquared-API/latest/")
+            from("../mvn/com/plotsquared/PlotSquared/${project.parent.version}/")
+            into("../mvn/com/plotsquared/PlotSquared/latest/")
             include("*.jar")
-            rename("PlotSquared-API-${project.parent.version}.jar", "PlotSquared-API-latest.jar")
+            rename("PlotSquared-${project.parent.version}.jar", "PlotSquared-latest.jar")
         }
     }
 }
@@ -74,8 +76,14 @@ shadowJar {
         include(dependency("net.kyori:text-serializer-gson:3.0.2"))
         include(dependency("net.kyori:text-serializer-legacy:3.0.2"))
         include(dependency("net.kyori:text-serializer-plain:3.0.2"))
+        include(dependency("org.khelekore:prtree:1.7.0-SNAPSHOT"))
+        include(dependency("com.intellectualsites.paster:Paster:1.0.2-SNAPSHOT"))
     }
-    relocate('net.kyori.text', 'com.github.intellectualsites.plotsquared.formatting.text')
+    relocate('net.kyori.text', 'com.plotsquared.formatting.text')
+    relocate("org.json", "com.plotsquared.json") {
+        exclude "org/json/simple/**"
+    }
+    relocate('com.intellectualsites.paster', 'com.plotsquared.core.paster')
 }
 
 shadowJar.doLast {

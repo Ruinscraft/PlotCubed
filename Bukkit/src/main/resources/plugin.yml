@@ -1,12 +1,12 @@
 name: ${name}
-main: com.github.intellectualsites.plotsquared.bukkit.BukkitMain
+main: com.plotsquared.bukkit.BukkitMain
 api-version: "1.13"
 version: "${version}"
 load: STARTUP
 description: "Easy, yet powerful Plot World generation and management."
-authors: [Citymonstret, Empire92, MattBDev, dordsor21]
-website: https://github.com/IntellectualSites/
-softdepend: [BarAPI, CameraAPI, Vault]
+authors: [Citymonstret, Empire92, MattBDev, dordsor21, NotMyFault, SirYwell]
+website: https://www.spigotmc.org/resources/77506/
+softdepend: [Vault, PlaceholderAPI, Essentials, LuckPerms, BungeePerms, MVdWPlaceholderAPI]
 loadbefore: [MultiWorld, Multiverse-Core]
 depend: [WorldEdit]
 database: false
