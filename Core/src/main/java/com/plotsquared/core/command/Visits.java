@@ -2,6 +2,7 @@
 package com.plotsquared.core.command;
 
 import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.CaptionUtility;
 import com.plotsquared.core.configuration.Captions;
 import com.plotsquared.core.database.DBFunc;
 import com.plotsquared.core.player.PlotPlayer;
@@ -35,7 +36,7 @@ public class Visits extends SubCommand {
         }
 
         final PlotArea applicableArea = player.getApplicablePlotArea();
-        String blockIdKey = "worlds." + applicableArea.worldname + ".wall.block_claimed";
+        String blockIdKey = "worlds." + applicableArea.getWorldName() + ".wall.block_claimed";
         final String itemStackBlockId = PlotSquared.get().worlds.getString(blockIdKey);
 
         TaskManager.runTaskAsync(() -> {
@@ -76,14 +77,14 @@ public class Visits extends SubCommand {
             }
 
             final List<TopInventoryEntry> inventoryEntries = new ArrayList<>();
-            final String inventoryName = Captions.format(Captions.TOP_INVENTORY_NAME, optionName);
+            final String inventoryName = CaptionUtility.format(player, Captions.TOP_INVENTORY_NAME, optionName);
             final PlotInventory inventory = new PlotInventory(player, INVENTORY_ROWS, inventoryName) {
                 @Override
                 public boolean onClick(final int index) {
                     if (inventoryEntries.size() - 1 < index) return false;
                     TopInventoryEntry entry = inventoryEntries.get(index);
                     Plot plot = entry.plot;
-                    plot.teleportPlayer(player);
+                    plot.teleportPlayer(player, null);
                     return false;
                 }
             };
@@ -113,7 +114,7 @@ public class Visits extends SubCommand {
                 if (inventoryEntries.size() < i + 1) break;
                 TopInventoryEntry entry = inventoryEntries.get(i);
                 String plotOwnerName = MainUtil.getName(entry.plot.getOwner());
-                String itemName = Captions.color(Captions.format(Captions.TOP_ITEM_NAME, plotOwnerName));
+                String itemName = CaptionUtility.format(player, Captions.TOP_ITEM_NAME, plotOwnerName);
                 PlotItemStack itemStack = new PlotItemStack(
                         itemStackBlockId,
                         INVENTORY_ITEM_STACK_AMT,

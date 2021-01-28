@@ -352,12 +352,6 @@ public class BukkitPlayer extends PlotPlayer<Player> {
         }
     }
 
-    // PlotCubed start
-    @Override public boolean canSee(PlotPlayer player) {
-        return this.player.canSee(Bukkit.getPlayer(player.getUUID()));
-    }
-    // PlotCubed end
-
     @Override public boolean isBanned() {
         return this.player.isBanned();
     }

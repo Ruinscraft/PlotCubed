@@ -46,6 +46,7 @@ import com.plotsquared.core.util.net.AbstractDelegateOutputStream;
 import com.plotsquared.core.util.task.RunnableVal;
 import com.plotsquared.core.util.task.TaskManager;
 import com.plotsquared.core.uuid.UUIDMapping;
+import com.plotsquared.core.uuid.UUIDService;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -606,7 +607,7 @@ public class MainUtil {
     // PlotCubed start
     public static Map<Plot, Integer> getCurrentVisitors() {
         Map<Plot, Integer> map = new HashMap<>();
-        for (PlotPlayer plotPlayer : UUIDHandler.getPlayers().values()) {
+        for (PlotPlayer plotPlayer : PlotSquared.imp().getPlayerManager().getPlayers()) {
             Plot current = plotPlayer.getCurrentPlot();
             if (current == null || !current.hasOwner()) {
                 continue;

@@ -25,6 +25,7 @@
  */
 package com.plotsquared.bukkit;
 
+import com.github.intellectualsites.plotsquared.bukkit.object.BukkitPlotBossBar;
 import com.plotsquared.bukkit.chat.Reflection;
 import com.plotsquared.bukkit.generator.BukkitHybridUtils;
 import com.plotsquared.bukkit.generator.BukkitPlotGenerator;
@@ -83,11 +84,7 @@ import com.plotsquared.core.generator.IndependentPlotGenerator;
 import com.plotsquared.core.generator.SingleWorldGenerator;
 import com.plotsquared.core.listener.PlotListener;
 import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotArea;
-import com.plotsquared.core.plot.PlotAreaTerrainType;
-import com.plotsquared.core.plot.PlotAreaType;
-import com.plotsquared.core.plot.PlotId;
+import com.plotsquared.core.plot.*;
 import com.plotsquared.core.plot.message.PlainChatManager;
 import com.plotsquared.core.plot.world.PlotAreaManager;
 import com.plotsquared.core.plot.world.SinglePlotArea;
@@ -129,6 +126,9 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
@@ -1185,5 +1185,12 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain<
     public PlayerManager<? extends PlotPlayer<Player>, ? extends Player> getPlayerManager() {
         return this.playerManager;
     }
+
+    // PlotCubed start
+    @Override
+    public PlotBossBar createBossBar(String title, PlotBossBar.PlotBarColor color, PlotBossBar.PlotBarStyle style) {
+        return new BukkitPlotBossBar(title, BukkitPlotBossBar.getBarColor(color), BukkitPlotBossBar.getBarStyle(style));
+    }
+    // PlotCubed end
 
 }

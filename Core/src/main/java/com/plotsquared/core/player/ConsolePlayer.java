@@ -51,8 +51,8 @@ public class ConsolePlayer extends PlotPlayer<Actor> {
         if (area != null) {
             CuboidRegion region = area.getRegion();
             location = new Location(area.getWorldName(),
-                region.getMinimumPoint().getX() + region.getMaximumPoint().getX() / 2, 0,
-                region.getMinimumPoint().getZ() + region.getMaximumPoint().getZ() / 2);
+                    region.getMinimumPoint().getX() + region.getMaximumPoint().getX() / 2, 0,
+                    region.getMinimumPoint().getZ() + region.getMaximumPoint().getZ() / 2);
         } else {
             location = new Location("world", 0, 0, 0);
         }
@@ -68,7 +68,7 @@ public class ConsolePlayer extends PlotPlayer<Actor> {
     }
 
     @Override public Actor toActor() {
-        return instance.toActor();  // PlotCubed
+        return PlotSquared.get().IMP.getConsole();
     }
 
     @Override public Actor getPlatformPlayer() {
@@ -169,13 +169,6 @@ public class ConsolePlayer extends PlotPlayer<Actor> {
 
     @Override public void stopSpectating() {
     }
-
-    // PlotCubed start
-    @Override
-    public boolean canSee(PlotPlayer player) {
-        return false;
-    }
-    // PlotCubed end
 
     @Override public boolean isBanned() {
         return false;

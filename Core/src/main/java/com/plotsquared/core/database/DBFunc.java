@@ -29,9 +29,6 @@ import com.plotsquared.core.plot.*;
 import com.plotsquared.core.plot.comment.PlotComment;
 import com.plotsquared.core.plot.flag.PlotFlag;
 import com.plotsquared.core.util.task.RunnableVal;
-import com.github.intellectualsites.plotsquared.plot.flag.Flag;
-import com.github.intellectualsites.plotsquared.plot.object.*;
-import com.github.intellectualsites.plotsquared.plot.object.comment.PlotComment;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
