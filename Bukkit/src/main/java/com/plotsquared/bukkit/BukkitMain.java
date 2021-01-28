@@ -25,7 +25,6 @@
  */
 package com.plotsquared.bukkit;
 
-import com.github.intellectualsites.plotsquared.bukkit.object.BukkitPlotBossBar;
 import com.plotsquared.bukkit.chat.Reflection;
 import com.plotsquared.bukkit.generator.BukkitHybridUtils;
 import com.plotsquared.bukkit.generator.BukkitPlotGenerator;

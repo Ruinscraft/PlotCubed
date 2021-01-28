@@ -1,5 +1,5 @@
 # PlotCubed
-A fork of PlotSquared v4 with additional features
+A fork of PlotSquared v5 with additional features
 
 ## Additional Features
 Some additional features include:

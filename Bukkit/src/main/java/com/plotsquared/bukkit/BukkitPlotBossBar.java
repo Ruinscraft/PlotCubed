@@ -1,5 +1,5 @@
 // PlotCubed start
-package com.github.intellectualsites.plotsquared.bukkit.object;
+package com.plotsquared.bukkit;
 
 import com.plotsquared.bukkit.player.BukkitPlayer;
 import com.plotsquared.core.player.PlotPlayer;

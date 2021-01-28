@@ -57,39 +57,39 @@ public class UpdateUtility implements Listener {
     }
 
     public void updateChecker() {
-        task = Bukkit.getScheduler().runTaskTimerAsynchronously(this.javaPlugin, () -> {
-            try {
-                HttpsURLConnection connection = (HttpsURLConnection) new URL(
-                    "https://api.spigotmc.org/simple/0.1/index.php?action=getResource&id=77506")
-                    .openConnection();
-                connection.setRequestMethod("GET");
-                JsonObject result = (new JsonParser())
-                    .parse(new JsonReader(new InputStreamReader(connection.getInputStream())))
-                    .getAsJsonObject();
-                spigotVersion = result.get("current_version").getAsString();
-            } catch (IOException e) {
-                PlotSquared.log(Captions.PREFIX + "&cUnable to check for updates because: " + e);
-                return;
-            }
-
-            if (internalVersion.isLaterVersion(spigotVersion)) {
-                PlotSquared
-                    .log(Captions.PREFIX + "&6There appears to be a PlotSquared update available!");
-                PlotSquared.log(
-                    Captions.PREFIX + "&6You are running version " + internalVersion.versionString()
-                        + ", &6latest version is " + spigotVersion);
-                PlotSquared
-                    .log(Captions.PREFIX + "&6https://www.spigotmc.org/resources/77506/updates");
-                hasUpdate = true;
-                if (Settings.UpdateChecker.NOTIFY_ONCE) {
-                    cancelTask();
-                }
-            } else if (notify) {
-                notify = false;
-                PlotSquared.log(Captions.PREFIX
-                    + "Congratulations! You are running the latest PlotSquared version.");
-            }
-        }, 0L, Settings.UpdateChecker.POLL_RATE * 60 * 20);
+//        task = Bukkit.getScheduler().runTaskTimerAsynchronously(this.javaPlugin, () -> {
+//            try {
+//                HttpsURLConnection connection = (HttpsURLConnection) new URL(
+//                    "https://api.spigotmc.org/simple/0.1/index.php?action=getResource&id=77506")
+//                    .openConnection();
+//                connection.setRequestMethod("GET");
+//                JsonObject result = (new JsonParser())
+//                    .parse(new JsonReader(new InputStreamReader(connection.getInputStream())))
+//                    .getAsJsonObject();
+//                spigotVersion = result.get("current_version").getAsString();
+//            } catch (IOException e) {
+//                PlotSquared.log(Captions.PREFIX + "&cUnable to check for updates because: " + e);
+//                return;
+//            }
+//
+//            if (internalVersion.isLaterVersion(spigotVersion)) {
+//                PlotSquared
+//                    .log(Captions.PREFIX + "&6There appears to be a PlotSquared update available!");
+//                PlotSquared.log(
+//                    Captions.PREFIX + "&6You are running version " + internalVersion.versionString()
+//                        + ", &6latest version is " + spigotVersion);
+//                PlotSquared
+//                    .log(Captions.PREFIX + "&6https://www.spigotmc.org/resources/77506/updates");
+//                hasUpdate = true;
+//                if (Settings.UpdateChecker.NOTIFY_ONCE) {
+//                    cancelTask();
+//                }
+//            } else if (notify) {
+//                notify = false;
+//                PlotSquared.log(Captions.PREFIX
+//                    + "Congratulations! You are running the latest PlotSquared version.");
+//            }
+//        }, 0L, Settings.UpdateChecker.POLL_RATE * 60 * 20);
     }
 
     private void cancelTask() {
