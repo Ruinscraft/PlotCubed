@@ -114,7 +114,6 @@ import com.plotsquared.core.uuid.offline.OfflineModeUUIDService;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
-import de.notmyfault.serverlib.ServerLib;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import lombok.NonNull;
@@ -404,9 +403,6 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain<
                 getLogger().warning("Failed to clean up players: " + e.getMessage());
             }
         }, 100L, 100L);
-
-        // Check if we are in a safe environment
-        ServerLib.checkUnsafeForks();
     }
 
     private void unload() {
@@ -1029,6 +1025,8 @@ public final class BukkitMain extends JavaPlugin implements Listener, IPlotMain<
             () -> Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") != null ?
                 "FastAsyncWorldEdit" :
                 "WorldEdit"));
+        metrics.addCustomChart(new Metrics.SimplePie("offline_mode", () -> Settings.UUID.OFFLINE ? "true" : "false"));
+        metrics.addCustomChart(new Metrics.SimplePie("offline_mode_force", () -> Settings.UUID.FORCE_LOWERCASE ? "true" : "false"));
     }
 
     @Override public ChunkManager initChunkManager() {
