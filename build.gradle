@@ -5,11 +5,11 @@ buildscript {
         mavenCentral()
         maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
+        gradlePluginPortal()
     }
     dependencies {
-        classpath("com.github.jengelman.gradle.plugins:shadow:5.0.0")
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
         classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0'
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
     }
     configurations.all {
         resolutionStrategy {
@@ -20,8 +20,7 @@ buildscript {
 }
 
 plugins {
-    id "maven-publish"
-    id "org.ajoberstar.grgit" version "4.0.2"
+    id "org.ajoberstar.grgit" version "4.1.0"
 }
 
 group = "com.plotsquared"
@@ -42,23 +41,16 @@ version = ver + versuffix
 description = rootProject.name
 
 allprojects {
-    apply(plugin: 'com.bmuschko.nexus')
-
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xmaxerrs" << "1000"
         }
     }
-    nexus {
-        sign = false
-        repositoryUrl = 'https://mvn.intellectualsites.com/content/repositories/releases/'
-        snapshotRepositoryUrl = 'https://mvn.intellectualsites.com/content/repositories/snapshots/'
-    }
 }
 
 subprojects {
     apply(plugin: "java")
-    apply(plugin: "maven")
+    apply(plugin: "maven-publish")
     apply(plugin: "eclipse")
     apply(plugin: "idea")
     apply(plugin: "com.github.johnrengelman.shadow")
@@ -72,7 +64,7 @@ subprojects {
     javadoc.options.encoding = 'UTF-8'
 
     dependencies {
-        compile group: 'org.json', name: 'json', version: '20200518'
+        implementation("org.json:json:20200518")
 
         implementation("com.sk89q.worldedit:worldedit-core:7.2.0") {
             exclude(module: "bukkit-classloader-check")
@@ -88,10 +80,10 @@ subprojects {
             because("Minecraft uses Guava 21 as of 1.13")
         }
         compileOnly("org.jetbrains:annotations:20.1.0")
-        compileClasspath("org.projectlombok:lombok:1.18.12")
-        testCompileOnly("org.projectlombok:lombok:1.18.12")
-        annotationProcessor("org.projectlombok:lombok:1.18.8")
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.8")
+        compileClasspath("org.projectlombok:lombok:1.18.20")
+        testCompileOnly("org.projectlombok:lombok:1.18.20")
+        annotationProcessor("org.projectlombok:lombok:1.18.20")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
         testImplementation("junit:junit:4.13")
     }
 

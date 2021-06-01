@@ -1,6 +1,6 @@
-plugins {
-    id "com.github.johnrengelman.shadow"
-}
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
 repositories {
     maven { url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
     maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
@@ -15,23 +15,22 @@ repositories {
     maven { url = "https://mvn.intellectualsites.com/content/repositories/releases" }
     maven { url = "https://mvn.intellectualsites.com/content/repositories/thirdparty"}
     maven { url = "https://mvn.intellectualsites.com/content/repositories/snapshots" }
-    maven { url = "http://repo.mvdw-software.be/content/groups/public/" }
+    maven { url = "https://repo.mvdw-software.be/content/groups/public/" }
     mavenLocal()
 }
 
-
 dependencies {
     implementation(project(":PlotSquared-Core"))
-    compile("org.bstats:bstats-bukkit:1.7")
-    compile(project(":PlotSquared-Core"))
-    compile("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
+    implementation("org.bstats:bstats-bukkit:1.7")
+    implementation(project(":PlotSquared-Core"))
+    implementation("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT")
     implementation("org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT")
-    compile(group: "com.sk89q.worldedit", name: "worldedit-bukkit", version: "7.2.0") {
+    implementation(group: "com.sk89q.worldedit", name: "worldedit-bukkit", version: "7.2.0") {
         exclude(module: "bukkit")
     }
-    compile("io.papermc:paperlib:1.0.5")
+    implementation("io.papermc:paperlib:1.0.5")
     implementation("net.kyori:text-adapter-bukkit:3.0.3")
-    compile("com.github.MilkBowl:VaultAPI:1.7") {
+    implementation("com.github.MilkBowl:VaultAPI:1.7") {
         exclude(module: "bukkit")
     }
     implementation("me.clip:placeholderapi:2.10.6")
@@ -39,9 +38,9 @@ dependencies {
     implementation("net.ess3:EssentialsX:2.18.0") {
         exclude(group: "io.papermc", module: "paperlib")
     }
-    compile("se.hyperver.hyperverse:Core:0.6.0-SNAPSHOT"){ transitive = false }
-    compile('com.sk89q:squirrelid:1.0.0-SNAPSHOT'){ transitive = false }
-    compile('be.maximvdw:MVdWPlaceholderAPI:3.1.1'){ transitive = false }
+    implementation("se.hyperver.hyperverse:Core:0.6.0-SNAPSHOT"){ transitive = false }
+    implementation('com.sk89q:squirrelid:1.0.0-SNAPSHOT'){ transitive = false }
+    implementation('be.maximvdw:MVdWPlaceholderAPI:3.1.1'){ transitive = false }
     implementation("de.notmyfault:serverlib:1.0.0")
 }
 
@@ -51,6 +50,7 @@ targetCompatibility = 1.8
 processResources {
     from("src/main/resources") {
         include("plugin.yml")
+        exclude("plugin.yml")
         expand(
                 name: project.parent.name,
                 version: project.parent.version
@@ -61,25 +61,25 @@ processResources {
 //noinspection GroovyAssignabilityCheck
 jar.archiveFileName = "PlotSquared-Bukkit-${project.parent.version}.jar"
 jar.destinationDirectory = file("../mvn/com/plotsquared/PlotSquared-Bukkit/" + project.parent.version)
-task createPom {
-    doLast {
-        pom {
-            project {
-                groupId = rootProject.group
-                artifactId = "PlotSquared-Bukkit"
-                version = rootProject.version
-            }
-        }.writeTo("../mvn/com/plotsquared/PlotSquared-Bukkit/${project.parent.version}/PlotSquared-Bukkit-${project.parent.version}.pom")
-        pom {
-            project {
-                groupId = rootProject.group
-                artifactId = "PlotSquared-Bukkit"
-                version = "latest"
-            }
-        }.writeTo("../mvn/com/plotsquared/PlotSquared-Bukkit/latest/PlotSquared-Bukkit-latest.pom")
-         .writeTo("pom.xml")
-    }
-}
+// task createPom {
+//     doLast {
+//         pom {
+//             project {
+//                 groupId = rootProject.group
+//                 artifactId = "PlotSquared-Bukkit"
+//                 version = rootProject.version
+//             }
+//         }.writeTo("../mvn/com/plotsquared/PlotSquared-Bukkit/${project.parent.version}/PlotSquared-Bukkit-${project.parent.version}.pom")
+//         pom {
+//             project {
+//                 groupId = rootProject.group
+//                 artifactId = "PlotSquared-Bukkit"
+//                 version = "latest"
+//             }
+//         }.writeTo("../mvn/com/plotsquared/PlotSquared-Bukkit/latest/PlotSquared-Bukkit-latest.pom")
+//          .writeTo("pom.xml")
+//     }
+// }
 
 task copyFiles {
     doLast {
@@ -121,4 +121,4 @@ shadowJar.doLast {
 
 build.dependsOn(shadowJar)
 build.finalizedBy(copyFiles)
-copyFiles.dependsOn(createPom)
+// copyFiles.dependsOn(createPom)

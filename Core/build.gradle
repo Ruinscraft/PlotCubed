@@ -26,6 +26,7 @@ targetCompatibility = 1.8
 
 processResources {
     from("src/main/resources") {
+        exclude "plugin.properties"
         include "plugin.properties"
         expand(
                 version: "${project.parent.version}",
@@ -39,25 +40,25 @@ processResources {
 //noinspection GroovyAssignabilityCheck
 jar.archiveFileName = "PlotSquared-${project.parent.version}.jar"
 jar.destinationDirectory = file("../mvn/com/plotsquared/PlotSquared/" + project.parent.version)
-task createPom {
-    doLast {
-        pom {
-            project {
-                groupId = rootProject.group
-                artifactId = "PlotSquared"
-                version = project.parent.version
-            }
-        }.writeTo("../mvn/com/plotsquared/PlotSquared/${project.parent.version}/PlotSquared-${project.parent.version}.pom")
-        pom {
-            project {
-                groupId = rootProject.group
-                artifactId = "PlotSquared"
-                version = "latest"
-            }
-        }.writeTo("../mvn/com/plotsquared/PlotSquared/latest/PlotSquared-latest.pom")
-         .writeTo("pom.xml")
-    }
-}
+// task createPom {
+//     doLast {
+//         pom {
+//             project {
+//                 groupId = rootProject.group
+//                 artifactId = "PlotSquared"
+//                 version = project.parent.version
+//             }
+//         }.writeTo("../mvn/com/plotsquared/PlotSquared/${project.parent.version}/PlotSquared-${project.parent.version}.pom")
+//         pom {
+//             project {
+//                 groupId = rootProject.group
+//                 artifactId = "PlotSquared"
+//                 version = "latest"
+//             }
+//         }.writeTo("../mvn/com/plotsquared/PlotSquared/latest/PlotSquared-latest.pom")
+//          .writeTo("pom.xml")
+//     }
+// }
 
 task copyFiles {
     doLast {
@@ -94,4 +95,4 @@ shadowJar.doLast {
 build.dependsOn(shadowJar)
 
 build.finalizedBy(copyFiles)
-copyFiles.dependsOn(createPom)
+// copyFiles.dependsOn(createPom)
